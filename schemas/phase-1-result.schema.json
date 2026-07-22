@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cognitivestack.example/schemas/phase-1-result.schema.json",
+  "title": "Phase 1 Revit-to-CDE Trace Result",
+  "description": "Small, sanitised evidence artifact for the Phase 1 read-only vertical slice 'Trace and verify a Revit deliverable from authoring to the CDE'. This is a Phase 1 evidence schema only, not a general workflow language.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "execution",
+    "component_provenance",
+    "revit_observation",
+    "cde_observation",
+    "derivative_observation",
+    "comparison",
+    "sanitisation",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "slice", "execution_date", "read_only", "status"],
+      "properties": {
+        "phase": { "type": "string", "const": "1" },
+        "slice": { "type": "string", "const": "revit-to-cde-trace" },
+        "execution_date": {
+          "type": "string",
+          "description": "Date only, YYYY-MM-DD. No time-of-day or timezone.",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "read_only": { "type": "boolean", "const": true },
+        "status": {
+          "type": "string",
+          "description": "complete only when acceptance criteria are met; partial or failed when a required Revit or CDE observation is missing.",
+          "enum": ["complete", "partial", "failed"]
+        }
+      }
+    },
+    "component_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revit_mcp", "aps_forma_mcp"],
+      "properties": {
+        "revit_mcp": { "$ref": "#/definitions/provenance" },
+        "aps_forma_mcp": { "$ref": "#/definitions/provenance" }
+      }
+    },
+    "revit_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "model_name", "level_count", "level_names", "view_names"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "model_name": { "type": ["string", "null"] },
+        "level_count": { "type": ["integer", "null"], "minimum": 0 },
+        "level_names": { "type": "array", "items": { "type": "string" } },
+        "view_names": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "cde_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "item_alias", "item_display_name", "current_version", "version_alias"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "item_alias": { "$ref": "#/definitions/alias" },
+        "item_display_name": { "type": ["string", "null"] },
+        "current_version": { "type": ["integer", "null"], "minimum": 0 },
+        "version_alias": { "$ref": "#/definitions/alias" }
+      }
+    },
+    "derivative_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_status", "views", "properties_status", "selected_view", "selected_properties"],
+      "properties": {
+        "manifest_status": {
+          "type": ["string", "null"],
+          "description": "Status as reported by the MCP tool, e.g. success, inprogress, failed, or null if not queried."
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["alias", "display_label"],
+            "properties": {
+              "alias": { "$ref": "#/definitions/alias" },
+              "display_label": { "type": "string" }
+            }
+          }
+        },
+        "selected_view": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["alias", "display_label"],
+              "properties": {
+                "alias": { "$ref": "#/definitions/alias" },
+                "display_label": { "type": "string" }
+              }
+            }
+          ]
+        },
+        "properties_status": {
+          "type": "string",
+          "enum": ["captured", "pending", "not_queried"]
+        },
+        "selected_properties": {
+          "type": "object",
+          "description": "Allowlisted, sampled teaching properties only. No paths, users, emails, comments, URLs, identifiers, or arbitrary parameter text.",
+          "additionalProperties": false,
+          "required": ["sampled_element_count"],
+          "properties": {
+            "sampled_element_count": { "type": "integer", "minimum": 0 },
+            "categories": { "type": "array", "items": { "type": "string" } },
+            "families": { "type": "array", "items": { "type": "string" } },
+            "types": { "type": "array", "items": { "type": "string" } },
+            "levels": { "type": "array", "items": { "type": "string" } },
+            "property_count": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "comparison": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "result"],
+        "properties": {
+          "field": { "type": "string" },
+          "revit": { "type": ["string", "integer", "null"] },
+          "cde": { "type": ["string", "integer", "null"] },
+          "result": {
+            "type": "string",
+            "enum": ["match", "difference", "no_equivalent"]
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "sanitisation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["convention_version", "tokens_used"],
+      "properties": {
+        "convention_version": { "type": "integer", "minimum": 1 },
+        "tokens_used": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/alias" }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "stage", "message"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Stable machine-readable code, UPPER_SNAKE_CASE.",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "stage": {
+            "type": "string",
+            "enum": ["revit", "cde", "derivative", "comparison", "provenance", "sanitisation"]
+          },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "alias": {
+      "type": ["string", "null"],
+      "description": "Sanitised deterministic alias token (e.g. ITEM_1, URN_VERSION_1, VIEWGUID_1). Never a live Autodesk identifier or URN.",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_slug", "inspected_revision", "runtime_worktree_state", "runtime_status", "tools_invoked"],
+      "properties": {
+        "repository_slug": { "type": "string" },
+        "inspected_revision": { "type": "string" },
+        "runtime_worktree_state": {
+          "type": "string",
+          "enum": ["clean", "dirty", "unknown"]
+        },
+        "runtime_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reachable", "reported_status", "server_version"],
+          "properties": {
+            "reachable": { "type": "boolean" },
+            "reported_status": {
+              "type": "string",
+              "enum": ["ok", "error", "unavailable"]
+            },
+            "server_version": { "type": "string" }
+          }
+        },
+        "tools_invoked": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

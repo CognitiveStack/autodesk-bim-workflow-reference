@@ -50,3 +50,6 @@ output/
 config/local.yaml
 config/local.yml
 config/local.json
+
+# Private local execution data (raw observations, alias mappings) — never commit
+.local/
