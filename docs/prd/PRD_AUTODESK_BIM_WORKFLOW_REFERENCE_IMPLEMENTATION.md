@@ -93,12 +93,12 @@ Two independently maintained MCP components are coordinated, not absorbed:
 
 They remain in their own repositories. This repository owns documentation,
 configuration, synthetic examples, and validation utilities only. The
-responsibility matrix and the capability-status labelling (confirmed / required /
-planned) are defined in
-[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md). Because the
-component repositories were not inspected during Phase 0 orientation, this PRD
-does not assert that any specific MCP tool or Autodesk API capability currently
-exists.
+responsibility matrix and the dated capability ledger are defined in
+[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md). A read-only
+component inventory was completed on 2026-07-22 (APS/Forma MCP at `befcce5`, 18
+tools; Revit MCP at `ae01d29`, 14 tools); the capabilities the first slice needs
+are confirmed there. Capabilities not yet implemented (Reviews, RFI, Assets) are
+labelled as planned rather than assumed to exist.
 
 ## 7. First vertical slice (read-only)
 
@@ -120,11 +120,10 @@ remains strictly read-only:
 No upload or publishing write operation is introduced in the first slice; that is
 a later, explicitly approved extension.
 
-Capabilities required by steps 1–5 are labelled in
-[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) as one of:
-*confirmed only after component inventory*, *required capability*, or *planned
-capability*. Derivative and model-property tools in particular are **not** assumed
-to exist yet.
+Capabilities for steps 1–4 are **confirmed** in the dated capability ledger in
+[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md), including the
+derivative and model-property reads. Steps 5–6 (metadata comparison and sanitised
+evidence) remain utilities to build in this repository.
 
 ## 8. Lifecycle order vs implementation priority
 
@@ -177,8 +176,10 @@ implementation priority. No part of the first vertical slice depends on it.
 
 ## 12. Assumptions
 
-- The two component repositories exist at the paths supplied via
-  `FORMA_MCP_REPO` and `REVIT_MCP_REPO` and can be run locally.
+- The two component repositories exist and were inventoried read-only on
+  2026-07-22 (APS/Forma MCP at `befcce5`; Revit MCP at `ae01d29`); running them
+  locally still requires the paths supplied via `FORMA_MCP_REPO` and
+  `REVIT_MCP_REPO`.
 - An existing Harrismith Revit model is available to inspect.
 - A CDE location (Forma Data Management project / folder) exists or will exist to
   hold a published deliverable for the read-only slice.
@@ -190,15 +191,17 @@ implementation priority. No part of the first vertical slice depends on it.
 - APS/Forma MCP (`CognitiveStack/autodesk-aps-forma-mcp`).
 - Autodesk Platform Services APIs (Data Management, Model Derivative, and others
   as the workflow expands).
-- A component inventory step to confirm available MCP tools before any capability
-  is claimed.
+- The dated component capability ledger in
+  [COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md), re-verified
+  before each phase.
 
 ## 14. Open questions
 
-- Which specific MCP tools are actually exposed by each component today?
-- Which APS APIs used by later stages (Issues, Reviews, RFI, Assets) are stable
-  vs beta at build time? (To be verified and cited; do not infer from product
-  maturity.)
+- Reviews, RFI, and Assets have no MCP tools yet (planned); when will each be
+  implemented, and in which component?
+- What is the verified, citable maturity of the APS APIs used by later stages?
+  (Do not infer from product maturity; only Forma Site Design is confirmed Beta
+  `v1alpha`.)
 - Is a real Forma Data Management project available for the Harrismith example,
   or must the slice run against a synthetic fixture?
 - What sanitisation convention will represent hub / project / folder identifiers
@@ -206,9 +209,9 @@ implementation priority. No part of the first vertical slice depends on it.
 
 ## 15. Roadmap (summary)
 
-Phased delivery follows the implementation priority in Section 8. Detailed
-implementation tasks are intentionally deferred until Phase 0 foundations and the
-component inventory validate the assumptions above.
+Phased delivery follows the implementation priority in Section 8. Phase 0
+foundations and the read-only component inventory (2026-07-22) are complete;
+detailed implementation tasks remain deferred until the first slice is built.
 
 - **Phase 0** — Governance and foundations (this document set).
 - **Phase 1** — First read-only vertical slice (Section 7).

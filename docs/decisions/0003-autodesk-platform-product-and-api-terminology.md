@@ -77,7 +77,7 @@ The canonical definitions live in [GLOSSARY.md](../guides/GLOSSARY.md).
   a learner sees an accurate model of Autodesk's structure.
 - Configuration (for example `config/workflows/end-to-end-reference.yaml`)
   separates `platform`, `primary_system`, and `api_families` fields.
-- Some stages carry `api_mapping_status: to-be-verified` (with `api_families: []`)
-  until confirmed, and this is expected rather than a defect.
+- Some stages carry `mcp_implementation_status: planned` (with `api_families: []`)
+  until a component tool exists, and this is expected rather than a defect.
 - Verified Autodesk facts are distinguished from architectural decisions made by
   this project.

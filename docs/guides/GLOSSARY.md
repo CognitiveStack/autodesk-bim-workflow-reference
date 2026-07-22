@@ -90,16 +90,19 @@ repositories.
 ### Revit MCP
 The Revit / pyRevit MCP component, `CognitiveStack/revit-mcp-triviron`. Provides
 Revit authoring and inspection automation. Referenced locally via the
-`REVIT_MCP_REPO` environment variable. Its specific tools are treated as
-capabilities to be confirmed by component inventory.
+`REVIT_MCP_REPO` environment variable. Its tools are catalogued in the dated
+component capability ledger in
+[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) (inventory
+verified 2026-07-22).
 
 ### APS/Forma MCP
 The Autodesk Platform Services / Forma MCP component,
 `CognitiveStack/autodesk-aps-forma-mcp`. Provides focused cloud and
 information-management actions (authentication, Data Management, and related
 APIs). Referenced locally via the `FORMA_MCP_REPO` environment variable. Its
-specific tools are treated as capabilities to be confirmed by component
-inventory.
+tools are catalogued in the dated component capability ledger in
+[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) (inventory
+verified 2026-07-22).
 
 ## References
 

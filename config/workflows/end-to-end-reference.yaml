@@ -1,24 +1,30 @@
 schema_version: 1
 
 # Terminology model: see docs/decisions/0003-autodesk-platform-product-and-api-terminology.md
-# and docs/guides/GLOSSARY.md.
+# and docs/guides/GLOSSARY.md. Confirmed component capability inventory:
+# see docs/architecture/COMPONENT_BOUNDARIES.md (inventory verified 2026-07-22).
 #
-# Field meanings:
-#   platform            Autodesk platform the stage lives on (branding tier).
-#   primary_system      The Forma product/offering that carries the stage.
-#   api_families        Developer API families used for automation. ALWAYS a YAML
-#                       list. Empty ([]) when no API family has been confirmed.
-#                       Each entry names an API family only; it is NOT a claim
-#                       about API maturity (stable vs beta).
-#   api_mapping_status  How the api_families mapping should be read. Present only
-#                       when the mapping needs qualification:
-#                         to-be-verified        no API family confirmed yet
-#                         mediated-by-revit-mcp  reached via the Revit MCP, not APS
-#                       Confirmed direct mappings list their api_families and omit
-#                       this field.
-#   automation_policy   This project's chosen automation posture for the stage.
+# Each stage keeps these concerns as SEPARATE fields; they must not be conflated:
 #
-# API maturity is asserted only where verified and cited in the documentation.
+#   platform                  Autodesk platform the stage lives on (branding tier).
+#   primary_system            The Forma product/offering that carries the stage.
+#   api_families              List of relevant developer API families. Named only
+#                             where confirmed from component source/documentation
+#                             or official Autodesk/APS documentation; otherwise
+#                             left empty ([]) with a note. Not a maturity claim.
+#   mcp_component             Owning integration component: aps-forma-mcp |
+#                             revit-mcp | none.
+#   mcp_implementation_status Whether THIS project's MCP tooling exists for the
+#                             stage: confirmed | partial | planned | not-applicable.
+#   api_maturity              Separately verified maturity of the underlying API:
+#                             beta-v1alpha | to-be-verified | not-applicable.
+#                             No GA/stable value is used unless verified against an
+#                             official source and cited in the documentation.
+#   data_readiness            Whether the Harrismith example has enough data to
+#                             demonstrate the capability: ready | blocked |
+#                             not-assessed.
+#   data_readiness_reason     Optional sanitised machine-readable explanation.
+#   automation_policy         This project's chosen automation posture.
 #
 # Terminology last verified: 2026-07-22
 
@@ -31,15 +37,25 @@ stages:
   - id: site_and_context
     platform: Autodesk Forma
     primary_system: Forma Site Design
-    api_families: []
-    api_mapping_status: to-be-verified
+    api_families:
+      - Forma Site Design API
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: confirmed
+    api_maturity: beta-v1alpha
+    data_readiness: ready
     automation_policy: experimental_and_read_first
 
   - id: concept_design
     platform: Autodesk Forma
     primary_system: Forma
-    api_families: []
-    api_mapping_status: to-be-verified
+    # MCP proposal read + one guarded proposal-create tool exist (Beta). This does
+    # NOT mean all concept-design operations are automated, hence status: partial.
+    api_families:
+      - Forma Site Design API
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: partial
+    api_maturity: beta-v1alpha
+    data_readiness: ready
     automation_policy: limited_guarded_automation
 
   - id: revit_authoring
@@ -47,7 +63,10 @@ stages:
     primary_system: Revit
     api_families:
       - Autodesk Revit API
-    api_mapping_status: mediated-by-revit-mcp
+    mcp_component: revit-mcp
+    mcp_implementation_status: confirmed
+    api_maturity: not-applicable
+    data_readiness: not-assessed
     automation_policy: pyrevit_mcp
 
   - id: cde_information_management
@@ -55,33 +74,59 @@ stages:
     primary_system: Forma Data Management
     api_families:
       - APS Data Management API
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: confirmed
+    api_maturity: to-be-verified
+    data_readiness: ready
     automation_policy: stable_api_preferred
 
   - id: model_coordination
     platform: Autodesk Forma
     primary_system: Model Coordination
-    api_families: []
-    api_mapping_status: to-be-verified
+    # Model-set listing tool is implemented and confirmed; the Harrismith example
+    # currently has no model sets, so this is a data gap, not a missing-tool gap.
+    api_families:
+      - Model Coordination API
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: confirmed
+    api_maturity: to-be-verified
+    data_readiness: blocked
+    data_readiness_reason: no_harrismith_model_sets
     automation_policy: use_native_coordination_engine
 
   - id: reviews_and_issues
     platform: Autodesk Forma
     primary_system: Forma Data Management
+    # Issues MCP reads are confirmed. Reviews MCP capability is not implemented
+    # (planned); its API-family name is left unasserted until verified.
     api_families:
       - APS Issues API
-      - APS Reviews API
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: partial
+    api_maturity: to-be-verified
+    data_readiness: ready
     automation_policy: stable_api_preferred
 
   - id: construction_information
     platform: Autodesk Forma
     primary_system: Forma Build
+    # No RFI MCP tool exists yet (planned). API-family name left unasserted until
+    # verified from an official/component source.
     api_families: []
-    api_mapping_status: to-be-verified
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: planned
+    api_maturity: to-be-verified
+    data_readiness: not-assessed
     automation_policy: focused_reference_examples
 
   - id: asset_handover
     platform: Autodesk Forma
     primary_system: Forma Build
+    # No Assets MCP tool exists yet (planned). API-family name left unasserted
+    # until verified from an official/component source.
     api_families: []
-    api_mapping_status: to-be-verified
+    mcp_component: aps-forma-mcp
+    mcp_implementation_status: planned
+    api_maturity: to-be-verified
+    data_readiness: not-assessed
     automation_policy: focused_reference_example

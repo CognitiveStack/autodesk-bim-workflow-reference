@@ -1,31 +1,109 @@
-# Component Boundaries
+# Component Boundaries and Capability Ledger
 
-**Status:** Draft (Phase 0 foundations)
-**Date:** 2026-07-22
+**Status:** Confirmed component capability inventory
+**Inventory verified:** 2026-07-22
 
-This document is the anti-duplication contract between this orchestration layer
-and the two MCP components. It is consistent with the
+This document is the authoritative, dated ledger of the MCP capabilities this
+project depends on, and the anti-duplication contract between this orchestration
+layer and the two MCP components. It is consistent with the
 [PRD](../prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md),
 [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md), and
 [REPOSITORY_STRATEGY.md](REPOSITORY_STRATEGY.md), and is governed by
 [ADR-0001](../decisions/0001-orchestration-layer-not-mcp-server.md) and
 [ADR-0002](../decisions/0002-multi-repo-no-submodules.md).
 
-## 1. Capability status labels
+## 1. Inventory provenance
 
-Because the component repositories were **not** inspected during Phase 0
-orientation, no specific MCP tool is asserted to exist. Every capability
-referenced anywhere in this project must carry one of these labels until a
-component inventory resolves it:
+| Component | Repository | Inspected commit | Tools |
+|---|---|---|---|
+| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `befcce5` | 18 |
+| Revit MCP | `CognitiveStack/revit-mcp-triviron` | `ae01d29` | 14 |
 
-- **confirmed-after-inventory** — believed to exist; to be confirmed by inspecting
-  the component repository.
-- **required-capability** — the workflow needs it; it must exist or be added.
-- **planned-capability** — intended for a later phase; not needed yet.
+The tool identifiers below are code identifiers read from component source; they
+are not Autodesk data. No live Autodesk hub, project, folder, item, version,
+proposal, or model identifiers are recorded in this repository.
 
-Nothing here should be read as a claim that a tool currently exists.
+For the Revit MCP, the inventory was verified from the committed tree at
+`ae01d29`; unrelated uncommitted working-tree content was excluded.
 
-## 2. Responsibility matrix
+## 2. Capability-status vocabulary
+
+- **confirmed** — MCP tool implemented and verified in component source at the
+  inspected commit.
+- **partial** — the stage's sub-capabilities are split; some tools exist, others
+  are planned.
+- **planned** — no MCP tool yet; a later-phase capability.
+- **experimental** — MCP tool exists but targets a Beta / `v1alpha` API.
+- **data-readiness-blocked** — the tool works, but the Harrismith example lacks
+  the data to exercise it.
+- **mediated-by-revit-mcp** — reached through the Revit MCP / Revit API rather
+  than APS.
+
+In `config/workflows/end-to-end-reference.yaml` these concerns are expressed as
+separate fields (`mcp_component`, `mcp_implementation_status`, `api_maturity`,
+`data_readiness`) so MCP coverage, API maturity, and project-data readiness are
+never conflated.
+
+## 3. APS/Forma MCP — 18 tools (16 read · 1 guarded write · 1 local)
+
+| Capability group | Tools | Class | Status |
+|---|---|---|---|
+| Data Management | `list_autodesk_hubs`, `list_projects`, `list_top_folders`, `list_folder_contents`, `get_item_details`, `list_item_versions` | read | confirmed |
+| Model Derivative | `get_derivative_manifest`, `list_model_views`, `get_model_properties` | read | confirmed |
+| Issues | `list_issues`, `get_issue_details`, `list_issue_types` | read | confirmed |
+| Model Coordination | `list_model_sets` | read | confirmed · data-readiness-blocked (§8) |
+| Forma Site Design (Beta `v1alpha`) | `get_forma_project`, `list_forma_proposals`, `list_forma_proposal_elements` | read | experimental |
+| Forma Site Design (Beta `v1alpha`) | `create_forma_proposal` | guarded write | experimental (sole write; requires explicit confirmation and an explicit source proposal) |
+| Local-only (no Autodesk call) | `prepare_native_floor_stack_preview` | local | confirmed |
+
+## 4. Revit MCP — 14 tools (10 read/inspection · 4 mutating)
+
+| Capability group | Tools | Class | Status |
+|---|---|---|---|
+| Status & model inspection | `get_revit_status`, `get_revit_model_info`, `list_levels`, `list_families`, `list_family_categories`, `list_category_parameters` | read | confirmed |
+| View inspection | `get_revit_view`, `list_revit_views`, `get_current_view_info`, `get_current_view_elements` | read | confirmed |
+| Mutating / guarded | `execute_revit_code`, `place_family`, `color_splash`, `clear_colors` | write | confirmed (excluded from the read-only first slice) |
+
+## 5. First-slice capability ledger (read-only) — all confirmed
+
+| Slice step | Capability (component · tools) | Status |
+|---|---|---|
+| 1. Inspect Revit model | Revit MCP · `get_revit_model_info`, `list_levels`, `list_revit_views`, `get_current_view_elements` | confirmed |
+| 2. Locate deliverable in CDE | APS/Forma MCP · `list_folder_contents`, `get_item_details` | confirmed |
+| 3. Item / version info | APS/Forma MCP · `list_item_versions` | confirmed |
+| 4. Derivative / properties | APS/Forma MCP · `get_derivative_manifest`, `list_model_views`, `get_model_properties` | confirmed |
+| 5. Compare metadata | This repository (comparison utility) | to build here |
+| 6. Record sanitised result | This repository (sanitisation + fixture) | to build here |
+
+**No component tool capability is missing for the read-only first slice.** Steps
+5–6 remain this repository's work to build.
+
+## 6. Later-stage missing MCP capabilities (planned)
+
+| Stage | Capability | Status |
+|---|---|---|
+| reviews_and_issues | Reviews (issues reads are implemented; Reviews is not) | planned |
+| construction_information | RFI | planned |
+| asset_handover | Assets | planned |
+
+API-family names for Reviews, RFI, and Assets are not asserted here until they are
+verified from an official Autodesk/APS or component source.
+
+## 7. Experimental boundary
+
+The Forma Site Design tools target Beta (`v1alpha`) APIs and are isolated as
+experimental. The project's only write tool, `create_forma_proposal`, sits inside
+this Beta boundary and is guarded. Nothing on the stable read-only path depends on
+Forma Site Design writes.
+
+## 8. Data-readiness gap
+
+`list_model_sets` is implemented and confirmed, but the Harrismith example
+currently has no model sets, so the model-coordination stage is
+**data-readiness-blocked** (`no_harrismith_model_sets`). This is a project-data
+gap, not a missing-tool gap.
+
+## 9. Responsibility matrix
 
 | Concern | Revit MCP | APS/Forma MCP | This repository |
 |---|---|---|---|
@@ -33,63 +111,32 @@ Nothing here should be read as a claim that a tool currently exists.
 | Autodesk authentication (APS) | — | Owns | Never implements |
 | Forma Data Management (CDE) | — | Owns | Documents, invokes, validates |
 | Model Derivative / properties | — | Owns | Documents, invokes, validates |
-| Issues / Reviews / RFI / Assets | — | Owns | Documents, invokes, validates |
+| Issues (reviews/RFI/assets planned) | — | Owns | Documents, invokes, validates |
 | Model Coordination (native engine) | — | Consumes / surfaces | Documents only |
 | Clash detection | Must not build | Must not build | Must not build |
 | Orchestration / docs / examples | — | — | Owns |
-| Synthetic learning data | — | — | Owns |
 
 "Owns" means the component is the source of truth for that behaviour. This
 repository may **invoke** or **validate** a behaviour but must never
-**re-implement** it ([ADR-0001](../decisions/0001-orchestration-layer-not-mcp-server.md)).
+**re-implement** it.
 
-## 3. Revit MCP (`CognitiveStack/revit-mcp-triviron`)
-
-- **Role:** Revit / pyRevit authoring and inspection.
-- **Referenced locally via:** `REVIT_MCP_REPO`.
-- **Capabilities relied on by the first slice** (all *confirmed-after-inventory*):
-  read an existing Revit model's identifying and selected element/level/view
-  metadata for comparison against cloud-side data.
-- **Must-not:** the orchestration layer must not reproduce Revit or pyRevit logic.
-
-## 4. APS/Forma MCP (`CognitiveStack/autodesk-aps-forma-mcp`)
-
-- **Role:** focused cloud and information-management actions on Autodesk Forma via
-  Autodesk Platform Services.
-- **Referenced locally via:** `FORMA_MCP_REPO`.
-- **Capabilities relied on by the first slice:**
-  - Locate an existing deliverable in Forma Data Management —
-    *confirmed-after-inventory*.
-  - Retrieve item and version information — *confirmed-after-inventory*.
-  - Retrieve derivative status or model properties — *required-capability*
-    (explicitly **not assumed to exist**; confirm or add before use).
-- **Must-not:** the orchestration layer must not implement APS authentication,
-  API clients, or derivative processing.
-
-## 5. First-slice capability ledger
-
-| Slice step | Capability | Status |
-|---|---|---|
-| 1. Inspect Revit model | Revit model / metadata read (Revit MCP) | confirmed-after-inventory |
-| 2. Locate deliverable in CDE | Forma Data Management listing (APS/Forma MCP) | confirmed-after-inventory |
-| 3. Item / version info | Item + version read (APS/Forma MCP) | confirmed-after-inventory |
-| 4. Derivative / properties | Model Derivative / properties read (APS/Forma MCP) | required-capability |
-| 5. Compare metadata | Comparison / validation utility (this repo) | planned-capability |
-| 6. Record sanitised result | Sanitisation + fixture (this repo) | planned-capability |
-
-## 6. Anti-duplication rules
+## 10. Anti-duplication rules
 
 - Do not copy or vendor component source; no Git submodules
   ([ADR-0002](../decisions/0002-multi-repo-no-submodules.md)).
 - Do not re-implement authentication, derivative processing, or clash detection.
 - Utilities in `scripts/` call component tools or validate their outputs; they do
-  not reproduce internal logic.
+  not reproduce internal logic
+  ([ADR-0001](../decisions/0001-orchestration-layer-not-mcp-server.md)).
 - When a capability is missing, raise it in the owning component repository rather
   than working around it here.
 
-## 7. Drift management
+## 11. Reverification policy
 
-Component tool surfaces will change over time. This repository pins expectations
-through documentation and the capability ledger above, not through submodule
-commits. A component inventory should re-confirm labels before each phase; see
-[REPOSITORY_STRATEGY.md](REPOSITORY_STRATEGY.md).
+- This ledger is pinned to the inspected commits (`befcce5`, `ae01d29`) and the
+  verification date above.
+- Re-run the read-only inventory and update the counts, commit hashes, and date
+  before each phase, or whenever a component publishes a relevant change.
+- Component tool surfaces evolve; expectations are captured here in documentation,
+  not by submodule pins (see
+  [REPOSITORY_STRATEGY.md](REPOSITORY_STRATEGY.md)).

@@ -83,12 +83,18 @@ git-ignored):
   path environment variables (`FORMA_MCP_REPO`, `REVIT_MCP_REPO`).
 - `config/projects/harrismith.example.yaml` — the Harrismith project and its
   safety switches.
-- `config/workflows/end-to-end-reference.yaml` — the lifecycle stages, each with
-  `platform`, `primary_system`, `api_families`, and `automation_policy`.
+- `config/workflows/end-to-end-reference.yaml` — the lifecycle stages. Each stage
+  keeps separate, non-conflated fields: `api_families` (a list of relevant
+  developer APIs), `mcp_component` (owning integration component),
+  `mcp_implementation_status` (`confirmed` / `partial` / `planned` /
+  `not-applicable`), `api_maturity` (`beta-v1alpha` / `to-be-verified` /
+  `not-applicable`), and `data_readiness` (`ready` / `blocked` / `not-assessed`),
+  alongside `platform`, `primary_system`, and `automation_policy`.
 
-`api_families` is always a list and names API families only; it is not a maturity
-claim, and stages with no confirmed family use `api_families: []` with
-`api_mapping_status: to-be-verified`
+`api_families` is always a list and names API families only. MCP implementation
+coverage, API maturity, and project-data readiness are recorded as separate
+fields so they are never conflated; no GA/stable maturity is claimed without a
+cited source
 ([ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md)).
 
 ## 5. Trust and security boundaries
