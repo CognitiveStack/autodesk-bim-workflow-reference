@@ -1,0 +1,251 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cognitivestack.example/schemas/phase-2-result.schema.json",
+  "title": "Phase 2 Review-to-Issue Governance Trace Result",
+  "description": "Small, sanitised evidence artifact for the Phase 2 read-only slice 'Review-to-Issue Governance Trace': CDE file version -> approval workflow -> review -> outcome -> related issue -> relationship -> resolution evidence. Phase 2 evidence schema only, not a general workflow language. Consistent with schemas/phase-1-result.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "execution",
+    "component_provenance",
+    "document_observation",
+    "review_observation",
+    "issue_observation",
+    "relationship_observation",
+    "governance_checks",
+    "sanitisation",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "slice", "execution_date", "read_only", "status"],
+      "properties": {
+        "phase": { "type": "string", "const": "2" },
+        "slice": { "type": "string", "const": "review-to-issue-trace" },
+        "execution_date": { "$ref": "#/definitions/date_only_required" },
+        "read_only": { "type": "boolean", "const": true },
+        "status": { "type": "string", "enum": ["complete", "partial", "failed"] }
+      }
+    },
+
+    "component_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aps_forma_mcp"],
+      "properties": {
+        "aps_forma_mcp": { "$ref": "#/definitions/provenance" }
+      }
+    },
+
+    "document_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "document_alias", "version_alias"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "document_alias": { "$ref": "#/definitions/alias" },
+        "document_display_name": { "type": ["string", "null"] },
+        "folder_alias": { "$ref": "#/definitions/alias" },
+        "version_alias": { "$ref": "#/definitions/alias" },
+        "version_number": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+
+    "review_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "workflow_alias", "review_alias", "service_generation"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "workflow_alias": { "$ref": "#/definitions/alias" },
+        "review_alias": { "$ref": "#/definitions/alias" },
+        "service_generation": {
+          "type": "string",
+          "description": "Which Reviews service the review belongs to. 'legacy' = pre-31-October-2025 service; must not be silently used as the canonical current-workflow example.",
+          "enum": ["current", "legacy", "unknown"]
+        },
+        "review_status": { "type": ["string", "null"] },
+        "step_count": { "type": ["integer", "null"], "minimum": 0 },
+        "current_step": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "ordinal": { "type": ["integer", "null"], "minimum": 0 },
+                "type": { "type": ["string", "null"] }
+              }
+            }
+          ]
+        },
+        "reviewed_file_version_count": { "type": ["integer", "null"], "minimum": 0 },
+        "approval_outcome": { "type": ["string", "null"] },
+        "started_date": { "$ref": "#/definitions/date_only_nullable" },
+        "completed_date": { "$ref": "#/definitions/date_only_nullable" }
+      }
+    },
+
+    "issue_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "issue_alias"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "issue_alias": { "$ref": "#/definitions/alias" },
+        "issue_type_alias": { "$ref": "#/definitions/alias" },
+        "issue_status": { "type": ["string", "null"] },
+        "assignee_alias": { "$ref": "#/definitions/alias" },
+        "due_date": { "$ref": "#/definitions/date_only_nullable" },
+        "created_date": { "$ref": "#/definitions/date_only_nullable" },
+        "updated_date": { "$ref": "#/definitions/date_only_nullable" },
+        "reference_summary": {
+          "type": "array",
+          "description": "Reference entity types and counts only. No raw ids, urns, or free text.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entity_type", "count"],
+            "properties": {
+              "entity_type": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+
+    "relationship_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "method", "links"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "method": {
+          "type": "string",
+          "description": "How relationships were determined.",
+          "enum": ["issue_detail_reference", "relationships_api", "operator_asserted", "none"]
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "target", "relation_type", "result", "proven"],
+            "properties": {
+              "source": { "type": "string" },
+              "target": { "type": "string" },
+              "relation_type": { "type": "string" },
+              "result": { "type": "string", "enum": ["match", "difference", "no_equivalent"] },
+              "proven": { "type": "boolean" },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "governance_checks": {
+      "type": "array",
+      "description": "Explicit governance checks. Outcomes are pass/fail/unproven/not_applicable (distinct from relationship match/difference/no_equivalent).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "outcome"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "statement": { "type": "string" },
+          "outcome": { "type": "string", "enum": ["pass", "fail", "unproven", "not_applicable"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "sanitisation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["convention_version", "tokens_used"],
+      "properties": {
+        "convention_version": { "type": "integer", "minimum": 1 },
+        "tokens_used": { "type": "array", "items": { "$ref": "#/definitions/alias" } }
+      }
+    },
+
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "stage", "message"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "stage": {
+            "type": "string",
+            "enum": ["document", "review", "issue", "relationship", "governance", "provenance", "sanitisation"]
+          },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "A result may be 'complete' only when the document version, review, and issue observations are all available.",
+      "if": {
+        "properties": { "execution": { "properties": { "status": { "const": "complete" } } } }
+      },
+      "then": {
+        "properties": {
+          "document_observation": { "properties": { "available": { "const": true } } },
+          "review_observation": { "properties": { "available": { "const": true } } },
+          "issue_observation": { "properties": { "available": { "const": true } } }
+        }
+      }
+    }
+  ],
+
+  "definitions": {
+    "alias": {
+      "type": ["string", "null"],
+      "description": "Sanitised deterministic alias token (e.g. REVIEW_1, ISSUE_1, VERSION_1). Never a live Autodesk identifier or URN.",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "date_only_required": {
+      "type": "string",
+      "description": "Date only, YYYY-MM-DD. No time-of-day or timezone.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "date_only_nullable": {
+      "type": ["string", "null"],
+      "description": "Date only, YYYY-MM-DD, or null. No time-of-day or timezone.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_slug", "inspected_revision", "runtime_worktree_state", "runtime_status", "tools_invoked"],
+      "properties": {
+        "repository_slug": { "type": "string" },
+        "inspected_revision": { "type": "string" },
+        "runtime_worktree_state": { "type": "string", "enum": ["clean", "dirty", "unknown"] },
+        "runtime_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reachable", "reported_status", "server_version"],
+          "properties": {
+            "reachable": { "type": "boolean" },
+            "reported_status": { "type": "string", "enum": ["ok", "error", "unavailable"] },
+            "server_version": { "type": "string" }
+          }
+        },
+        "tools_invoked": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
