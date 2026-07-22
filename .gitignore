@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+tokens.json
+tokens.lock
+*.pem
+*.key
+secrets/
+credentials/
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary output
+tmp/
+temp/
+logs/
+*.log
+output/
+
+# Autodesk project and model files
+*.rvt
+*.rfa
+*.rte
+*.nwc
+*.nwd
+*.dwg
+*.dxf
+*.ifc
+*.svf
+*.svf2
+
+# Generated or local configuration
+config/local.yaml
+config/local.yml
+config/local.json

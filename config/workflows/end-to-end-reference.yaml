@@ -1,0 +1,39 @@
+schema_version: 1
+
+workflow:
+  id: autodesk-bim-end-to-end-reference
+  name: Autodesk BIM End-to-End Reference Workflow
+  implementation_style: hybrid
+
+stages:
+  - id: site_and_context
+    primary_system: Forma Site Design
+    automation_policy: experimental_and_read_first
+
+  - id: concept_design
+    primary_system: Forma
+    automation_policy: limited_guarded_automation
+
+  - id: revit_authoring
+    primary_system: Revit
+    automation_policy: pyrevit_mcp
+
+  - id: cde_information_management
+    primary_system: Forma Data Management
+    automation_policy: stable_api_preferred
+
+  - id: model_coordination
+    primary_system: Forma Model Coordination
+    automation_policy: use_native_coordination_engine
+
+  - id: reviews_and_issues
+    primary_system: Forma Data Management
+    automation_policy: stable_api_preferred
+
+  - id: construction_information
+    primary_system: Forma Build
+    automation_policy: focused_reference_examples
+
+  - id: asset_handover
+    primary_system: Forma Build Assets
+    automation_policy: focused_reference_example

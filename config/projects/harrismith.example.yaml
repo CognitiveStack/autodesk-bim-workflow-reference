@@ -1,0 +1,32 @@
+schema_version: 1
+
+project:
+  project_key: harrismith-bim-learning-project
+  display_name: Harrismith BIM Learning Project
+  project_type: synthetic-learning-project
+  location:
+    country: South Africa
+    locality: Harrismith
+
+workflow:
+  primary_example: true
+  stages:
+    - site_and_context
+    - concept_design
+    - revit_authoring
+    - cde_information_management
+    - model_coordination
+    - reviews_and_issues
+    - construction_information
+    - asset_handover
+
+safety:
+  use_synthetic_public_data: true
+  expose_real_project_ids: false
+  expose_credentials: false
+  writes_require_explicit_approval: true
+  protect_baseline_proposals: true
+
+components:
+  forma_mcp: enabled
+  revit_mcp: enabled

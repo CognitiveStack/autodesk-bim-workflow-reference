@@ -1,0 +1,23 @@
+schema_version: 1
+
+components:
+  forma_mcp:
+    name: Autodesk APS Forma MCP
+    repository: CognitiveStack/autodesk-aps-forma-mcp
+    local_path_env: FORMA_MCP_REPO
+    responsibility:
+      - APS authentication
+      - Forma and cloud API integration
+      - Data Management
+      - Issues and reviews
+      - Construction and handover APIs
+
+  revit_mcp:
+    name: Revit MCP Triviron
+    repository: CognitiveStack/revit-mcp-triviron
+    local_path_env: REVIT_MCP_REPO
+    responsibility:
+      - Revit authoring automation
+      - Model inspection
+      - Views and sheets
+      - Revit workflow demonstrations
