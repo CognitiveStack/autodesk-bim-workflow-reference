@@ -1,5 +1,27 @@
 schema_version: 1
 
+# Terminology model: see docs/decisions/0003-autodesk-platform-product-and-api-terminology.md
+# and docs/guides/GLOSSARY.md.
+#
+# Field meanings:
+#   platform            Autodesk platform the stage lives on (branding tier).
+#   primary_system      The Forma product/offering that carries the stage.
+#   api_families        Developer API families used for automation. ALWAYS a YAML
+#                       list. Empty ([]) when no API family has been confirmed.
+#                       Each entry names an API family only; it is NOT a claim
+#                       about API maturity (stable vs beta).
+#   api_mapping_status  How the api_families mapping should be read. Present only
+#                       when the mapping needs qualification:
+#                         to-be-verified        no API family confirmed yet
+#                         mediated-by-revit-mcp  reached via the Revit MCP, not APS
+#                       Confirmed direct mappings list their api_families and omit
+#                       this field.
+#   automation_policy   This project's chosen automation posture for the stage.
+#
+# API maturity is asserted only where verified and cited in the documentation.
+#
+# Terminology last verified: 2026-07-22
+
 workflow:
   id: autodesk-bim-end-to-end-reference
   name: Autodesk BIM End-to-End Reference Workflow
@@ -7,33 +29,59 @@ workflow:
 
 stages:
   - id: site_and_context
+    platform: Autodesk Forma
     primary_system: Forma Site Design
+    api_families: []
+    api_mapping_status: to-be-verified
     automation_policy: experimental_and_read_first
 
   - id: concept_design
+    platform: Autodesk Forma
     primary_system: Forma
+    api_families: []
+    api_mapping_status: to-be-verified
     automation_policy: limited_guarded_automation
 
   - id: revit_authoring
+    platform: Autodesk Revit
     primary_system: Revit
+    api_families:
+      - Autodesk Revit API
+    api_mapping_status: mediated-by-revit-mcp
     automation_policy: pyrevit_mcp
 
   - id: cde_information_management
+    platform: Autodesk Forma
     primary_system: Forma Data Management
+    api_families:
+      - APS Data Management API
     automation_policy: stable_api_preferred
 
   - id: model_coordination
-    primary_system: Forma Model Coordination
+    platform: Autodesk Forma
+    primary_system: Model Coordination
+    api_families: []
+    api_mapping_status: to-be-verified
     automation_policy: use_native_coordination_engine
 
   - id: reviews_and_issues
+    platform: Autodesk Forma
     primary_system: Forma Data Management
+    api_families:
+      - APS Issues API
+      - APS Reviews API
     automation_policy: stable_api_preferred
 
   - id: construction_information
+    platform: Autodesk Forma
     primary_system: Forma Build
+    api_families: []
+    api_mapping_status: to-be-verified
     automation_policy: focused_reference_examples
 
   - id: asset_handover
-    primary_system: Forma Build Assets
+    platform: Autodesk Forma
+    primary_system: Forma Build
+    api_families: []
+    api_mapping_status: to-be-verified
     automation_policy: focused_reference_example
