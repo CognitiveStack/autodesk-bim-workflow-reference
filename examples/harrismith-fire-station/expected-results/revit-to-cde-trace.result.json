@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "phase": "1",
+    "slice": "revit-to-cde-trace",
+    "execution_date": "2026-07-22",
+    "read_only": true,
+    "status": "complete"
+  },
+  "component_provenance": {
+    "revit_mcp": {
+      "repository_slug": "CognitiveStack/revit-mcp-triviron",
+      "inspected_revision": "ae01d292735549ac406e5e7101620e64a5477970",
+      "runtime_worktree_state": "dirty",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": ["get_revit_status", "get_revit_model_info"]
+    },
+    "aps_forma_mcp": {
+      "repository_slug": "CognitiveStack/autodesk-aps-forma-mcp",
+      "inspected_revision": "befcce5fa327f69c48478c34f61d567a6ab4c7fc",
+      "runtime_worktree_state": "clean",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": [
+        "list_autodesk_hubs",
+        "list_projects",
+        "list_top_folders",
+        "list_folder_contents",
+        "get_item_details",
+        "list_item_versions",
+        "get_derivative_manifest",
+        "list_model_views",
+        "get_model_properties"
+      ]
+    }
+  },
+  "revit_observation": {
+    "available": true,
+    "model_name": "HFS-ARC",
+    "level_count": 4,
+    "level_names": ["Level 1", "Level 2", "Mezzanine", "Roof"],
+    "view_names": []
+  },
+  "cde_observation": {
+    "available": true,
+    "item_alias": "ITEM_1",
+    "item_display_name": "MODEL_1.rvt",
+    "current_version": 1,
+    "version_alias": "URN_VERSION_1"
+  },
+  "derivative_observation": {
+    "manifest_status": "success",
+    "views": [
+      { "alias": "VIEWGUID_1", "display_label": "New Construction" },
+      { "alias": "VIEWGUID_2", "display_label": "{3D}" }
+    ],
+    "selected_view": { "alias": "VIEWGUID_1", "display_label": "New Construction" },
+    "properties_status": "captured",
+    "selected_properties": {
+      "sampled_element_count": 12,
+      "categories": ["Structural Columns", "Floors", "Walls", "Structural Foundations", "Roofs"],
+      "families": ["Concrete-Rectangular-Column", "Circular Hollow Sections-Column", "Floor", "Basic Wall", "Foundation Slab", "Basic Roof"],
+      "types": ["300 x 450mm", "CHS168.3x10", "CHS21.3x3.2", "Generic 300mm", "Insitu Concrete 225mm", "Exterior - 300mm Concrete", "Interior - 138mm Partition (1-hr)", "150mm Foundation Slab", "Generic - 400mm"],
+      "levels": ["Level 1", "Mezzanine", "Roof"],
+      "property_count": 9
+    }
+  },
+  "comparison": [
+    {
+      "field": "model_name",
+      "revit": "HFS-ARC",
+      "cde": "MODEL_1.rvt",
+      "result": "difference",
+      "note": "Live open model versus the Shared CDE deliverable."
+    },
+    {
+      "field": "level_count",
+      "revit": 4,
+      "cde": 4,
+      "result": "match",
+      "note": "Matches the default {3D} level-datum enumeration; the New Construction property summary listed 3 (Level 2 absent from that view)."
+    },
+    {
+      "field": "category:Floors",
+      "revit": 5,
+      "cde": 5,
+      "result": "match"
+    },
+    {
+      "field": "category:Walls",
+      "revit": 18,
+      "cde": 8,
+      "result": "difference"
+    },
+    {
+      "field": "category:Windows",
+      "revit": 52,
+      "cde": null,
+      "result": "no_equivalent",
+      "note": "Present in live Revit; absent from both inspected derivative views."
+    },
+    {
+      "field": "category:Doors",
+      "revit": 15,
+      "cde": null,
+      "result": "no_equivalent",
+      "note": "Present in live Revit; absent from both inspected derivative views."
+    },
+    {
+      "field": "category:Furniture",
+      "revit": 36,
+      "cde": null,
+      "result": "no_equivalent",
+      "note": "Present in live Revit; absent from both inspected derivative views."
+    },
+    {
+      "field": "category:Plumbing Fixtures",
+      "revit": 6,
+      "cde": null,
+      "result": "no_equivalent",
+      "note": "Present in live Revit; absent from both inspected derivative views."
+    },
+    {
+      "field": "category:Ceilings",
+      "revit": 1,
+      "cde": null,
+      "result": "no_equivalent",
+      "note": "Present in live Revit; absent from both inspected derivative views."
+    },
+    {
+      "field": "category:Structural Columns",
+      "revit": null,
+      "cde": 15,
+      "result": "no_equivalent",
+      "note": "Present in derivative; no equivalent in the available live category summary."
+    },
+    {
+      "field": "category:Structural Foundations",
+      "revit": null,
+      "cde": 1,
+      "result": "no_equivalent",
+      "note": "Present in derivative; no equivalent in the available live category summary."
+    },
+    {
+      "field": "category:Roofs",
+      "revit": null,
+      "cde": 1,
+      "result": "difference",
+      "note": "View-dependent in derivative: 1 in New Construction, absent from default {3D}; live per-category Roofs count was not itemised."
+    },
+    {
+      "field": "derivative_view_visibility",
+      "revit": null,
+      "cde": null,
+      "result": "difference",
+      "note": "New Construction includes 1 Roof element omitted by default {3D}; default {3D} enumerates 4 level datums not in the New Construction property summary."
+    },
+    {
+      "field": "overall_content_state",
+      "revit": "HFS-ARC live model (134 elements incl. fit-out)",
+      "cde": "Shared derivative (structural shell)",
+      "result": "difference",
+      "note": "The Shared CDE derivative represents a materially different content state from the currently open HFS-ARC model. The evidence strongly suggests that the Shared model predates the architectural fit-out, but exact version chronology was not independently proven because no source-file hash or direct upload-date-to-live-file comparison was performed."
+    }
+  ],
+  "sanitisation": {
+    "convention_version": 1,
+    "tokens_used": ["HUB_1", "PROJECT_1", "FOLDER_1", "ITEM_1", "URN_VERSION_1", "VIEWGUID_1", "VIEWGUID_2", "USER_1"]
+  },
+  "warnings": [
+    {
+      "code": "FILESYSTEM_DISPATCH_UNAVAILABLE",
+      "stage": "sanitisation",
+      "message": "Claude Desktop could not dispatch local Filesystem MCP tool calls during live capture; sanitised evidence was returned through the conversation for operator-mediated local validation."
+    },
+    {
+      "code": "OPERATOR_MEDIATED_EVIDENCE_TRANSFER",
+      "stage": "sanitisation",
+      "message": "Sanitised live observations were transferred through the conversation and structured locally by the operator-assisted Claude Code workflow."
+    },
+    {
+      "code": "PARTIAL_VIEW_VISIBILITY_DIFFERENCE",
+      "stage": "derivative",
+      "message": "Default {3D} and New Construction derivative views differ by one Roofs element and level-datum enumeration, confirming per-view visibility filtering is active; this does not account for the fit-out categories absent from the derivative."
+    }
+  ]
+}
