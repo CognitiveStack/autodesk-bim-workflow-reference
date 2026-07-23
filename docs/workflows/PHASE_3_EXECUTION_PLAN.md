@@ -1,7 +1,10 @@
 # Phase 3 Execution Plan — Model Coordination-to-Issue Trace (Operator Runbook)
 
-**Status:** Phase 3A planning (no live run performed; Phase 3 is not executable
-yet).
+**Status:** Phase 3B recorded — the model-set/participating-version foundation is
+implemented and live-verified (2026-07-23) and the coordination training data is
+ready, so narrowed Option A is now **partially executable**. The issue-selection
+and relationship portion, and all clash-level reads, remain outstanding, and **no
+Phase 3 evidence artifact exists yet**.
 **Slice:** "Model Coordination-to-Issue Trace" (narrowed Option A).
 **Posture:** strictly **read-only**.
 
@@ -14,20 +17,26 @@ status is governed by
 
 ## 1. Phase structure
 
-- **Phase 3A — planning and schema (this change set).** Capability gap, learner
-  trace, runbook, and `schemas/phase-3-result.schema.json`. **No live run.**
-- **Phase 3B — close or verify gaps.** In `CognitiveStack/autodesk-aps-forma-mcp`:
-  implement/verify read-only Model Coordination reads (model-set membership,
-  coordinated versions, and — where the public API supports it — clash reads);
-  and resolve the **data-readiness gap** by ensuring the training project has a
-  usable coordination model set. Update the reference inventory only after those
-  component changes are independently committed and verified.
+- **Phase 3A — planning and schema.** Capability gap, learner trace, runbook, and
+  `schemas/phase-3-result.schema.json`. **Complete.**
+- **Phase 3B — close or verify gaps. Recorded here (2026-07-23).** In
+  `CognitiveStack/autodesk-aps-forma-mcp`, the five read-only Model Coordination
+  model-set reads (`list_model_sets`, `get_model_set`, `list_model_set_versions`,
+  `get_latest_model_set_version`, `get_model_set_version`) are implemented, tested,
+  and live-verified, giving model-set membership and coordinated-version reads; the
+  **data-readiness gap is closed** (a usable training coordination model set with
+  two processed discipline-context models exists). Clash-level reads were **not**
+  implemented and remain deferred. The reference inventory is updated to
+  `0117022` / 30 tools accordingly.
 - **Phase 3C — authenticated read-only trace.** Perform Section 4 once the gates
-  in Section 3 pass.
+  in Section 3 pass. The coordination-context gates (Section 3, 1–3) now pass; the
+  issue-selection gate (4) and a supported relationship remain outstanding.
 - **Phase 3D — sanitised evidence artifact.** Structure, sanitise, and validate a
-  public result under `examples/harrismith-fire-station/expected-results/`.
+  public result under `examples/harrismith-fire-station/expected-results/`. **No
+  such artifact exists yet.**
 
-Phase 3C cannot begin until Phase 3B closes both blockers.
+The coordination-context foundation for Phase 3C is now executable; the remaining
+gate is a selected coordination issue and a supported model-context relationship.
 
 ## 2. Read-only safeguards
 
@@ -42,33 +51,41 @@ Phase 3C cannot begin until Phase 3B closes both blockers.
 ## 3. Execution gates (all must pass before Phase 3C)
 
 1. **A usable coordination model set exists** in the training project
-   (`list_model_sets` returns at least one set).
+   (`list_model_sets` returns at least one set). ✅ **Satisfied (2026-07-23).**
 2. **Participating models can be enumerated** for that set (membership read
-   available and returns models).
-3. **Their coordinated versions can be identified** (version read available).
+   available and returns models). ✅ **Satisfied** — participating documents are
+   embedded in `get_latest_model_set_version` / `get_model_set_version`; two were
+   returned.
+3. **Their coordinated versions can be identified** (version read available). ✅
+   **Satisfied** — each participating document carries an exact `version_urn`.
 4. **The intended coordination issue can be safely selected** (a single
-   unambiguous candidate, or an operator-confirmed selection).
+   unambiguous candidate, or an operator-confirmed selection). ⬜ **Outstanding.**
+   Any issue selection or creation remains a **manual Autodesk-UI action** unless a
+   separate write workflow is explicitly approved; it is not performed here.
+
+Also outstanding for Phase 3C: read the selected issue through the existing Issues
+tools, establish a supported model-context relationship, determine the honest
+outcome, and sanitise and validate the result.
 
 If any gate fails, **do not run Phase 3C**. Any produced result must be
 `status: partial` (or no artifact) with `outcome: coordination_evidence_incomplete`
-and the relevant warning (for example `NO_COORDINATION_MODEL_SETS`,
-`MODEL_SET_MEMBERSHIP_UNAVAILABLE`).
+and the relevant warning (for example `NO_COORDINATION_MODEL_SETS`, `ISSUE_NOT_FOUND`).
 
 ## 4. Logical tool order, gates, and handling (Phase 3C — provisional)
 
-Tool signatures must be taken from the **live tool definitions at execution time**;
-Model Coordination membership/version/clash tools are **not yet implemented** and
-their names/parameters are placeholders pending Phase 3B verification. No endpoint
-paths are asserted here.
+Tool signatures must be taken from the **live tool definitions at execution time**.
+The Model Coordination model-set/version reads are now implemented and live-verified;
+clash-level tools remain **not implemented** and their names/parameters stay
+deferred pending a future phase. No endpoint paths are asserted here.
 
 ### Stage A — Coordination context (APS/Forma MCP)
 
 | # | Step | Confirmed today? | Gate / handling |
 |---|---|---|---|
 | A1 | `list_autodesk_hubs` → `list_projects` | ✅ | locate project |
-| A2 | `list_model_sets` | ✅ | if 0 sets → `coordination_evidence_incomplete`, warning `NO_COORDINATION_MODEL_SETS`, **stop** |
-| A3 | enumerate participating models (membership read) | ❌ Phase 3B | if unavailable → `coordination_evidence_incomplete`, warning `MODEL_SET_MEMBERSHIP_UNAVAILABLE` |
-| A4 | identify coordinated versions | ❌ Phase 3B | record `version_alias` per model |
+| A2 | `list_model_sets` → `get_model_set` | ✅ | if 0 sets → `coordination_evidence_incomplete`, warning `NO_COORDINATION_MODEL_SETS`, **stop** |
+| A3 | enumerate participating documents via `get_latest_model_set_version` / `get_model_set_version` | ✅ live-verified | read embedded participating documents (two returned in verification) |
+| A4 | identify coordinated versions | ✅ live-verified | record `version_alias` per document from its exact `version_urn` (never `tip_version_urn`) |
 
 ### Stage B — Coordination issue (APS/Forma MCP, confirmed reads)
 

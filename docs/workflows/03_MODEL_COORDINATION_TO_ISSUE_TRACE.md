@@ -11,8 +11,12 @@ The example project is the synthetic **Harrismith Fire Station**. Phase 3 is
 strictly read-only: no model is uploaded or published, no coordination is run, no
 issue is created or changed.
 
-> **Status:** planning only. Phase 3 is **not executable yet** (see the two
-> blockers below). The current honest proof ceiling is
+> **Status:** the model-set and participating-version foundation is now
+> implemented and **live-verified** (2026-07-23), and the coordination training
+> data is ready, so this trace is **partially executable**. Selecting a
+> coordination issue and proving a supported model-context relationship remain
+> outstanding, and clash-level reads stay deferred. **No Phase 3 evidence artifact
+> exists yet**, so the current honest public proof ceiling is
 > `coordination_evidence_incomplete`.
 
 ## What Model Coordination does
@@ -73,16 +77,31 @@ clash-to-issue link, and **not** a resolution.
 
 ## Why the current evidence is incomplete
 
-Two independent blockers (detailed in the capability gap):
+What is now in place (detailed in the capability gap):
 
-1. **Capability gap** — the current component can list coordination *model sets*
-   and read coordination *issues*, but it cannot read clash results, clash
-   identities/groups/status, model-set membership, coordinated versions, or any
-   recheck/resolution state.
-2. **Data-readiness gap** — the Harrismith project currently has **no coordination
-   model sets** at all, so there is nothing to traverse.
+- **Model-set/version foundation — done.** The component can discover coordination
+  *model sets*, read a set's detail, list its coordination snapshot versions, and
+  read the latest/specific snapshot with its **participating documents and their
+  exact coordinated versions**. It also reads coordination *issues* and generic
+  issue-to-document relationships.
+- **Data readiness — done.** The training project now has a usable coordination
+  model set (two discipline-context models processed, both participating versions
+  visible through the version-level reads).
 
-Until both are addressed, an honest run yields `coordination_evidence_incomplete`.
+What still blocks a completed trace:
+
+1. **Issue/relationship portion outstanding** — a coordination issue must be
+   selected through the Autodesk UI, read through the existing Issues tools, and
+   tied to the coordination models by a **supported model-context relationship**.
+   No such trace has been captured or committed.
+2. **Clash-level capability gap** — the component still cannot read clash results,
+   clash identities/groups/status, clash element references, a direct
+   clash-to-issue relationship, clash history, or any recheck/resolution state.
+
+Until a selected issue and a supported relationship are traced and committed, an
+honest run yields `coordination_evidence_incomplete`. Any issue selection or
+creation remains a **manual Autodesk-UI action** unless a separate write workflow
+is explicitly approved.
 
 ## Distinctions this slice keeps honest
 

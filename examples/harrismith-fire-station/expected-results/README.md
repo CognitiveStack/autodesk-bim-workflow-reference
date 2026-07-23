@@ -73,7 +73,7 @@ What the evidence establishes:
   conversation handoff (the Filesystem connector was not used); no live Autodesk
   identifiers are stored here.
 
-## Phase 3 — Model Coordination-to-Issue trace (planned)
+## Phase 3 — Model Coordination-to-Issue trace (foundation verified; evidence pending)
 
 - **Workflow (learner):** [`docs/workflows/03_MODEL_COORDINATION_TO_ISSUE_TRACE.md`](../../../docs/workflows/03_MODEL_COORDINATION_TO_ISSUE_TRACE.md)
 - **Runbook (operator):** [`docs/workflows/PHASE_3_EXECUTION_PLAN.md`](../../../docs/workflows/PHASE_3_EXECUTION_PLAN.md)
@@ -81,17 +81,24 @@ What the evidence establishes:
 - **Schema:** [`schemas/phase-3-result.schema.json`](../../../schemas/phase-3-result.schema.json)
 - **Sanitisation:** [`docs/guides/SANITISATION_CONVENTION.md`](../../../docs/guides/SANITISATION_CONVENTION.md)
 
-Phase 3A planning and schema are **present**. **No Phase 3 evidence artifact exists
-yet**, and none is created by this change.
+Phase 3A planning and schema are **complete**. Phase 3B is **recorded**: the five
+read-only Model Coordination model-set/version reads (`list_model_sets`,
+`get_model_set`, `list_model_set_versions`, `get_latest_model_set_version`,
+`get_model_set_version`) are implemented and **live-verified (2026-07-23)** in the
+APS/Forma component, and the coordination **training dataset is ready** (a usable
+model set with two processed discipline-context models). **No Phase 3 evidence
+artifact exists yet**, and none is created by this change.
 
-Phase 3C (the live read-only trace) is **blocked** by two independent gaps:
+What remains before the live read-only trace (Phase 3C) can complete:
 
-- the current component lacks the required **clash-level reads** (clash results,
-  identities, groups, status/history) and authoritative **model-set membership /
-  coordinated-version reads**;
-- the Harrismith project currently has **no usable coordination model set**.
+- a coordination **issue must be selected** through the Autodesk UI and read with
+  the existing Issues tools, and a **supported model-context relationship** proven;
+- **clash-level reads remain deferred** — the component still does not read clash
+  results, identities, groups, status/history, a direct clash-to-issue
+  relationship, or resolution verification.
 
-The current honest proof ceiling is **`coordination_evidence_incomplete`**. A
-Phase 3 evidence artifact (`model-coordination-to-issue-trace.result.json`) will be
-added in a later, separate commit once both gaps are closed and a `complete`
-Option A run exists.
+The current honest **public artifact status** remains
+**`coordination_evidence_incomplete`**. A Phase 3 evidence artifact
+(`model-coordination-to-issue-trace.result.json`) will be added in a later,
+separate commit once a selected issue and supported relationship are traced,
+sanitised, and a `complete` Option A run exists.
