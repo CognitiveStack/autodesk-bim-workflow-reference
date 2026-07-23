@@ -1,7 +1,8 @@
 # Component Boundaries and Capability Ledger
 
 **Status:** Confirmed component capability inventory
-**Inventory verified:** 2026-07-22
+**Inventory verified:** 2026-07-23 (APS/Forma MCP re-verified at `a54acf8`); Revit
+MCP unchanged (`ae01d29`, 2026-07-22)
 
 This document is the authoritative, dated ledger of the MCP capabilities this
 project depends on, and the anti-duplication contract between this orchestration
@@ -16,12 +17,21 @@ layer and the two MCP components. It is consistent with the
 
 | Component | Repository | Inspected commit | Tools |
 |---|---|---|---|
-| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `befcce5` | 18 |
+| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `a54acf8` | 26 |
 | Revit MCP | `CognitiveStack/revit-mcp-triviron` | `ae01d29` | 14 |
+
+The APS/Forma MCP inventory is published at
+`a54acf8e5c628dbf7f97bf901a78f3c31c4b0781` and reports **26 MCP tools total**:
+24 read-only Autodesk tools, 1 guarded Autodesk write tool, and 1 local-only
+preview tool. Component evidence: **196 automated tests passing at
+`76f485306f09aedf990cf1ec22b6ec2cbf6b26c8`**, and offline doctor
+**`TOOL_COUNT=26`, `RESULT=PASS`**.
 
 The tool identifiers below are code identifiers read from component source; they
 are not Autodesk data. No live Autodesk hub, project, folder, item, version,
-proposal, or model identifiers are recorded in this repository.
+proposal, or model identifiers are recorded in this repository. Private
+operational identifiers remain in the component runtime; public evidence and
+identifier aliases belong in this reference repository.
 
 For the Revit MCP, the inventory was verified from the committed tree at
 `ae01d29`; unrelated uncommitted working-tree content was excluded.
@@ -44,17 +54,24 @@ separate fields (`mcp_component`, `mcp_implementation_status`, `api_maturity`,
 `data_readiness`) so MCP coverage, API maturity, and project-data readiness are
 never conflated.
 
-## 3. APS/Forma MCP — 18 tools (16 read · 1 guarded write · 1 local)
+## 3. APS/Forma MCP — 26 tools (24 read · 1 guarded write · 1 local)
 
 | Capability group | Tools | Class | Status |
 |---|---|---|---|
 | Data Management | `list_autodesk_hubs`, `list_projects`, `list_top_folders`, `list_folder_contents`, `get_item_details`, `list_item_versions` | read | confirmed |
 | Model Derivative | `get_derivative_manifest`, `list_model_views`, `get_model_properties` | read | confirmed |
 | Issues | `list_issues`, `get_issue_details`, `list_issue_types` | read | confirmed |
+| Reviews | `list_review_workflows`, `list_reviews`, `get_review_details`, `get_review_workflow`, `list_review_file_versions`, `get_review_progress`, `get_file_version_approval_statuses` | read | confirmed · live-verified |
+| Issue Relationships | `list_issue_relationships` | read | confirmed · live-verified |
 | Model Coordination | `list_model_sets` | read | confirmed · data-readiness-blocked (§8) |
 | Forma Site Design (Beta `v1alpha`) | `get_forma_project`, `list_forma_proposals`, `list_forma_proposal_elements` | read | experimental |
-| Forma Site Design (Beta `v1alpha`) | `create_forma_proposal` | guarded write | experimental (sole write; requires explicit confirmation and an explicit source proposal) |
+| Forma Site Design (Beta `v1alpha`) | `create_forma_proposal` | guarded write | experimental (sole write; requires explicit confirmation and an explicit source proposal; **not part of the Phase 2 read-only workflow**) |
 | Local-only (no Autodesk call) | `prepare_native_floor_stack_preview` | local | confirmed |
+
+Issues, Reviews, and Relationships reads are confirmed; RFI and Assets
+capabilities remain planned (§6). Direct Review-to-Issue relationship support is
+**not** established; the relationship read (`list_issue_relationships`) supports
+**shared-document comparison** only.
 
 ## 4. Revit MCP — 14 tools (10 read/inspection · 4 mutating)
 
@@ -82,12 +99,13 @@ never conflated.
 
 | Stage | Capability | Status |
 |---|---|---|
-| reviews_and_issues | Reviews (issues reads are implemented; Reviews is not) | planned |
 | construction_information | RFI | planned |
 | asset_handover | Assets | planned |
 
-API-family names for Reviews, RFI, and Assets are not asserted here until they are
-verified from an official Autodesk/APS or component source.
+Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
+and live-verified (§3); they are no longer a gap. API-family names for RFI and
+Assets are not asserted here until they are verified from an official Autodesk/APS
+or component source.
 
 ## 7. Experimental boundary
 
@@ -111,7 +129,7 @@ gap, not a missing-tool gap.
 | Autodesk authentication (APS) | — | Owns | Never implements |
 | Forma Data Management (CDE) | — | Owns | Documents, invokes, validates |
 | Model Derivative / properties | — | Owns | Documents, invokes, validates |
-| Issues (reviews/RFI/assets planned) | — | Owns | Documents, invokes, validates |
+| Issues, Reviews & Relationships (RFI/assets planned) | — | Owns | Documents, invokes, validates |
 | Model Coordination (native engine) | — | Consumes / surfaces | Documents only |
 | Clash detection | Must not build | Must not build | Must not build |
 | Orchestration / docs / examples | — | — | Owns |
@@ -133,8 +151,10 @@ repository may **invoke** or **validate** a behaviour but must never
 
 ## 11. Reverification policy
 
-- This ledger is pinned to the inspected commits (`befcce5`, `ae01d29`) and the
-  verification date above.
+- This ledger is pinned to the inspected commits (`a54acf8` APS/Forma, `ae01d29`
+  Revit) and the verification date above. The APS/Forma inventory update is
+  evidenced by 196 automated tests passing at `76f4853` and offline doctor
+  `TOOL_COUNT=26`, `RESULT=PASS`.
 - Re-run the read-only inventory and update the counts, commit hashes, and date
   before each phase, or whenever a component publishes a relevant change.
 - Component tool surfaces evolve; expectations are captured here in documentation,

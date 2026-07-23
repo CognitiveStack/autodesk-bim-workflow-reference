@@ -14,15 +14,21 @@ and the confirmed inventory in
 
 - **Phase 2A — Planning and capability gap (this change set):** documents the
   workflow, capability gap, schema, sanitisation, and warnings. **No live run.**
-- **Phase 2B — Reviews read capability:** implement and test read-only Reviews
-  tools in `CognitiveStack/autodesk-aps-forma-mcp`; separately assess whether a
-  Relationships API read tool is required; update the reference inventory only
-  after those component changes are independently committed and verified.
-- **Phase 2C — Live read-only trace:** perform the sequence in Section 4 and
-  produce a sanitised public result.
+- **Phase 2B — Reviews read capability (complete, 2026-07-23):** seven read-only
+  Reviews tools and a narrow read-only `list_issue_relationships` tool are
+  implemented and live-verified in `CognitiveStack/autodesk-aps-forma-mcp`, and the
+  reference inventory is updated (see
+  [COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) §3 and
+  [PHASE_2_CAPABILITY_GAP.md](../architecture/PHASE_2_CAPABILITY_GAP.md) §8). Direct
+  Review-to-Issue relationship support is not established; shared-document
+  comparison is supported.
+- **Phase 2C — Live read-only trace (ready to run):** perform the sequence in
+  Section 4 and produce a sanitised public result.
 
-Phase 2C cannot begin until Phase 2B lands the Reviews reads. Until then a Phase 2
-run is at best `partial`.
+Phase 2B has landed the Reviews reads, so Phase 2C is ready to run.
+`relationship_not_proven` remains a valid evidence outcome, and a runtime absence
+of the Reviews reads would still force `partial`. Phase 2 as a whole is not yet
+complete — sanitised Phase 2C evidence is still pending.
 
 ## 2. Read-only safeguards
 
@@ -37,10 +43,10 @@ run is at best `partial`.
 ## 3. Tool signatures
 
 Use the **exact MCP schemas exposed by the connected servers at execution time**.
-The Reviews tool names below are *logical placeholders* from
-[PHASE_2_CAPABILITY_GAP.md](../architecture/PHASE_2_CAPABILITY_GAP.md); do not
-invent parameters or assume REST signatures — inspect the live tool definition
-first.
+The Reviews tools below are now implemented and live-verified (see
+[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) §3); still
+**inspect the live tool definition/schema at execution time** and do not assume
+parameters or REST signatures.
 
 ## 4. Logical tool order, gates, and handling (Phase 2C)
 
@@ -52,7 +58,7 @@ first.
 | A2 | `get_item_details` | project, item | document display name, tip version | if not found: `document_observation.available=false`, warning `REVIEW_VERSION_MISMATCH` may apply later |
 | A3 | `list_item_versions` | project, item | the specific reviewed version | record `version_alias`, `version_number` |
 
-### Stage B — Workflow and review (Reviews reads — **Phase 2B dependency**)
+### Stage B — Workflow and review (Reviews reads — **implemented, Phase 2B**)
 
 | # | Tool (logical) | Input | Output used | Gate / handling |
 |---|---|---|---|---|
@@ -120,8 +126,9 @@ silently become the canonical current-workflow example.
 - `complete` — document version, review + workflow, review progress/outcome, and
   candidate issue all identified, and the review/document/issue relationship is
   positively verified or explicitly recorded as `no_equivalent`.
-- `partial` — a required observation is missing; in particular, **missing Reviews
-  MCP capability forces `partial`**.
+- `partial` — a required observation is missing; in particular, if the Reviews
+  reads are **unavailable at runtime**, the run falls back to `partial` (the
+  capability itself is implemented and live-verified — see §1).
 - `failed` — the document and/or review and/or issue could not be captured at all.
 
 Warnings must not be used as substitutes for required observations.

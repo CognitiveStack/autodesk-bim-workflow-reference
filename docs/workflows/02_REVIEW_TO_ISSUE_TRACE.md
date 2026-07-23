@@ -75,12 +75,18 @@ titles or identifiers.
 
 ## A capability caveat
 
-At the time of writing, the reference project can already read **issues**
-(`list_issues`, `get_issue_details`, `list_issue_types`) but has **no Reviews
-tools** yet, and it is not yet confirmed whether issue details expose enough
-reference information to prove the relationship. So a live run today would be
-**partial**, not complete — and it should say so plainly. The missing Reviews read
-capability is built and verified before a full run is attempted.
+Since Phase 2B (2026-07-23) the reference project can read **issues**
+(`list_issues`, `get_issue_details`, `list_issue_types`), **reviews** (seven
+read-only tools), and a narrow **issue-relationship lookup**
+(`list_issue_relationships`) — all live-verified. A **direct** Review-to-Issue
+relationship is **not** established by the platform: the relationship lookup
+compares **shared documents**, and can prove that an issue and a review point at
+the **same document version** or the **same document lineage** (a weaker proof
+than an exact version). A valid **empty** lookup result is not proof that no
+relationship exists, and legitimately leads to a `relationship_not_proven`
+outcome. So a live run can now reach every stage — but honest qualification of the
+relationship still matters, and the sanitised **Phase 2C evidence is still
+pending**.
 
 ## Where this leads
 
