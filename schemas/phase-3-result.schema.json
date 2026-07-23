@@ -1,0 +1,317 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cognitivestack.example/schemas/phase-3-result.schema.json",
+  "title": "Phase 3 Model Coordination-to-Issue Trace Result",
+  "description": "Small, sanitised evidence artifact for the Phase 3 read-only slice 'Model Coordination-to-Issue Trace': coordination model-set context -> participating discipline models and coordinated versions -> coordination issue -> assignment/status -> shared-model-context comparison. Clash identity and geometric-resolution evidence are deferred to later clash-capability phases. Phase 3 evidence schema only, not a general workflow language. Consistent with schemas/phase-1-result.schema.json and schemas/phase-2-result.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "execution",
+    "component_provenance",
+    "coordination_observation",
+    "clash_observation",
+    "issue_observation",
+    "relationship_observation",
+    "resolution_observation",
+    "outcome",
+    "governance_checks",
+    "sanitisation",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "slice", "execution_date", "read_only", "status"],
+      "properties": {
+        "phase": { "type": "string", "const": "3" },
+        "slice": { "type": "string", "const": "model-coordination-to-issue-trace" },
+        "execution_date": { "$ref": "#/definitions/date_only_required" },
+        "read_only": { "type": "boolean", "const": true },
+        "status": { "type": "string", "enum": ["complete", "partial", "failed"] }
+      }
+    },
+
+    "component_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aps_forma_mcp"],
+      "properties": {
+        "aps_forma_mcp": { "$ref": "#/definitions/provenance" }
+      }
+    },
+
+    "coordination_observation": {
+      "type": "object",
+      "description": "Coordination model-set context and participating discipline models with their coordinated versions.",
+      "additionalProperties": false,
+      "required": ["available", "model_set_available", "participating_models"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "model_set_available": { "type": "boolean" },
+        "model_set_alias": { "$ref": "#/definitions/alias" },
+        "coordination_space_alias": { "$ref": "#/definitions/alias" },
+        "participating_model_count": { "type": ["integer", "null"], "minimum": 0 },
+        "participating_models": {
+          "type": "array",
+          "description": "Sanitised participating models. No URNs, filenames, or GUIDs.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["model_alias"],
+            "properties": {
+              "model_alias": { "$ref": "#/definitions/alias" },
+              "discipline": { "type": ["string", "null"] },
+              "version_alias": { "$ref": "#/definitions/alias" },
+              "version_number": { "type": ["integer", "null"], "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+
+    "clash_observation": {
+      "type": "object",
+      "description": "Clash-level evidence. In Phase 3A/first-slice scope, clash reads are not yet available; capability_status records this and clash identity fields are optional and null.",
+      "additionalProperties": false,
+      "required": ["capability_status", "available"],
+      "properties": {
+        "capability_status": {
+          "type": "string",
+          "enum": ["confirmed", "planned", "unavailable"]
+        },
+        "available": { "type": "boolean" },
+        "clash_alias": { "$ref": "#/definitions/alias" },
+        "clash_group_alias": { "$ref": "#/definitions/alias" },
+        "clash_status": { "type": ["string", "null"] },
+        "involved": {
+          "type": "array",
+          "description": "Safe element evidence only: source-model alias, discipline, category, element role, count. No element GUIDs or geometry coordinates.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["model_alias"],
+            "properties": {
+              "model_alias": { "$ref": "#/definitions/alias" },
+              "discipline": { "type": ["string", "null"] },
+              "category": { "type": ["string", "null"] },
+              "element_role": { "type": ["string", "null"] },
+              "count": { "type": ["integer", "null"], "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+
+    "issue_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "issue_alias"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "issue_alias": { "$ref": "#/definitions/alias" },
+        "issue_type_alias": { "$ref": "#/definitions/alias" },
+        "issue_status": { "type": ["string", "null"] },
+        "assignee_alias": { "$ref": "#/definitions/alias" },
+        "due_date": { "$ref": "#/definitions/date_only_nullable" },
+        "created_date": { "$ref": "#/definitions/date_only_nullable" },
+        "updated_date": { "$ref": "#/definitions/date_only_nullable" },
+        "reference_summary": {
+          "type": "array",
+          "description": "Reference entity types and counts only. No raw ids, urns, or free text.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entity_type", "count"],
+            "properties": {
+              "entity_type": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+
+    "relationship_observation": {
+      "type": "object",
+      "description": "How the issue relates to coordination entities. A shared-model-context link (issue and coordination refer to the same models/versions) is not a proven direct clash-to-issue relationship.",
+      "additionalProperties": false,
+      "required": ["available", "method", "links"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "method": {
+          "type": "string",
+          "enum": ["issue_detail_reference", "relationships_api", "shared_model_context", "operator_asserted", "none"]
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "target", "relation_type", "result", "proven"],
+            "properties": {
+              "source": { "type": "string" },
+              "target": { "type": "string" },
+              "relation_type": { "type": "string" },
+              "result": { "type": "string", "enum": ["match", "difference", "no_equivalent"] },
+              "proven": { "type": "boolean" },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "resolution_observation": {
+      "type": "object",
+      "description": "Resolution evidence. Issue status alone does not prove geometric resolution; a later model version alone does not prove a clash disappeared; clash status alone does not prove the revised model was reprocessed.",
+      "additionalProperties": false,
+      "required": ["resolution_claimed", "resolution_verified"],
+      "properties": {
+        "resolution_claimed": { "type": "boolean" },
+        "resolution_verified": { "type": "boolean" },
+        "later_version_alias": { "$ref": "#/definitions/alias" },
+        "method": {
+          "type": "string",
+          "enum": ["issue_status", "clash_status", "clash_recheck", "none"]
+        }
+      }
+    },
+
+    "outcome": {
+      "type": "string",
+      "description": "Small Phase 3 outcome vocabulary. shared_model_context_proven: issue and coordination refer to the same models/versions (medium proof; no clash entity). clash_issue_link_proven: an explicit clash-to-issue relationship is proven (high proof; requires clash + relationship reads). clash_resolution_claimed_not_verified: issue/clash status says resolved but geometric resolution was not verified. clash_resolution_verified: a later coordinated version shows the specific clash is no longer present (high proof; requires clash recheck reads). clash_relationship_not_proven: no clash-to-issue relationship could be proven. coordination_evidence_incomplete: a required coordination observation is missing (for example no model set, or membership/version reads unavailable).",
+      "enum": [
+        "shared_model_context_proven",
+        "clash_issue_link_proven",
+        "clash_resolution_claimed_not_verified",
+        "clash_resolution_verified",
+        "clash_relationship_not_proven",
+        "coordination_evidence_incomplete"
+      ]
+    },
+
+    "governance_checks": {
+      "type": "array",
+      "description": "Explicit governance checks. Outcomes are pass/fail/unproven/not_applicable (distinct from relationship match/difference/no_equivalent).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "outcome"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "statement": { "type": "string" },
+          "outcome": { "type": "string", "enum": ["pass", "fail", "unproven", "not_applicable"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "sanitisation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["convention_version", "tokens_used"],
+      "properties": {
+        "convention_version": { "type": "integer", "minimum": 1 },
+        "tokens_used": { "type": "array", "items": { "$ref": "#/definitions/alias" } }
+      }
+    },
+
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "stage", "message"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "stage": {
+            "type": "string",
+            "enum": ["coordination", "clash", "issue", "relationship", "resolution", "governance", "provenance", "sanitisation"]
+          },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "A result may be 'complete' only for the narrowed Option A shared multidisciplinary model context: coordination_observation.available true; model_set_available true; at least TWO participating models (minItems 2), each including model_alias, a non-null discipline, and a non-null coordinated version_alias; issue_observation.available true; and at least one explicit proven relationship link (proven:true) supporting the selected outcome. An issue existing alone, or a single participating model, is never sufficient. Clash identity is NOT required for the narrowed Option A slice. NOTE: Draft-7 cannot express that the two model aliases and disciplines are semantically DISTINCT; the runtime trace must verify at least two distinct model aliases, at least two relevant discipline contexts, and a non-null coordinated version alias per model (see PHASE_3_EXECUTION_PLAN.md).",
+      "if": {
+        "properties": { "execution": { "properties": { "status": { "const": "complete" } } } }
+      },
+      "then": {
+        "properties": {
+          "coordination_observation": {
+            "properties": {
+              "available": { "const": true },
+              "model_set_available": { "const": true },
+              "participating_models": {
+                "minItems": 2,
+                "items": {
+                  "required": ["model_alias", "discipline", "version_alias"],
+                  "properties": {
+                    "discipline": { "type": "string", "minLength": 1 },
+                    "version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+                  }
+                }
+              }
+            }
+          },
+          "issue_observation": { "properties": { "available": { "const": true } } },
+          "relationship_observation": {
+            "properties": {
+              "links": {
+                "minItems": 1,
+                "contains": { "properties": { "proven": { "const": true } }, "required": ["proven"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+
+  "definitions": {
+    "alias": {
+      "type": ["string", "null"],
+      "description": "Sanitised deterministic alias token (e.g. MODEL_SET_1, MODEL_1, VERSION_1, ISSUE_1). Never a live Autodesk identifier, URN, or GUID.",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "date_only_required": {
+      "type": "string",
+      "description": "Date only, YYYY-MM-DD. No time-of-day or timezone.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "date_only_nullable": {
+      "type": ["string", "null"],
+      "description": "Date only, YYYY-MM-DD, or null. No time-of-day or timezone.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_slug", "inspected_revision", "runtime_worktree_state", "runtime_status", "tools_invoked"],
+      "properties": {
+        "repository_slug": { "type": "string" },
+        "inspected_revision": { "type": "string" },
+        "runtime_worktree_state": { "type": "string", "enum": ["clean", "dirty", "unknown"] },
+        "runtime_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reachable", "reported_status", "server_version"],
+          "properties": {
+            "reachable": { "type": "boolean" },
+            "reported_status": { "type": "string", "enum": ["ok", "error", "unavailable"] },
+            "server_version": { "type": "string" }
+          }
+        },
+        "tools_invoked": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

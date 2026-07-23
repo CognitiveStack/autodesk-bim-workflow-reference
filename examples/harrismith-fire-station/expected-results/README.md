@@ -72,3 +72,26 @@ What the evidence establishes:
 - The artifact was produced through an **operator-mediated** sanitised
   conversation handoff (the Filesystem connector was not used); no live Autodesk
   identifiers are stored here.
+
+## Phase 3 — Model Coordination-to-Issue trace (planned)
+
+- **Workflow (learner):** [`docs/workflows/03_MODEL_COORDINATION_TO_ISSUE_TRACE.md`](../../../docs/workflows/03_MODEL_COORDINATION_TO_ISSUE_TRACE.md)
+- **Runbook (operator):** [`docs/workflows/PHASE_3_EXECUTION_PLAN.md`](../../../docs/workflows/PHASE_3_EXECUTION_PLAN.md)
+- **Capability gap:** [`docs/architecture/PHASE_3_CAPABILITY_GAP.md`](../../../docs/architecture/PHASE_3_CAPABILITY_GAP.md)
+- **Schema:** [`schemas/phase-3-result.schema.json`](../../../schemas/phase-3-result.schema.json)
+- **Sanitisation:** [`docs/guides/SANITISATION_CONVENTION.md`](../../../docs/guides/SANITISATION_CONVENTION.md)
+
+Phase 3A planning and schema are **present**. **No Phase 3 evidence artifact exists
+yet**, and none is created by this change.
+
+Phase 3C (the live read-only trace) is **blocked** by two independent gaps:
+
+- the current component lacks the required **clash-level reads** (clash results,
+  identities, groups, status/history) and authoritative **model-set membership /
+  coordinated-version reads**;
+- the Harrismith project currently has **no usable coordination model set**.
+
+The current honest proof ceiling is **`coordination_evidence_incomplete`**. A
+Phase 3 evidence artifact (`model-coordination-to-issue-trace.result.json`) will be
+added in a later, separate commit once both gaps are closed and a `complete`
+Option A run exists.
