@@ -51,12 +51,24 @@ Phase 2 follows the same public/private boundary as Phase 1: raw observations an
 alias maps live in `.local/phase-2/` (git-ignored); only the sanitised result JSON
 is committed here.
 
-### Expected artifact (not yet produced)
+### Artifact
 
-- `review-to-issue-trace.result.json` — added in a later, separate commit once a
-  live read-only run exists. Because Reviews MCP tools are not yet implemented (see
-  the capability gap), the first runs are expected to be `partial`, not `complete`;
-  only a `complete` run becomes the canonical artifact.
+- `review-to-issue-trace.result.json` — present. A **complete**, read-only,
+  sanitised Phase 2 evidence artifact from a live run on 2026-07-23 (Reviews and
+  issue-relationship reads are implemented and live-verified; see the capability
+  gap §8).
 
-This planning change set intentionally does **not** include a Phase 2 result
-artifact.
+What the evidence establishes:
+
+- The explicit issue-side document reference proved the **same document lineage**
+  as the reviewed version (`ISSUE_1` → `DOCUMENT_1`, `match`, `proven`).
+- **No exact document-version match** was established (lineage is a weaker proof
+  than an exact version).
+- **No direct Review-to-Issue relationship** is claimed; the proof is a shared
+  document lineage only.
+- The Relationships API lookup returned **no records** for the tested issue; that
+  empty result **does not** prove the issue was unrelated in the project or
+  Autodesk UI.
+- The artifact was produced through an **operator-mediated** sanitised
+  conversation handoff (the Filesystem connector was not used); no live Autodesk
+  identifiers are stored here.

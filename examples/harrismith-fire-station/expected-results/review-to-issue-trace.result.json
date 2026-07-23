@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "phase": "2",
+    "slice": "review-to-issue-trace",
+    "execution_date": "2026-07-23",
+    "read_only": true,
+    "status": "complete"
+  },
+  "component_provenance": {
+    "aps_forma_mcp": {
+      "repository_slug": "CognitiveStack/autodesk-aps-forma-mcp",
+      "inspected_revision": "a54acf8e5c628dbf7f97bf901a78f3c31c4b0781",
+      "runtime_worktree_state": "clean",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": [
+        "list_autodesk_hubs",
+        "list_projects",
+        "list_reviews",
+        "get_review_details",
+        "get_review_workflow",
+        "get_review_progress",
+        "list_review_file_versions",
+        "get_file_version_approval_statuses",
+        "list_issues",
+        "list_issue_types",
+        "get_issue_details",
+        "list_issue_relationships"
+      ]
+    }
+  },
+  "document_observation": {
+    "available": true,
+    "document_alias": "DOCUMENT_1",
+    "version_alias": "VERSION_1",
+    "version_number": null
+  },
+  "review_observation": {
+    "available": true,
+    "workflow_alias": "WORKFLOW_1",
+    "review_alias": "REVIEW_1",
+    "service_generation": "unknown",
+    "review_status": "OPEN",
+    "step_count": 2,
+    "current_step": {
+      "ordinal": 2,
+      "type": "APPROVER"
+    },
+    "reviewed_file_version_count": 1,
+    "approval_outcome": "IN_REVIEW"
+  },
+  "issue_observation": {
+    "available": true,
+    "issue_alias": "ISSUE_1",
+    "issue_type_alias": "ISSUE_TYPE_1",
+    "issue_status": "open",
+    "assignee_alias": "USER_1",
+    "reference_summary": [
+      {
+        "entity_type": "document_lineage",
+        "count": 1
+      }
+    ]
+  },
+  "relationship_observation": {
+    "available": true,
+    "method": "issue_detail_reference",
+    "links": [
+      {
+        "source": "ISSUE_1",
+        "target": "DOCUMENT_1",
+        "relation_type": "document_lineage",
+        "result": "match",
+        "proven": true,
+        "note": "The explicit issue-side document reference matched the reviewed document lineage. This proves a shared lineage, not an exact version match or a direct Review-to-Issue relationship."
+      }
+    ]
+  },
+  "governance_checks": [
+    {
+      "code": "EXPECTED_CDE_VERSION_VERIFIED",
+      "statement": "Reviewed document version equals the expected CDE version.",
+      "outcome": "unproven",
+      "note": "VERSION_1 was obtained from the Reviews endpoint, but no independent CDE item/version lookup was performed during this run."
+    },
+    {
+      "code": "REVIEW_PROJECT_MATCH",
+      "statement": "Review belongs to the expected project.",
+      "outcome": "pass",
+      "note": "REVIEW_1 was retrieved through the project-scoped Reviews API chain for PROJECT_1."
+    },
+    {
+      "code": "REVIEW_WORKFLOW_MATCH",
+      "statement": "Review uses the expected workflow.",
+      "outcome": "pass",
+      "note": "REVIEW_1 returned WORKFLOW_1 and its two-step workflow definition."
+    },
+    {
+      "code": "REVIEW_PROGRESS_OUTCOME_CONSISTENT",
+      "statement": "Review progress and outcome are internally consistent.",
+      "outcome": "pass",
+      "note": "Current-step correlation was an exact identifier match to ordinal 2, and the independent approval endpoint returned IN_REVIEW."
+    },
+    {
+      "code": "ISSUE_PROJECT_MATCH",
+      "statement": "Issue belongs to the same project.",
+      "outcome": "pass",
+      "note": "ISSUE_1 was retrieved through the same project-scoped Issues API chain."
+    },
+    {
+      "code": "ISSUE_TYPE_STATUS_AVAILABLE",
+      "statement": "Issue type and status are available.",
+      "outcome": "pass",
+      "note": "Issue type and status were independently observed."
+    },
+    {
+      "code": "SHARED_DOCUMENT_RELATIONSHIP",
+      "statement": "A file/review/issue relationship is positively verified as a shared document lineage.",
+      "outcome": "pass",
+      "note": "ISSUE_1's explicit lineage reference exactly matched DOCUMENT_1."
+    },
+    {
+      "code": "ISSUE_STATUS_INDEPENDENT",
+      "statement": "The issue status is not assumed from the review outcome.",
+      "outcome": "pass",
+      "note": "Issue status came from the Issues API and was not inferred from the review."
+    },
+    {
+      "code": "REVIEW_OUTCOME_INDEPENDENT",
+      "statement": "The review outcome is not assumed from the issue status.",
+      "outcome": "pass",
+      "note": "Review approval outcome came from the version-scoped approval endpoint and was not inferred from issue status."
+    },
+    {
+      "code": "RESPONSE_EVIDENCE_TRACEABLE",
+      "statement": "Response evidence is separately traceable.",
+      "outcome": "unproven",
+      "note": "A separate issue-resolution or response document was not traced in this execution."
+    }
+  ],
+  "sanitisation": {
+    "convention_version": 1,
+    "tokens_used": [
+      "PROJECT_1",
+      "REVIEW_1",
+      "WORKFLOW_1",
+      "STEP_1",
+      "STEP_2",
+      "VERSION_1",
+      "DOCUMENT_1",
+      "ISSUE_1",
+      "ISSUE_REFERENCE_1",
+      "APPROVAL_STATUS_1",
+      "ISSUE_TYPE_1",
+      "USER_1"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "CROSS_REGION_ENTITLEMENT_PROBES",
+      "stage": "provenance",
+      "message": "The target EMEA project was discovered successfully; non-target regional discovery probes returned authorization warnings."
+    },
+    {
+      "code": "SERVICE_GENERATION_UNKNOWN",
+      "stage": "review",
+      "message": "The Reviews responses did not provide an explicit authoritative service generation."
+    },
+    {
+      "code": "REVIEW_SELECTION_NAME_ANCHORED",
+      "stage": "review",
+      "message": "REVIEW_1 selection used an exact and unique designator in the review display name because the listing exposed no stronger scenario discriminator."
+    },
+    {
+      "code": "CDE_VERSION_CROSSCHECK_NOT_PERFORMED",
+      "stage": "document",
+      "message": "VERSION_1 was captured from the review's reviewed-version collection and was not independently retrieved through the general CDE item/version tools."
+    },
+    {
+      "code": "APPROVAL_STATUS_SURFACE_DIFFERENCE",
+      "stage": "review",
+      "message": "The reviewed-version record supplied null approval_status while the dedicated version-scoped approval endpoint supplied IN_REVIEW."
+    },
+    {
+      "code": "RELATIONSHIPS_API_EMPTY",
+      "stage": "relationship",
+      "message": "No Relationships API records were returned for ISSUE_1. This verifies the lookup capability but does not prove that ISSUE_1 was unrelated in the project or Autodesk UI."
+    },
+    {
+      "code": "EXACT_VERSION_MATCH_NOT_PROVEN",
+      "stage": "relationship",
+      "message": "The issue reference matched DOCUMENT_1 at lineage level; an exact match to VERSION_1 was not established."
+    },
+    {
+      "code": "DIRECT_REVIEW_ISSUE_RELATIONSHIP_NOT_ESTABLISHED",
+      "stage": "relationship",
+      "message": "The evidence establishes a shared document lineage, not a direct Review-to-Issue relationship."
+    },
+    {
+      "code": "RESPONSE_EVIDENCE_NOT_TRACED",
+      "stage": "governance",
+      "message": "A separate response or resolution document was not observed during this run."
+    },
+    {
+      "code": "OPERATOR_MEDIATED_EVIDENCE_TRANSFER",
+      "stage": "sanitisation",
+      "message": "Sanitised observations were transferred through the conversation and structured locally without persisting live identifiers in the repository."
+    }
+  ]
+}
