@@ -1,8 +1,9 @@
 # PRD: Autodesk BIM Workflow Reference Implementation
 
-**Status:** Draft (Phase 0 foundations)
-**Date:** 2026-07-22
-**Terminology last verified:** 2026-07-22 (see
+**Status:** Active reference implementation — Phases 0, 1 and 2 complete;
+Phase 3 capability planning in progress.
+**Created:** 2026-07-22 · **Last reviewed:** 2026-07-23
+**Terminology last verified:** 2026-07-23 (see
 [GLOSSARY.md](../guides/GLOSSARY.md) and
 [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md))
 
@@ -94,19 +95,23 @@ Two independently maintained MCP components are coordinated, not absorbed:
 They remain in their own repositories. This repository owns documentation,
 configuration, synthetic examples, and validation utilities only. The
 responsibility matrix and the dated capability ledger are defined in
-[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md). A read-only
-component inventory was completed on 2026-07-22 (APS/Forma MCP at `befcce5`, 18
-tools; Revit MCP at `ae01d29`, 14 tools); the capabilities the first slice needs
-are confirmed there. Capabilities not yet implemented (Reviews, RFI, Assets) are
-labelled as planned rather than assumed to exist.
+[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md). The APS/Forma
+MCP (`CognitiveStack/autodesk-aps-forma-mcp`) inventory is re-verified at
+`a54acf8e5c628dbf7f97bf901a78f3c31c4b0781` and reports **26 registered MCP tools**
+(24 read-only Autodesk, 1 guarded Autodesk write, 1 local-only preview), including
+**seven Reviews reads and `list_issue_relationships`, all implemented and
+live-verified** (Phase 2B). The Revit MCP baseline remains `ae01d29` (14 tools;
+its pre-existing working-tree changes are unrelated and unresolved). **RFI and
+Assets capabilities remain planned**, not confirmed.
 
-## 7. First vertical slice (read-only)
+## 7. First vertical slice (read-only) — complete
 
 **Slice: "Trace and verify a Revit deliverable from authoring to the CDE."**
+**Status: complete (Phase 1).**
 
 The smallest valuable slice connects existing Revit work to Autodesk cloud
 information management without any Forma Site Design Beta write functionality, and
-remains strictly read-only:
+remained strictly read-only:
 
 1. Inspect an existing Harrismith Revit model through the Revit MCP.
 2. Locate an existing uploaded or published deliverable in Forma Data Management
@@ -117,13 +122,37 @@ remains strictly read-only:
 6. Record a sanitised expected result under
    `examples/harrismith-fire-station/expected-results/`.
 
-No upload or publishing write operation is introduced in the first slice; that is
-a later, explicitly approved extension.
+No upload or publishing write operation was introduced; that remains a later,
+explicitly approved extension.
 
-Capabilities for steps 1–4 are **confirmed** in the dated capability ledger in
-[COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md), including the
-derivative and model-property reads. Steps 5–6 (metadata comparison and sanitised
-evidence) remain utilities to build in this repository.
+Phase 1 delivered a **live read-only Revit-to-CDE trace**, **sanitised evidence**,
+**schema validation**, and a **committed canonical result artifact**
+(`revit-to-cde-trace.result.json`). The evidence was structured through an
+**operator-mediated workflow** (a chat-mediated sanitised handoff), not through a
+general-purpose orchestration utility; no such comparison/sanitisation utility
+needs to be built for the slice to be complete.
+
+## 7A. Governance slice — Review-to-Issue (Phase 2) — complete
+
+**Slice: "Review-to-Issue Governance Trace."** **Status: complete (Phase 2),
+strictly read-only.**
+
+Phase 2 delivered:
+
+- **Reviews read capability** (seven read-only tools) and **issue Relationships
+  read capability** (`list_issue_relationships`), implemented and live-verified in
+  the component;
+- a **live read-only Review-to-Issue governance trace**;
+- **shared document-lineage proof** (the issue's explicit document reference
+  matched the reviewed document lineage);
+- **sanitised, schema-validated evidence**
+  (`review-to-issue-trace.result.json`).
+
+Qualifications preserved from the evidence:
+
+- **no exact document-version match** was proven (lineage is a weaker proof);
+- **no direct Review-to-Issue relationship** was claimed;
+- **no review, issue, or relationship writes** were performed.
 
 ## 8. Lifecycle order vs implementation priority
 
@@ -176,14 +205,15 @@ implementation priority. No part of the first vertical slice depends on it.
 
 ## 12. Assumptions
 
-- The two component repositories exist and were inventoried read-only on
-  2026-07-22 (APS/Forma MCP at `befcce5`; Revit MCP at `ae01d29`); running them
-  locally still requires the paths supplied via `FORMA_MCP_REPO` and
-  `REVIT_MCP_REPO`.
-- An existing Harrismith Revit model is available to inspect.
-- A CDE location (Forma Data Management project / folder) exists or will exist to
-  hold a published deliverable for the read-only slice.
-- Synthetic, sanitised data can represent the project without licensed content.
+- The two component repositories exist and are inventoried read-only; the APS/Forma
+  MCP inventory has been **re-verified at `a54acf8`** (26 tools) and the Revit MCP
+  baseline remains `ae01d29`. Running them locally requires the paths supplied via
+  `FORMA_MCP_REPO` and `REVIT_MCP_REPO`.
+- The Harrismith project and its CDE deliverable **exist and were successfully
+  traced** in Phases 1 and 2 (a real Forma Data Management item and version).
+- The **sanitisation convention exists and was applied** (see
+  [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md)); synthetic,
+  sanitised aliases represent the project without licensed content.
 
 ## 13. Dependencies
 
@@ -197,25 +227,78 @@ implementation priority. No part of the first vertical slice depends on it.
 
 ## 14. Open questions
 
-- Reviews, RFI, and Assets have no MCP tools yet (planned); when will each be
-  implemented, and in which component?
-- What is the verified, citable maturity of the APS APIs used by later stages?
-  (Do not infer from product maturity; only Forma Site Design is confirmed Beta
-  `v1alpha`.)
-- Is a real Forma Data Management project available for the Harrismith example,
-  or must the slice run against a synthetic fixture?
-- What sanitisation convention will represent hub / project / folder identifiers
-  in recorded expected results?
+Resolved since Phase 0 (retained here as record): a real Forma Data Management
+project/deliverable **is** available (traced in Phase 1); the **sanitisation
+convention** is defined and applied; **Reviews and issue-relationship MCP reads
+now exist** (Phase 2B).
+
+Open:
+
+- **RFI** capabilities: no MCP tools yet (planned); when and in which component?
+- **Assets** capabilities: no MCP tools yet (planned); when and in which component?
+- **Model Coordination clash-read availability**: does the current public API
+  expose clash tests, clash results, clash groups, and clash status as reads?
+- **Model Coordination model-set membership and version contracts**: endpoints for
+  participating models and their coordinated versions.
+- Verified, citable **maturity** of the APS APIs used by later stages (do not infer
+  from product maturity; only Forma Site Design is confirmed Beta `v1alpha`).
 
 ## 15. Roadmap (summary)
 
-Phased delivery follows the implementation priority in Section 8. Phase 0
-foundations and the read-only component inventory (2026-07-22) are complete;
-detailed implementation tasks remain deferred until the first slice is built.
+Phased delivery follows the implementation priority in Section 8.
 
-- **Phase 0** — Governance and foundations (this document set).
-- **Phase 1** — First read-only vertical slice (Section 7).
-- **Phase 2** — Issues and reviews (read-first, guarded writes).
-- **Phase 3** — Coordination evidence (native engine; no clash re-implementation).
-- **Phase 4** — Construction information exchange and asset handover.
-- **Phase 5** — Experimental Forma Site Design automation (isolated, deferred).
+- **Phase 0 — complete.** Governance and foundations (this document set).
+- **Phase 1 — complete.** Read-only Revit-to-CDE trace with committed sanitised
+  evidence (Section 7).
+- **Phase 2 — complete.** Issues and Reviews governance evidence: a complete
+  read-only slice; write workflows remain deferred (Section 7A).
+- **Phase 3 — planning in progress.** Model Coordination evidence (native engine;
+  **no clash re-implementation**). See below.
+- **Phase 4 — planned.** Forma Build construction information exchange and asset
+  handover. See below.
+- **Phase 5 — deferred experimental work.** Forma Site Design automation, isolated
+  and non-blocking (Section 11).
+
+### Phase 3 — Model Coordination evidence (planning in progress)
+
+Phase 3A has identified **two separate gaps**:
+
+1. **Capability gap** — the current component lacks clash-level, clash-group,
+   clash-status, clash-membership, and resolution/recheck reads. Only model-set
+   *listing* (`list_model_sets`) and coordination *issues* are read today.
+2. **Data-readiness gap** — the tested Harrismith project currently exposes **no
+   coordination model sets**.
+
+A Model Coordination evidence run is therefore **not currently possible**. The
+intended first scope is **provisional**:
+
+```
+model-set context
+  → participating models and versions
+    → coordination issue
+      → assignment and status
+        → shared-model-context comparison
+```
+
+This scope remains **blocked** until model-set membership reads and suitable
+project data are available. Phase 3 will **not** claim a clash was identified,
+linked to an issue, resolved, or geometrically verified, and will **not**
+re-implement Autodesk clash detection.
+
+### Phase 4 — Forma Build construction information exchange and asset handover (planned)
+
+Forma Build is treated as a **family of module-specific capabilities, not one
+monolithic API** (module-specific APS APIs such as Issues, RFIs, Submittals,
+Forms, Sheets, Assets, and Cost Management). Provisional structure, **subject to
+later capability verification**:
+
+- **Phase 4A — construction information exchange:** RFIs, Submittals, Sheets and
+  Meetings.
+- **Phase 4B — field quality and execution:** Issues, Forms, inspections and
+  construction records.
+- **Phase 4C — asset handover:** Assets, equipment records, defects, inspections
+  and handover information.
+
+Shared platform services (Issues, Relationships, Data Management) may be used in
+several phases; their use in Phase 2 or Phase 3 **does not** mean the complete
+Forma Build phase has begun.
