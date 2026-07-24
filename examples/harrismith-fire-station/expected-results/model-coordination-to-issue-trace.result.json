@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "phase": "3",
+    "slice": "model-coordination-to-issue-trace",
+    "execution_date": "2026-07-24",
+    "read_only": true,
+    "status": "complete"
+  },
+  "component_provenance": {
+    "aps_forma_mcp": {
+      "repository_slug": "CognitiveStack/autodesk-aps-forma-mcp",
+      "inspected_revision": "0117022ca29fd78c3e9cb38ccde9e47c8ea89df9",
+      "runtime_worktree_state": "clean",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": [
+        "list_projects",
+        "list_issues",
+        "get_issue_details",
+        "list_issue_relationships",
+        "list_model_sets",
+        "get_model_set",
+        "list_model_set_versions",
+        "get_latest_model_set_version",
+        "get_model_set_version"
+      ]
+    }
+  },
+  "coordination_observation": {
+    "available": true,
+    "model_set_available": true,
+    "model_set_alias": "MODEL_SET_1",
+    "model_set_version_alias": "MODEL_SET_VERSION_1",
+    "model_set_version_is_tip": true,
+    "version_history_confirmed": true,
+    "participating_model_count": 2,
+    "participating_models": [
+      {
+        "model_alias": "MODEL_1",
+        "discipline": null,
+        "version_alias": "VERSION_1",
+        "version_number": null,
+        "lineage_reference_present": true,
+        "coordinated_version_reference_present": true,
+        "is_tip_version": true
+      },
+      {
+        "model_alias": "MODEL_2",
+        "discipline": null,
+        "version_alias": "VERSION_2",
+        "version_number": null,
+        "lineage_reference_present": true,
+        "coordinated_version_reference_present": true,
+        "is_tip_version": true
+      }
+    ]
+  },
+  "clash_observation": {
+    "capability_status": "unavailable",
+    "available": false,
+    "clash_alias": null,
+    "clash_group_alias": null,
+    "clash_status": null,
+    "involved": []
+  },
+  "issue_observation": {
+    "available": true,
+    "issue_alias": "ISSUE_1",
+    "issue_type_alias": "ISSUE_TYPE_1",
+    "issue_status": "open",
+    "assignee_alias": "USER_1",
+    "reference_summary": [
+      {
+        "entity_type": "placement_document_lineage",
+        "count": 1
+      }
+    ]
+  },
+  "relationship_observation": {
+    "available": true,
+    "method": "issue_detail_reference",
+    "viewer_state_version_match_count": 2,
+    "links": [
+      {
+        "source": "ISSUE_1",
+        "target": "MODEL_1",
+        "relation_type": "placement_document_lineage",
+        "result": "match",
+        "proven": true,
+        "evidence_class": "typed_issue_field",
+        "note": "The typed issue placement lineage exactly matched MODEL_1's participating lineage in MODEL_SET_VERSION_1. This is a typed issue-field match; it is not a Relationships API record."
+      },
+      {
+        "source": "ISSUE_1",
+        "target": "VERSION_1",
+        "relation_type": "viewer_state_version_context",
+        "result": "match",
+        "proven": true,
+        "evidence_class": "viewer_state_derived",
+        "note": "A version reference was decoded locally from viewer-state data already returned by a read-only tool and exactly matched VERSION_1 in MODEL_SET_VERSION_1. This is contextual model matching; it is not a typed relationship, not a Relationships API record, and not clash membership or clash provenance."
+      },
+      {
+        "source": "ISSUE_1",
+        "target": "VERSION_2",
+        "relation_type": "viewer_state_version_context",
+        "result": "match",
+        "proven": true,
+        "evidence_class": "viewer_state_derived",
+        "note": "A version reference was decoded locally from viewer-state data already returned by a read-only tool and exactly matched VERSION_2 in MODEL_SET_VERSION_1. This is contextual model matching; it is not a typed relationship, not a Relationships API record, and not clash membership or clash provenance."
+      }
+    ]
+  },
+  "resolution_observation": {
+    "resolution_claimed": false,
+    "resolution_verified": false,
+    "later_version_alias": null,
+    "method": "none"
+  },
+  "outcome": "shared_model_context_proven",
+  "governance_checks": [
+    {
+      "code": "MODEL_SET_TIP_CONFIRMED",
+      "statement": "The retrieved coordination snapshot is the model-set tip.",
+      "outcome": "pass",
+      "note": "For MODEL_SET_1 in PROJECT_1, get_model_set identified MODEL_SET_VERSION_1 as the tip and list_model_set_versions independently confirmed it as the highest successful version; get_model_set_version then retrieved that exact snapshot."
+    },
+    {
+      "code": "PARTICIPATING_VERSIONS_IDENTIFIED",
+      "statement": "Each participating document exposes an exact coordinated version.",
+      "outcome": "pass",
+      "note": "MODEL_SET_VERSION_1 contained exactly two participating documents; each returned a stable lineage reference and an exact coordinated version reference (VERSION_1, VERSION_2)."
+    },
+    {
+      "code": "DISCIPLINE_NOT_INFERRED",
+      "statement": "Discipline is not inferred when no authoritative field is returned.",
+      "outcome": "pass",
+      "note": "No authoritative discipline field was returned for either participant; discipline was left null and never inferred from filenames, display names, folders, model titles, or viewer context."
+    },
+    {
+      "code": "NUMERIC_VERSION_NOT_INFERRED",
+      "statement": "No numeric Data Management document version is inferred from a URN.",
+      "outcome": "pass",
+      "note": "version_number is null for both participants; MODEL_SET_VERSION_1 is a coordination snapshot version and is not a Data Management document version."
+    },
+    {
+      "code": "ISSUE_PLACEMENT_LINEAGE_MATCH",
+      "statement": "The issue's typed placement lineage matches a snapshot participant.",
+      "outcome": "pass",
+      "note": "ISSUE_1's typed placement-lineage reference exactly matched MODEL_1's participating lineage in MODEL_SET_VERSION_1 (a typed issue-field match)."
+    },
+    {
+      "code": "VIEWER_STATE_VERSION_CONTEXT_MATCH",
+      "statement": "Viewer-state-derived version references match the participants.",
+      "outcome": "pass",
+      "note": "Two distinct issue-side version references decoded from viewer state exactly matched VERSION_1 and VERSION_2 in MODEL_SET_VERSION_1; contextual model matching only."
+    },
+    {
+      "code": "VIEWER_STATE_NOT_CLASH_MEMBERSHIP",
+      "statement": "Viewer-state element isolation is not clash membership.",
+      "outcome": "pass",
+      "note": "The viewer-state content was treated as contextual model/version evidence only and was never interpreted as clash membership or clash provenance."
+    },
+    {
+      "code": "UI_CLASH_ASSOCIATION_CONTEXTUAL_ONLY",
+      "statement": "A UI clash association is contextual evidence only.",
+      "outcome": "pass",
+      "note": "The Forma UI Clashes tab showed one clash under the issue, but this is contextual UI evidence only; the API exposed no machine-readable clash identifier, group, member, or origin."
+    },
+    {
+      "code": "ISSUE_STATUS_NOT_RESOLUTION",
+      "statement": "Issue status is not treated as geometric resolution.",
+      "outcome": "pass",
+      "note": "The issue is open; issue status alone was not used to claim or deny geometric resolution."
+    },
+    {
+      "code": "RELATIONSHIPS_API_EMPTY",
+      "statement": "The Relationships API returned no matching record.",
+      "outcome": "unproven",
+      "note": "list_issue_relationships returned zero records for ISSUE_1. This proves only that no matching Relationships API record was returned; it does not prove the real-world issue is unrelated."
+    },
+    {
+      "code": "TYPED_ISSUE_TO_MODELSET_RELATIONSHIP",
+      "statement": "A typed issue-to-model-set or issue-to-snapshot relationship exists.",
+      "outcome": "unproven",
+      "note": "No typed relationship linking ISSUE_1 to MODEL_SET_1 or MODEL_SET_VERSION_1 was returned; the shared-model-context evidence is a typed issue-field and viewer-state match, not a typed relationship."
+    },
+    {
+      "code": "DIRECT_CLASH_ISSUE_LINK",
+      "statement": "A direct clash-to-issue relationship is proven.",
+      "outcome": "unproven",
+      "note": "No clash identifier, clash-group identifier, clash-member collection, or clash-origin field was returned, so no direct clash-to-issue provenance could be established."
+    },
+    {
+      "code": "CLASH_MEMBERSHIP_EXPOSED",
+      "statement": "Clash membership is exposed by the API.",
+      "outcome": "unproven",
+      "note": "The component exposes no clash-member reads; clash membership was neither returned nor inferred."
+    },
+    {
+      "code": "GEOMETRIC_RESOLUTION_NOT_VERIFIED",
+      "statement": "Geometric resolution of a clash is verified.",
+      "outcome": "unproven",
+      "note": "No later coordinated version was compared and no clash recheck was performed; geometric resolution was not verified."
+    }
+  ],
+  "sanitisation": {
+    "convention_version": 1,
+    "tokens_used": [
+      "PROJECT_1",
+      "MODEL_SET_1",
+      "MODEL_SET_VERSION_1",
+      "MODEL_1",
+      "MODEL_2",
+      "VERSION_1",
+      "VERSION_2",
+      "ISSUE_1",
+      "ISSUE_TYPE_1",
+      "USER_1"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "LATEST_SNAPSHOT_TOOL_TIMEOUT",
+      "stage": "coordination",
+      "message": "get_latest_model_set_version returned a transport timeout and produced no evidence. The latest snapshot was instead established because get_model_set identified the tip, list_model_set_versions independently confirmed it as the highest successful version, and get_model_set_version successfully retrieved that exact snapshot and its two participating documents. The timeout is a disclosed tool limitation and does not invalidate the retrieved snapshot evidence."
+    },
+    {
+      "code": "RELATIONSHIPS_API_EMPTY",
+      "stage": "relationship",
+      "message": "list_issue_relationships returned no records for ISSUE_1. This verifies the lookup capability but proves only that no matching Relationships API record was returned; it does not prove the issue is unrelated in the project or the Autodesk UI."
+    },
+    {
+      "code": "EXACT_VERSION_NOT_TYPED_ISSUE_FIELD",
+      "stage": "issue",
+      "message": "Exact coordinated document-version references are not typed issue fields. The two version references were decoded from a viewer-state field already returned by a read-only tool and matched against the retrieved snapshot participants."
+    },
+    {
+      "code": "VIEWER_STATE_CONTEXT_NOT_CLASH_MEMBERSHIP",
+      "stage": "clash",
+      "message": "Viewer-state element isolation is contextual model/version evidence only and is not clash membership."
+    },
+    {
+      "code": "UI_CLASH_ASSOCIATION_NOT_MACHINE_READABLE",
+      "stage": "clash",
+      "message": "The Forma UI associated ISSUE_1 with one clash, but the API returned no clash identifier, clash-group identifier, clash-member collection, or clash-origin field; the UI association is contextual only and not machine-readable provenance."
+    },
+    {
+      "code": "DIRECT_CLASH_ISSUE_LINK_NOT_PROVEN",
+      "stage": "relationship",
+      "message": "No direct clash-to-issue relationship was provable from the available reads; a shared model context is not a clash-to-issue link."
+    },
+    {
+      "code": "GEOMETRIC_RESOLUTION_NOT_VERIFIED",
+      "stage": "resolution",
+      "message": "The issue remains open and no later coordinated version or clash recheck was evaluated; geometric resolution was not verified."
+    }
+  ]
+}

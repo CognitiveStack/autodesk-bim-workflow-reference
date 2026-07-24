@@ -73,7 +73,7 @@ What the evidence establishes:
   conversation handoff (the Filesystem connector was not used); no live Autodesk
   identifiers are stored here.
 
-## Phase 3 — Model Coordination-to-Issue trace (foundation verified; evidence pending)
+## Phase 3 — Model Coordination-to-Issue trace
 
 - **Workflow (learner):** [`docs/workflows/03_MODEL_COORDINATION_TO_ISSUE_TRACE.md`](../../../docs/workflows/03_MODEL_COORDINATION_TO_ISSUE_TRACE.md)
 - **Runbook (operator):** [`docs/workflows/PHASE_3_EXECUTION_PLAN.md`](../../../docs/workflows/PHASE_3_EXECUTION_PLAN.md)
@@ -81,24 +81,57 @@ What the evidence establishes:
 - **Schema:** [`schemas/phase-3-result.schema.json`](../../../schemas/phase-3-result.schema.json)
 - **Sanitisation:** [`docs/guides/SANITISATION_CONVENTION.md`](../../../docs/guides/SANITISATION_CONVENTION.md)
 
-Phase 3A planning and schema are **complete**. Phase 3B is **recorded**: the five
-read-only Model Coordination model-set/version reads (`list_model_sets`,
-`get_model_set`, `list_model_set_versions`, `get_latest_model_set_version`,
-`get_model_set_version`) are implemented and **live-verified (2026-07-23)** in the
-APS/Forma component, and the coordination **training dataset is ready** (a usable
-model set with two processed discipline-context models). **No Phase 3 evidence
-artifact exists yet**, and none is created by this change.
+Phase 3 follows the same public/private boundary as Phases 1 and 2: raw
+observations, the alias map, and raw/decoded viewer-state data live in
+`.local/phase-3/` (git-ignored); only the sanitised result JSON is committed here.
 
-What remains before the live read-only trace (Phase 3C) can complete:
+### Artifact
 
-- a coordination **issue must be selected** through the Autodesk UI and read with
-  the existing Issues tools, and a **supported model-context relationship** proven;
-- **clash-level reads remain deferred** — the component still does not read clash
-  results, identities, groups, status/history, a direct clash-to-issue
-  relationship, or resolution verification.
+- `model-coordination-to-issue-trace.result.json` — present. A **complete**,
+  read-only, sanitised Phase 3C evidence artifact from a live run on 2026-07-24,
+  with outcome **`shared_model_context_proven`**.
 
-The current honest **public artifact status** remains
-**`coordination_evidence_incomplete`**. A Phase 3 evidence artifact
-(`model-coordination-to-issue-trace.result.json`) will be added in a later,
-separate commit once a selected issue and supported relationship are traced,
-sanitised, and a `complete` Option A run exists.
+What the evidence establishes (the narrow proof):
+
+- `ISSUE_1` carries a **typed placement-lineage reference** that exactly matched
+  `MODEL_1`'s participating lineage in the coordination snapshot
+  `MODEL_SET_VERSION_1` (`evidence_class: typed_issue_field`).
+- **Two viewer-state-derived version references** (decoded locally from a
+  viewer-state field already returned by a read-only tool) exactly matched
+  `VERSION_1` and `VERSION_2`, the coordinated versions of the two participating
+  documents in `MODEL_SET_VERSION_1` (`evidence_class: viewer_state_derived`;
+  `viewer_state_version_match_count: 2`).
+- Together these prove a **shared model context** — the issue and the coordination
+  snapshot refer to the same models at the same coordinated versions.
+
+Distinctions kept honest:
+
+- **Typed placement evidence vs viewer-state contextual evidence.** The placement
+  match is a typed issue-field match; the version matches are contextual,
+  viewer-state-derived matches — **not** typed relationships.
+- **Relationships API returned zero records** for `ISSUE_1`. That empty result
+  proves only that no matching Relationships API record was returned; it does **not**
+  prove the issue is unrelated in the project or the Autodesk UI.
+- The Forma **Clashes tab** showed one clash under the issue, but that is
+  **contextual UI evidence only** — no machine-readable clash identifier, group,
+  member, or origin was returned, so there is **no direct clash-to-issue provenance**.
+  Viewer-state element isolation is **not** clash membership.
+- No discipline field was returned (discipline is `null`, never inferred); no numeric
+  Data Management document version was inferred from a URN (`MODEL_SET_VERSION_1` is a
+  coordination snapshot version, not a document-version number).
+
+Tool limitation: `get_latest_model_set_version` returned a **transport timeout** and
+produced no evidence. The tip snapshot was instead established because `get_model_set`
+identified the tip, `list_model_set_versions` independently confirmed it as the
+highest successful version, and `get_model_set_version` successfully retrieved that
+exact snapshot and its two participants. The timeout is disclosed and does not
+invalidate the retrieved evidence.
+
+Unsupported ceilings (not established by this artifact):
+
+- `clash_issue_link_proven`;
+- `clash_resolution_claimed_not_verified`;
+- `clash_resolution_verified`.
+
+Clash-level reads remain deferred, and no clash-level aliases are used because no
+clash-level API data was returned.
