@@ -1,16 +1,17 @@
 # Phase 3 Capability Gap — Model Coordination-to-Issue Trace
 
-**Status:** Phase 3B recorded — model-set/version foundation implemented and
-live-verified; issue/relationship and clash-level gaps remain.
-**Date:** 2026-07-23
+**Status:** Phase 3C read-only inspection completed — `shared_model_context_proven`
+established (§6); clash-level reads remain unimplemented and deferred.
+**Date:** 2026-07-24
 
 This document records what the Model Coordination-to-Issue Trace needs, what the
 current component provides, and the remaining gaps. The model-set and
-participating-version foundation is now **executable and live-verified**; the
-coordination-data-readiness blocker is **closed**; the issue-selection and
-relationship portion, and all clash-level reads, remain outstanding. It is
-consistent with [COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) (APS/Forma MCP
-re-verified 2026-07-23 at `0117022`) and the terminology model in
+participating-version foundation is **executable and live-verified**; the
+coordination-data-readiness blocker is **closed**; the Phase 3C issue/relationship
+trace has been executed and establishes a **shared model context** (§6); all
+clash-level reads remain outstanding. It is consistent with
+[COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) (APS/Forma MCP re-verified
+2026-07-23 at `0117022`) and the terminology model in
 [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md).
 
 No capability is asserted to exist unless it appears as **confirmed** in
@@ -69,17 +70,17 @@ clash-group, clash-member, or clash-status functions, registered or unregistered
 | 11 | clash geometry / involved element references | **missing** |
 | 12 | discipline / model ownership | **no_authoritative_field** (no discipline field in the five live-verified responses; a governed orchestration-level classification, never inferred from file/display names, folders or model titles) |
 | 13 | coordination issues created from clashes | partially_available (coordination issues readable; clash origin/provenance not) |
-| 14 | issue-to-clash relationships | undocumented_or_uncertain (Relationships exposes generic issue-to-document entities only, not clash references) |
-| 15 | issue placement / pushpin references | undocumented_or_uncertain (needs a real coordination `get_issue_details`) |
+| 14 | issue-to-clash relationships | undocumented_or_uncertain (Relationships exposes generic issue-to-document entities only, not clash references; the shared-model-context match is a typed issue-field / viewer-state match, not a clash relationship) |
+| 15 | issue placement / pushpin references | **confirmed_available** (a real coordination `get_issue_details` returned a typed placement-lineage reference and a viewer-state field; see §6) |
 | 16 | issue assignment & status | **confirmed_available** (`get_issue_details`) |
 | 17 | subsequent model versions | **confirmed_available** (`list_item_versions`, document-item scope) |
 | 18 | evidence a clash disappeared / was resolved | **missing** |
 | 19 | clash history across model-set versions | **missing** |
 | 20 | Model Coordination ↔ Navisworks correlation | unavailable_through_current_public_api / undocumented_or_uncertain |
 
-**Confirmed:** #3, #4, #5, #16, #17. **Partial:** #13. **No authoritative field:**
-#12. **Missing:** #6, #7, #8, #9, #10, #11, #18, #19. **Uncertain:** #1, #2, #14,
-#15, #20.
+**Confirmed:** #3, #4, #5, #15, #16, #17. **Partial:** #13. **No authoritative
+field:** #12. **Missing:** #6, #7, #8, #9, #10, #11, #18, #19. **Uncertain:** #1, #2,
+#14, #20.
 
 ### 4.1 Phase 3 capability matrix
 
@@ -140,24 +141,82 @@ Closing the data-readiness gap does not add clash reads: the remaining Phase 3
 work is the issue/relationship portion (§6) plus the clash-level capability gap
 (§5.1), which are independent of coordination data existing.
 
-## 6. Present proof ceiling
+## 6. Present proof ceiling — `shared_model_context_proven`
 
-The live capability foundation now exists, but the repository still has **no
-committed Phase 3 evidence artifact**. Until a selected coordination issue and a
-supported model-context relationship are traced, sanitised, and committed, the
-current honest public ceiling remains **`coordination_evidence_incomplete`**. The
-trace cannot yet claim `shared_model_context_proven`, `clash_issue_link_proven`,
-`clash_resolution_claimed_not_verified`, or `clash_resolution_verified`.
+The Phase 3C read-only inspection establishes **`shared_model_context_proven`** as
+the strongest justified conclusion.
 
-The remaining Phase 3C gate is:
+### 6.1 The proof
 
-coordination snapshot → at least two participating document versions → selected
-coordination issue → issue assignment/status → supported issue-to-model-context
-relationship.
+- `ISSUE_1` contains a **typed placement-lineage reference**;
+- that lineage **exactly matches `MODEL_1`** participating in `MODEL_SET_VERSION_1`;
+- **two viewer-state-derived version references** decoded locally from a viewer-state
+  field already returned by a read-only tool **exactly match `VERSION_1` and
+  `VERSION_2`**, the coordinated versions of the two documents participating in
+  `MODEL_SET_VERSION_1`.
 
-The full Phase 3 trace is **not** complete. Any issue selection or creation must
-remain a manual Autodesk-UI action unless a separate write workflow is explicitly
-approved.
+This proves that the issue and the coordination snapshot refer to the same models
+and versions. It **does not** prove a Relationships API record, a typed
+issue-to-model-set relationship, a typed issue-to-snapshot relationship, or
+clash-to-issue provenance.
+
+### 6.2 Evidence-ceiling boundary
+
+- **Supported (established):** `shared_model_context_proven`.
+- **Not supported (not established):** `clash_issue_link_proven`,
+  `clash_resolution_claimed_not_verified`, `clash_resolution_verified`.
+
+### 6.3 Contextual and negative observations
+
+- The Forma **Clashes tab** visibly associates `ISSUE_1` with one clash — this is
+  **contextual UI evidence only**; the API returned no clash identifier, clash-group
+  identifier, clash-member collection, or clash-origin field.
+- **Viewer-state element isolation is not clash membership.**
+- `list_issue_relationships` returned **zero records**; an empty Relationships API
+  result proves only that **no matching record was returned**, not that the issue is
+  unrelated in the project or the Autodesk UI.
+- **No discipline field was returned**, and none was inferred; a null discipline does
+  not make the inspection partial.
+- **No numeric document version was inferred from a URN.**
+- `MODEL_SET_VERSION_1` is a **coordination snapshot version**, distinct from Data
+  Management document-version numbering.
+
+### 6.4 Tool limitation
+
+- `get_latest_model_set_version` returned a **transport timeout**;
+- `get_model_set` identified the tip, `list_model_set_versions` independently
+  corroborated it as the highest successful version, and `get_model_set_version`
+  successfully returned the selected snapshot and its two participating documents;
+- the timeout is disclosed but does **not** invalidate the retrieved snapshot
+  evidence.
+
+### 6.5 Schema and artifact status
+
+The Phase 3 result schema was extended (backward-compatibly; `schema_version`
+remains 1) to represent this result: an optional coordination snapshot identity
+(`model_set_version_alias`, `model_set_version_is_tip`, `version_history_confirmed`),
+optional per-participant lineage/version/tip presence booleans, a nullable
+`discipline` that no longer forces a `partial` status, an optional `evidence_class`
+on relationship links (`typed_issue_field`, `viewer_state_derived`,
+`relationships_api`, `ui_context`), and an optional
+`relationship_observation.viewer_state_version_match_count`.
+
+The `shared_model_context_proven` guard structurally requires: a stable
+**`model_set_alias`** and a coordination-snapshot **`model_set_version_alias`**
+(neither a Data Management document-version number); **at least two** participating
+model/version identities, each with a returned lineage reference
+(`lineage_reference_present: true`) and an exact coordinated-version reference
+(`coordinated_version_reference_present: true`); **one** proven `typed_issue_field`
+placement-lineage match; and **at least two** exact viewer-state-derived
+coordinated-version matches (`viewer_state_version_match_count ≥ 2`, plus a proven
+`viewer_state_derived` link). Alias distinctness remains a runtime governance check;
+`discipline` may remain null; viewer-state matching is not a typed relationship,
+viewer-state element isolation is not clash membership, and no direct clash-to-issue
+provenance is proved.
+
+**No sanitised public Phase 3 result artifact has been committed yet**; packaging it
+is a separate later increment. No issue was created; issue creation remains a manual
+Autodesk-UI action unless a separate write workflow is explicitly approved.
 
 ## 7. Official Autodesk contract questions for Phase 3B to verify
 

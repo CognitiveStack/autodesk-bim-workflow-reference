@@ -11,13 +11,13 @@ The example project is the synthetic **Harrismith Fire Station**. Phase 3 is
 strictly read-only: no model is uploaded or published, no coordination is run, no
 issue is created or changed.
 
-> **Status:** the model-set and participating-version foundation is now
-> implemented and **live-verified** (2026-07-23), and the coordination training
-> data is ready, so this trace is **partially executable**. Selecting a
-> coordination issue and proving a supported model-context relationship remain
-> outstanding, and clash-level reads stay deferred. **No Phase 3 evidence artifact
-> exists yet**, so the current honest public proof ceiling is
-> `coordination_evidence_incomplete`.
+> **Status:** the Phase 3C read-only inspection has been **completed**. It proves a
+> **shared model context** — `shared_model_context_proven` — between a coordination
+> issue and the participating documents of a coordination snapshot (see below).
+> Clash-level reads stay deferred, so a direct clash-to-issue link and any resolution
+> claim remain **not established**. No issue was created, and **no sanitised public
+> Phase 3 evidence artifact has been committed yet** (that packaging is a separate,
+> later step).
 
 ## What Model Coordination does
 
@@ -75,33 +75,46 @@ versions, and this coordination issue refers to the same models.* It intends to
 prove a **shared model context** — **not** a clash, **not** a direct
 clash-to-issue link, and **not** a resolution.
 
-## Why the current evidence is incomplete
+## What the Phase 3C inspection proved
 
-What is now in place (detailed in the capability gap):
+The read-only inspection established a **shared model context**
+(`shared_model_context_proven`):
 
-- **Model-set/version foundation — done.** The component can discover coordination
-  *model sets*, read a set's detail, list its coordination snapshot versions, and
-  read the latest/specific snapshot with its **participating documents and their
-  exact coordinated versions**. It also reads coordination *issues* and generic
-  issue-to-document relationships.
-- **Data readiness — done.** The training project now has a usable coordination
-  model set (two discipline-context models processed, both participating versions
-  visible through the version-level reads).
+- `ISSUE_1` carries a **typed placement-lineage reference** that **exactly matches
+  `MODEL_1`**, a participant in the coordination snapshot `MODEL_SET_VERSION_1`;
+- **two version references decoded from the issue's viewer-state field** (already
+  returned by a read-only tool) **exactly match `VERSION_1` and `VERSION_2`**, the
+  coordinated versions of the two participating documents in that same snapshot.
 
-What still blocks a completed trace:
+So the issue and the coordination snapshot demonstrably refer to the **same models
+at the same coordinated versions**. That is the shared model context — a real,
+useful, medium-strength proof.
 
-1. **Issue/relationship portion outstanding** — a coordination issue must be
-   selected through the Autodesk UI, read through the existing Issues tools, and
-   tied to the coordination models by a **supported model-context relationship**.
-   No such trace has been captured or committed.
-2. **Clash-level capability gap** — the component still cannot read clash results,
-   clash identities/groups/status, clash element references, a direct
-   clash-to-issue relationship, clash history, or any recheck/resolution state.
+### What it deliberately does *not* prove
 
-Until a selected issue and a supported relationship are traced and committed, an
-honest run yields `coordination_evidence_incomplete`. Any issue selection or
-creation remains a **manual Autodesk-UI action** unless a separate write workflow
-is explicitly approved.
+- It is **not** a Relationships API record: `list_issue_relationships` returned
+  **zero records**, and an empty result proves only that no matching record was
+  returned — not that the issue is unrelated.
+- The typed placement match is a **typed issue-field** match; the version matches are
+  **viewer-state-derived contextual** matches. Neither is a typed issue-to-model-set
+  or issue-to-snapshot relationship.
+- The Forma **Clashes tab** shows `ISSUE_1` beside one clash, but that is **UI
+  context only** — the API exposed no clash identifier, group, member, or origin, so
+  there is **no direct clash-to-issue provenance**. Viewer-state element isolation is
+  **not** clash membership.
+- No discipline field was returned (and none was inferred); no numeric document
+  version was inferred from a URN.
+
+## What is still deferred
+
+- **Clash-level capability gap** — the component still cannot read clash results,
+  clash identities/groups/status, clash element references, a direct clash-to-issue
+  relationship, clash history, or any recheck/resolution state. So
+  `clash_issue_link_proven`, `clash_resolution_claimed_not_verified`, and
+  `clash_resolution_verified` are **not** established.
+- A **sanitised public evidence artifact** has not been committed yet; packaging it
+  is a separate, later step. Any issue selection or creation remains a **manual
+  Autodesk-UI action** unless a separate write workflow is explicitly approved.
 
 ## Distinctions this slice keeps honest
 
@@ -117,14 +130,14 @@ These are easy to conflate and must not be:
 - **A direct clash-to-issue linkage** requires explicit API evidence tying a clash
   to an issue.
 - **Shared model context** (issue and coordination refer to the same models) is a
-  weaker, valuable proof — and is the *most* this slice could establish.
+  weaker, valuable proof — and is exactly what this slice **established**.
 
 Navisworks (desktop) and cloud Model Coordination evidence must **not** be silently
 merged unless their identifiers or provenance can be correlated.
 
 ## Where this leads
 
-Once clash-level reads and coordination data exist, later sub-phases can attempt
-clash identity, clash-to-issue linkage, and — most carefully — geometric
-resolution verification. As always, write actions (running coordination, creating
+Coordination data now exists in the training project. Once clash-level reads exist,
+later sub-phases can attempt clash identity, clash-to-issue linkage, and — most
+carefully — geometric resolution verification. As always, write actions (running coordination, creating
 or closing issues) are deferred by design: the reference observes before it acts.

@@ -46,7 +46,7 @@
 
     "coordination_observation": {
       "type": "object",
-      "description": "Coordination model-set context and participating discipline models with their coordinated versions.",
+      "description": "Coordination model-set context and participating models with their coordinated versions. model_set_version_alias identifies a Model Coordination snapshot (model-set) version and is a DIFFERENT domain from any Data Management document-version number; no numeric document version is inferred from a URN.",
       "additionalProperties": false,
       "required": ["available", "model_set_available", "participating_models"],
       "properties": {
@@ -54,6 +54,18 @@
         "model_set_available": { "type": "boolean" },
         "model_set_alias": { "$ref": "#/definitions/alias" },
         "coordination_space_alias": { "$ref": "#/definitions/alias" },
+        "model_set_version_alias": {
+          "description": "Alias for the coordination SNAPSHOT (model-set) version whose participating documents were retrieved (e.g. MODEL_SET_VERSION_1). A Model Coordination snapshot version, never a Data Management document-version number.",
+          "$ref": "#/definitions/alias"
+        },
+        "model_set_version_is_tip": {
+          "description": "Whether the retrieved snapshot was identified as the model-set tip (e.g. by get_model_set). Null when not determined.",
+          "type": ["boolean", "null"]
+        },
+        "version_history_confirmed": {
+          "description": "Whether version-history evidence (e.g. list_model_set_versions) independently corroborated the selected snapshot as the highest successful version. Null when not determined.",
+          "type": ["boolean", "null"]
+        },
         "participating_model_count": { "type": ["integer", "null"], "minimum": 0 },
         "participating_models": {
           "type": "array",
@@ -64,9 +76,24 @@
             "required": ["model_alias"],
             "properties": {
               "model_alias": { "$ref": "#/definitions/alias" },
-              "discipline": { "type": ["string", "null"] },
+              "discipline": {
+                "description": "Authoritative discipline label, or null when no authoritative discipline field was returned. Never inferred from filenames, display names, folders, model titles, or viewer context. A null discipline does NOT make the inspection partial.",
+                "type": ["string", "null"]
+              },
               "version_alias": { "$ref": "#/definitions/alias" },
-              "version_number": { "type": ["integer", "null"], "minimum": 0 }
+              "version_number": { "type": ["integer", "null"], "minimum": 0 },
+              "lineage_reference_present": {
+                "description": "Whether a stable model/document-lineage reference was returned for this participant. No raw URN is stored.",
+                "type": ["boolean", "null"]
+              },
+              "coordinated_version_reference_present": {
+                "description": "Whether an exact coordinated document-version reference was returned for this participant. No raw URN is stored.",
+                "type": ["boolean", "null"]
+              },
+              "is_tip_version": {
+                "description": "Whether this participant's coordinated version was reported as the current lineage tip. Null when not determined.",
+                "type": ["boolean", "null"]
+              }
             }
           }
         }
@@ -146,6 +173,11 @@
           "type": "string",
           "enum": ["issue_detail_reference", "relationships_api", "shared_model_context", "operator_asserted", "none"]
         },
+        "viewer_state_version_match_count": {
+          "description": "Count of distinct issue-side version references decoded from viewer state, each exactly matched against a participating coordinated version_urn in the retrieved snapshot. This is contextual shared-model evidence only: it does NOT represent Relationships API records, clash members, clash provenance, or geometric intersections.",
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
         "links": {
           "type": "array",
           "items": {
@@ -158,6 +190,11 @@
               "relation_type": { "type": "string" },
               "result": { "type": "string", "enum": ["match", "difference", "no_equivalent"] },
               "proven": { "type": "boolean" },
+              "evidence_class": {
+                "description": "How this link's evidence was obtained. typed_issue_field: a structured field returned directly inside issue details (e.g. placement lineage); not automatically a Relationships API record. viewer_state_derived: a reference decoded locally from viewer-state data already returned by a read-only tool; supports contextual model matching only after an exact comparison with a retrieved snapshot participant; not a typed relationship, not clash membership, not clash provenance. relationships_api: an explicit record returned by list_issue_relationships or its equivalent. ui_context: a visible UI observation; contextual only and never sufficient for a machine-readable proven relationship.",
+                "type": "string",
+                "enum": ["typed_issue_field", "viewer_state_derived", "relationships_api", "ui_context"]
+              },
               "note": { "type": "string" }
             }
           }
@@ -240,7 +277,7 @@
 
   "allOf": [
     {
-      "description": "A result may be 'complete' only for the narrowed Option A shared multidisciplinary model context: coordination_observation.available true; model_set_available true; at least TWO participating models (minItems 2), each including model_alias, a non-null discipline, and a non-null coordinated version_alias; issue_observation.available true; and at least one explicit proven relationship link (proven:true) supporting the selected outcome. An issue existing alone, or a single participating model, is never sufficient. Clash identity is NOT required for the narrowed Option A slice. NOTE: Draft-7 cannot express that the two model aliases and disciplines are semantically DISTINCT; the runtime trace must verify at least two distinct model aliases, at least two relevant discipline contexts, and a non-null coordinated version alias per model (see PHASE_3_EXECUTION_PLAN.md).",
+      "description": "A result may be 'complete' only for the narrowed Option A shared multi-model coordination context: coordination_observation.available true; model_set_available true; at least TWO participating models (minItems 2), each including model_alias and a non-null coordinated version_alias; issue_observation.available true; and at least one explicit proven relationship link (proven:true) supporting the selected outcome. An issue existing alone, or a single participating model, is never sufficient. Clash identity is NOT required for the narrowed Option A slice. DISCIPLINE: a non-null discipline is NOT required; a null discipline (no authoritative discipline field was returned, and none is inferred) does NOT make the inspection 'partial'. 'complete' means the governed inspection was completed and its required evidence was recorded; 'partial' means required execution or evidence retrieval remained incomplete, not merely that an optional metadata field (such as discipline) was unavailable. NOTE: Draft-7 cannot express that the two model aliases are semantically DISTINCT; the runtime trace must verify at least two distinct model aliases and a non-null coordinated version alias per model (see PHASE_3_EXECUTION_PLAN.md).",
       "if": {
         "properties": { "execution": { "properties": { "status": { "const": "complete" } } } }
       },
@@ -253,9 +290,8 @@
               "participating_models": {
                 "minItems": 2,
                 "items": {
-                  "required": ["model_alias", "discipline", "version_alias"],
+                  "required": ["model_alias", "version_alias"],
                   "properties": {
-                    "discipline": { "type": "string", "minLength": 1 },
                     "version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
                   }
                 }
@@ -268,6 +304,55 @@
               "links": {
                 "minItems": 1,
                 "contains": { "properties": { "proven": { "const": true } }, "required": ["proven"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shared_model_context_proven requires a stable model-set identity, a coordination-snapshot identity, and multi-participant shared context: coordination_observation.available and model_set_available true; a non-null model_set_alias (the stable model set) AND a non-null model_set_version_alias (the Model Coordination snapshot version) — neither is a Data Management document-version number; at least TWO participating models, each with a non-null model_alias, a non-null coordinated version_alias, and lineage_reference_present and coordinated_version_reference_present both true; relationship evidence whose links include at least one proven typed_issue_field placement-lineage link AND at least one proven viewer_state_derived version-context link, with every proven link carrying an evidence_class; and a relationship_observation.viewer_state_version_match_count of at least 2 (two distinct issue-side version references decoded from viewer state, each exactly matched to a participating coordinated version). This guard does NOT require non-null discipline, a relationships_api record, a typed issue-to-model-set relationship, a typed issue-to-snapshot relationship, direct clash-to-issue provenance, clash membership, or geometric resolution. Draft-7 cannot express that the two model aliases or the two version aliases are semantically DISTINCT; that remains a runtime governance check (see PHASE_3_EXECUTION_PLAN.md).",
+      "if": {
+        "properties": { "outcome": { "const": "shared_model_context_proven" } },
+        "required": ["outcome"]
+      },
+      "then": {
+        "properties": {
+          "coordination_observation": {
+            "required": ["available", "model_set_available", "model_set_alias", "model_set_version_alias", "participating_models"],
+            "properties": {
+              "available": { "const": true },
+              "model_set_available": { "const": true },
+              "model_set_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "model_set_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "participating_models": {
+                "minItems": 2,
+                "items": {
+                  "required": ["model_alias", "version_alias", "lineage_reference_present", "coordinated_version_reference_present"],
+                  "properties": {
+                    "model_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+                    "version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+                    "lineage_reference_present": { "const": true },
+                    "coordinated_version_reference_present": { "const": true }
+                  }
+                }
+              }
+            }
+          },
+          "relationship_observation": {
+            "required": ["available", "method", "links", "viewer_state_version_match_count"],
+            "properties": {
+              "viewer_state_version_match_count": { "type": "integer", "minimum": 2 },
+              "links": {
+                "minItems": 1,
+                "items": {
+                  "if": { "properties": { "proven": { "const": true } }, "required": ["proven"] },
+                  "then": { "required": ["evidence_class"] }
+                },
+                "allOf": [
+                  { "contains": { "required": ["proven", "evidence_class"], "properties": { "proven": { "const": true }, "evidence_class": { "const": "typed_issue_field" } } } },
+                  { "contains": { "required": ["proven", "evidence_class"], "properties": { "proven": { "const": true }, "evidence_class": { "const": "viewer_state_derived" } } } }
+                ]
               }
             }
           }
