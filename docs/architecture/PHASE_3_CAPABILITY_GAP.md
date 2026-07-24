@@ -1,8 +1,9 @@
 # Phase 3 Capability Gap — Model Coordination-to-Issue Trace
 
-**Status:** Phase 3C read-only inspection completed — `shared_model_context_proven`
-established (§6); clash-level reads remain unimplemented and deferred.
-**Date:** 2026-07-24
+**Status:** Phase 3 complete — Phase 3C read-only inspection established
+`shared_model_context_proven` (§6) and the Phase 3D sanitised public artifact is
+committed (§6.5); clash-level reads remain unimplemented and deferred.
+**Date:** 2026-07-24 (component re-pinned to `75b36b2`, 2026-07-24)
 
 This document records what the Model Coordination-to-Issue Trace needs, what the
 current component provides, and the remaining gaps. The model-set and
@@ -11,7 +12,7 @@ coordination-data-readiness blocker is **closed**; the Phase 3C issue/relationsh
 trace has been executed and establishes a **shared model context** (§6); all
 clash-level reads remain outstanding. It is consistent with
 [COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) (APS/Forma MCP re-verified
-2026-07-23 at `0117022`) and the terminology model in
+locally 2026-07-24 at `75b36b2`) and the terminology model in
 [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md).
 
 No capability is asserted to exist unless it appears as **confirmed** in
@@ -23,11 +24,17 @@ and no public API availability is claimed without evidence.
 - **Reference repository:** `CognitiveStack/autodesk-bim-workflow-reference`,
   `main`.
 - **APS/Forma MCP component:** `CognitiveStack/autodesk-aps-forma-mcp` at
-  `0117022ca29fd78c3e9cb38ccde9e47c8ea89df9` — 30 tools (28 read-only Autodesk,
+  `75b36b2635de3a5707fd1ff3dbf5cd487e3f0e0a` — 30 tools (28 read-only Autodesk,
   1 guarded write, 1 local-only). Five read-only Model Coordination model-set reads
   (`list_model_sets`, `get_model_set`, `list_model_set_versions`,
   `get_latest_model_set_version`, `get_model_set_version`) are implemented and
-  live-verified 2026-07-23.
+  live-verified 2026-07-23, and confirmed still registered at `75b36b2`.
+  **The capability classifications in this document are unchanged by the move from
+  `0117022` to `75b36b2`**: that increment is reliability-only (bounded
+  token-refresh locks, explicit HTTP timeouts, structured transport errors) and
+  adds no tool, no Autodesk capability, and no public tool-contract change
+  (see [COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §3.2). The Phase 3C
+  evidence itself was captured at `0117022`.
 - **Revit MCP component:** `ae01d29` (not used by Phase 3).
 
 ## 2. What Phase 3 needs
@@ -50,7 +57,8 @@ clash recheck / resolution status.
 
 ## 4. Model Coordination capability assessment (20 items)
 
-Classifications are evidence-based from component source at `0117022`. The five
+Classifications are evidence-based from component source, established at `0117022`
+and unchanged at the currently pinned `75b36b2`. The five
 read-only model-set/version reads now exist and are live-verified (2026-07-23); **no
 clash code of any kind exists in the component** — no clash-test, clash-result,
 clash-group, clash-member, or clash-status functions, registered or unregistered:
@@ -183,12 +191,26 @@ clash-to-issue provenance.
 
 ### 6.4 Tool limitation
 
+**Historical observation, recorded during the Phase 3C inspection on 2026-07-24 at
+component revision `0117022`. It is preserved unchanged as evidence and is not a
+statement of current behaviour.**
+
 - `get_latest_model_set_version` returned a **transport timeout**;
 - `get_model_set` identified the tip, `list_model_set_versions` independently
   corroborated it as the highest successful version, and `get_model_set_version`
   successfully returned the selected snapshot and its two participating documents;
 - the timeout is disclosed but does **not** invalidate the retrieved snapshot
   evidence.
+
+**Subsequent hardening (note added 2026-07-24).** Component revision `75b36b2`
+(*fix: bound token locks and APS transport timeouts*) subsequently bounded
+token-refresh lock acquisition, set explicit HTTP connect/read/write/pool
+timeouts, and made timeout and transport failures return structured, sanitised
+errors rather than hanging. This is a **forward-looking baseline change only**: the
+historical observation above stands as recorded, the committed Phase 3 artifact is
+unchanged, and **no re-observation has been performed**. Whether
+`get_latest_model_set_version` now succeeds against this project is **unverified**
+and would require a new read-only run.
 
 ### 6.5 Schema and artifact status
 
@@ -214,9 +236,16 @@ coordinated-version matches (`viewer_state_version_match_count ≥ 2`, plus a pr
 viewer-state element isolation is not clash membership, and no direct clash-to-issue
 provenance is proved.
 
-**No sanitised public Phase 3 result artifact has been committed yet**; packaging it
-is a separate later increment. No issue was created; issue creation remains a manual
-Autodesk-UI action unless a separate write workflow is explicitly approved.
+The sanitised public Phase 3 result artifact **is committed** (Phase 3D, complete):
+
+```
+examples/harrismith-fire-station/expected-results/model-coordination-to-issue-trace.result.json
+```
+
+It validates against `schemas/phase-3-result.schema.json` with
+`execution.status: complete` and `outcome: shared_model_context_proven`. No issue
+was created; issue creation remains a manual Autodesk-UI action unless a separate
+write workflow is explicitly approved.
 
 ## 7. Official Autodesk contract questions for Phase 3B to verify
 

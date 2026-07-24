@@ -25,7 +25,12 @@ software components:
 
 - `CognitiveStack/autodesk-aps-forma-mcp`
   - Autodesk Platform Services and Forma integration
-  - Data Management, Forma, Issues, Reviews, Assets, and related cloud APIs
+  - Currently confirmed read capabilities: Data Management, Model Derivative,
+    Issues, Reviews, issue Relationships, and Model Coordination
+    model-set/version reads, plus Forma Site Design (Beta `v1alpha`) reads and a
+    single guarded Beta write
+  - See [COMPONENT_BOUNDARIES.md](docs/architecture/COMPONENT_BOUNDARIES.md) for
+    the authoritative, dated capability ledger
 
 - `CognitiveStack/revit-mcp-triviron`
   - Revit and pyRevit MCP automation
@@ -48,7 +53,26 @@ Site and context
 ```
 ## Current Status
 
-Repository bootstrap and master architecture definition.
+**Phases 0, 1, 2 and 3 are complete**, all strictly read-only, each with a
+sanitised public evidence artifact committed under
+[`examples/harrismith-fire-station/expected-results/`](examples/harrismith-fire-station/expected-results/):
 
-The initial implementation will focus on one small end-to-end vertical slice
-using the Harrismith Fire Station learning project.
+| Phase | Slice | Artifact |
+|---|---|---|
+| 1 | Revit-to-CDE trace | `revit-to-cde-trace.result.json` |
+| 2 | Review-to-Issue governance trace | `review-to-issue-trace.result.json` |
+| 3 | Model Coordination-to-Issue trace | `model-coordination-to-issue-trace.result.json` |
+
+The current **Phase 3 evidence ceiling is `shared_model_context_proven`**: a
+coordination issue and a coordination snapshot were proven to refer to the same
+models at the same coordinated versions. Clash-level reads remain unimplemented, so
+a **direct clash-to-issue link and geometric resolution remain unproven**.
+
+**Next: Phase 4A — construction information exchange, beginning with authoritative
+APS capability research, not implementation.** RFIs are the provisional first
+research candidate; Submittals and Sheets are research-only candidates; Meetings
+are deferred. None of these is implemented, and no MCP tool exists for any of them.
+
+See the
+[PRD](docs/prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) for the
+roadmap and the Phase 4A entry gate.

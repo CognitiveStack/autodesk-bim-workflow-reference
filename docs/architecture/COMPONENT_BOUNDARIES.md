@@ -1,8 +1,8 @@
 # Component Boundaries and Capability Ledger
 
 **Status:** Confirmed component capability inventory
-**Inventory verified:** 2026-07-23 (APS/Forma MCP re-verified at `0117022`); Revit
-MCP unchanged (`ae01d29`, 2026-07-22)
+**Inventory verified:** 2026-07-24 (APS/Forma MCP re-verified locally at
+`75b36b2`); Revit MCP unchanged (`ae01d29`, 2026-07-22)
 
 This document is the authoritative, dated ledger of the MCP capabilities this
 project depends on, and the anti-duplication contract between this orchestration
@@ -17,20 +17,24 @@ layer and the two MCP components. It is consistent with the
 
 | Component | Repository | Inspected commit | Tools |
 |---|---|---|---|
-| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `0117022` | 30 |
+| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `75b36b2` | 30 |
 | Revit MCP | `CognitiveStack/revit-mcp-triviron` | `ae01d29` | 14 |
 
 The APS/Forma MCP inventory is published at
-`0117022ca29fd78c3e9cb38ccde9e47c8ea89df9` and reports **30 MCP tools total**:
+`75b36b2635de3a5707fd1ff3dbf5cd487e3f0e0a` and reports **30 MCP tools total**:
 28 read-only Autodesk tools, 1 guarded Autodesk write tool, and 1 local-only
 preview tool. Component evidence: the offline MCP doctor reports
-**`TOOL_COUNT=30`, `RESULT=PASS`** at that revision. The five read-only Model
+**`TOOL_COUNT=30`, `RESULT=PASS`** at that revision, re-run locally on
+2026-07-24. The capability inventory below is **unchanged** from the previous
+pinned revision `0117022`; the intervening component commit is a
+reliability-only increment (§3.2). The five read-only Model
 Coordination model-set reads were added by component commit
 `c92ee079408500b74f7c2f7efd8b1ab0b8047fe3` (*feat: add read-only Model
 Coordination model-set reads*), logging-privacy hardened by
 `1634d8c5e65aff9af1fbb44270159772ebae20ce` (*fix: suppress identifier-bearing HTTP
 client logs*), and recorded in the component inventory at `0117022` (*docs: update
 inventory for Model Coordination reads*); they were live-verified on 2026-07-23.
+All five remain registered at `75b36b2` (verified locally, 2026-07-24).
 
 The tool identifiers below are code identifiers read from component source; they
 are not Autodesk data. No live Autodesk hub, project, folder, item, version,
@@ -112,6 +116,47 @@ identities are returned privately for safe chaining; public evidence must alias 
 omit them, and `created_by` / `create_user_id` are omitted. Third-party
 `httpx`/`httpcore` INFO request-URL logging is suppressed while WARNING and ERROR
 logging remain available. Raw live responses remain private and uncommitted.
+
+### 3.2 Transport-reliability baseline (component `75b36b2`, 2026-07-24)
+
+Component commit `75b36b2` (*fix: bound token locks and APS transport timeouts*)
+is a **reliability-only** increment. It adds **no tool**, **no Autodesk
+capability**, and **no new API surface**, and it does not change any public MCP
+tool contract.
+
+**Locally inspected in this repository's re-verification (2026-07-24)** — read-only
+inspection of the component working tree at `75b36b2`:
+
+- **Bounded token-refresh lock acquisition.** The in-process thread lock and the
+  cross-process advisory file lock are acquired under a single bounded monotonic
+  deadline; the file lock is taken non-blocking and retried on a short interval,
+  raising a dedicated lock error on expiry instead of blocking indefinitely.
+- **Explicit HTTP connect/read/write/pool timeouts.** A single shared timeout
+  object with separate connect, read, write, and pool bounds replaces the previous
+  scalar timeout on the token refresh and the APS read paths.
+- **Structured timeout and transport errors.** Timeout, connection, and general
+  transport failures — and bounded lock contention — return sanitised structured
+  `{error, status, detail}` results carrying no URL, identifier, body, header, or
+  credential.
+- **Public tool contracts unchanged.** The MCP server module is untouched by the
+  commit; the offline doctor reports `TOOL_COUNT=30`, `RESULT=PASS`, and all five
+  Model Coordination model-set/version reads remain registered.
+
+**Previously reported by the component (not re-verified here)** — recorded as
+reported evidence only:
+
+- a **287-test** implementation report passing at this revision;
+- a successful fresh Claude Desktop `list_projects` relay smoke test after the
+  push.
+
+This reference repository's re-verification was a **local, read-only repository
+and tool-inventory inspection**. It did **not** re-run the component test suite
+and made **no live Autodesk call**.
+
+The Phase 3 evidence artifact was produced earlier, at component revision
+`0117022`, and records a `get_latest_model_set_version` transport timeout. That
+observation is **historical** and is not restated as current behaviour; see
+[PHASE_3_CAPABILITY_GAP.md](PHASE_3_CAPABILITY_GAP.md) §6.4.
 
 ## 4. Revit MCP — 14 tools (10 read/inspection · 4 mutating)
 
@@ -201,10 +246,14 @@ repository may **invoke** or **validate** a behaviour but must never
 
 ## 11. Reverification policy
 
-- This ledger is pinned to the inspected commits (`0117022` APS/Forma, `ae01d29`
-  Revit) and the verification date above. The APS/Forma inventory update to 30
-  tools is evidenced by the offline doctor `TOOL_COUNT=30`, `RESULT=PASS`, and the
-  five Model Coordination model-set reads were live-verified on 2026-07-23.
+- This ledger is pinned to the inspected commits (`75b36b2` APS/Forma, `ae01d29`
+  Revit) and the verification date above. The APS/Forma tool count of 30 is
+  evidenced by the offline doctor `TOOL_COUNT=30`, `RESULT=PASS` (re-run locally
+  2026-07-24), and the five Model Coordination model-set reads were live-verified
+  on 2026-07-23 and confirmed still registered at `75b36b2`.
+- A re-pin driven by a reliability-only component change updates the revision and
+  date but **must not** change any capability status; capability status changes
+  only on evidence of a new or altered tool.
 - Re-run the read-only inventory and update the counts, commit hashes, and date
   before each phase, or whenever a component publishes a relevant change.
 - Component tool surfaces evolve; expectations are captured here in documentation,

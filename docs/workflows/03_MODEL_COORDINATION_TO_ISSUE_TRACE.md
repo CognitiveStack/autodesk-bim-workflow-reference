@@ -15,9 +15,9 @@ issue is created or changed.
 > **shared model context** — `shared_model_context_proven` — between a coordination
 > issue and the participating documents of a coordination snapshot (see below).
 > Clash-level reads stay deferred, so a direct clash-to-issue link and any resolution
-> claim remain **not established**. No issue was created, and **no sanitised public
-> Phase 3 evidence artifact has been committed yet** (that packaging is a separate,
-> later step).
+> claim remain **not established**. No issue was created. The sanitised public
+> Phase 3 evidence artifact **is committed** at
+> `examples/harrismith-fire-station/expected-results/model-coordination-to-issue-trace.result.json`.
 
 ## What Model Coordination does
 
@@ -112,9 +112,13 @@ useful, medium-strength proof.
   relationship, clash history, or any recheck/resolution state. So
   `clash_issue_link_proven`, `clash_resolution_claimed_not_verified`, and
   `clash_resolution_verified` are **not** established.
-- A **sanitised public evidence artifact** has not been committed yet; packaging it
-  is a separate, later step. Any issue selection or creation remains a **manual
-  Autodesk-UI action** unless a separate write workflow is explicitly approved.
+- **Write actions remain deferred.** Any issue selection or creation remains a
+  **manual Autodesk-UI action** unless a separate write workflow is explicitly
+  approved.
+
+The sanitised public evidence artifact is **no longer outstanding** — it is
+committed, and you can read it at
+`examples/harrismith-fire-station/expected-results/model-coordination-to-issue-trace.result.json`.
 
 ## Distinctions this slice keeps honest
 

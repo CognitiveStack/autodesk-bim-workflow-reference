@@ -1,10 +1,10 @@
 # Phase 3 Execution Plan — Model Coordination-to-Issue Trace (Operator Runbook)
 
-**Status:** Phase 3C read-only inspection completed. The narrowed Option A
-**`shared_model_context_proven`** evidence class has been established live (see §9),
-and the Phase 3 result schema has been extended (backward-compatibly) to record it.
-Clash-level reads remain deferred, and **no sanitised public Phase 3 result artifact
-has been committed yet** — packaging is the later Phase 3D increment.
+**Status:** Phase 3 complete (3A–3D). The Phase 3C read-only inspection established
+the narrowed Option A **`shared_model_context_proven`** evidence class live (see §9),
+the Phase 3 result schema was extended (backward-compatibly) to record it, and the
+Phase 3D sanitised public artifact **has been committed**. Clash-level reads remain
+unimplemented and deferred.
 **Slice:** "Model Coordination-to-Issue Trace" (narrowed Option A).
 **Posture:** strictly **read-only**.
 
@@ -26,18 +26,30 @@ status is governed by
   and live-verified, giving model-set membership and coordinated-version reads; the
   **data-readiness gap is closed** (a usable training coordination model set with
   two processed discipline-context models exists). Clash-level reads were **not**
-  implemented and remain deferred. The reference inventory is updated to
-  `0117022` / 30 tools accordingly.
+  implemented and remain deferred. The reference inventory was updated to
+  `0117022` / 30 tools accordingly. (The ledger has since been re-pinned to
+  `75b36b2` — a reliability-only increment; tool count and capability inventory
+  unchanged. Phase 3C evidence was captured at `0117022`.)
 - **Phase 3C — authenticated read-only trace. Completed.** All four Section 3 gates
   passed; the Section 4 stages were executed read-only. The result is the
   `shared_model_context_proven` evidence class recorded in §9. The schema amendment
   in this increment makes that result representable without overstatement.
-- **Phase 3D — sanitised evidence artifact.** Structure, sanitise, and validate the
-  public result under `examples/harrismith-fire-station/expected-results/`. **No
-  such artifact has been committed yet**; it is a separate, later increment.
+- **Phase 3D — sanitised evidence artifact. Complete.** The public result was
+  structured, sanitised, validated, and committed under
+  `examples/harrismith-fire-station/expected-results/` as
+  `model-coordination-to-issue-trace.result.json` (`execution.status: complete`,
+  `outcome: shared_model_context_proven`).
 
-The coordination-context foundation and the issue/relationship trace are now
-executed; the strongest justified conclusion is `shared_model_context_proven` (§9).
+Phase 3 is therefore complete across 3A–3D. The coordination-context foundation,
+the issue/relationship trace, and the public artifact are all delivered; the
+strongest justified conclusion is `shared_model_context_proven` (§9).
+
+**Phase 3E (optional clash-provenance research spike) is a separate, later,
+optional label and is not part of Phase 3's completion.** It is non-blocking, is
+not a gate on this or any other phase, and may be opened only if a documented or
+discoverable read-only Autodesk clash surface is identified. It is named here only
+to prevent it being confused with Phase 3D. See the
+[PRD](../prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) §15.
 
 ## 2. Read-only safeguards
 
@@ -66,8 +78,8 @@ executed; the strongest justified conclusion is `shared_model_context_proven` (�
    action** unless a separate write workflow is explicitly approved.
 
 With all four gates satisfied, the Section 4 stages were executed and a supported
-model-context relationship was established (§9). Sanitising and committing the
-public result is the separate Phase 3D increment.
+model-context relationship was established (§9). The public result was then
+sanitised, validated, and committed in the Phase 3D increment (§1).
 
 If any gate fails, **do not run Phase 3C**. Any produced result must be
 `status: partial` (or no artifact) with `outcome: coordination_evidence_incomplete`
@@ -207,9 +219,12 @@ requirements above cannot be verified, the result must not be `complete`; use
   (`CLASH_TEST_1`, `CLASH_1`, `CLASH_GROUP_1`, `ELEMENT_1`, `ELEMENT_2`) are reserved
   for later clash-capability phases and remain **unused** because no clash-level API
   data was returned.
-- Every **proven** relationship link records an `evidence_class` (§9.4). The
-  sanitisation convention guide is not modified in this increment; adding
-  `MODEL_SET_*` / `MODEL_SET_VERSION_*` tokens to that guide is a separate follow-up.
+- Every **proven** relationship link records an `evidence_class` (§9.4).
+- **Outstanding follow-up (still open).** `docs/guides/SANITISATION_CONVENTION.md`
+  does not yet define the `MODEL_SET_*` / `MODEL_SET_VERSION_*` tokens that the
+  committed Phase 3 artifact uses. Adding them remains a separate, unclosed
+  increment; it is not part of Phase 3D and does not affect the validity of the
+  committed artifact.
 
 ## 9. Phase 3C recorded evidence
 
@@ -297,6 +312,9 @@ enforceable and remains a runtime governance check (§7.1).
 
 ### 9.5 Tool limitation
 
+**Historical observation from the 2026-07-24 Phase 3C run at component revision
+`0117022`; preserved as recorded evidence, not as current behaviour.**
+
 - `get_latest_model_set_version` returned a **transport timeout**.
 - `get_model_set` identified the model-set **tip**.
 - `list_model_set_versions` **independently corroborated** it as the highest
@@ -305,3 +323,9 @@ enforceable and remains a runtime governance check (§7.1).
   participating documents.
 - The timeout is disclosed (warning `LATEST_SNAPSHOT_TOOL_TIMEOUT`) but does **not**
   invalidate the successfully retrieved snapshot evidence.
+
+Component revision `75b36b2` subsequently hardened transport behaviour (bounded
+token-refresh locks, explicit connect/read/write/pool timeouts, structured
+timeout/transport errors). That is a forward baseline change only — the recorded
+observation and the committed artifact are unchanged, and **no re-observation has
+been performed**.
