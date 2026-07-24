@@ -2,7 +2,7 @@ schema_version: 1
 
 # Terminology model: see docs/decisions/0003-autodesk-platform-product-and-api-terminology.md
 # and docs/guides/GLOSSARY.md. Confirmed component capability inventory:
-# see docs/architecture/COMPONENT_BOUNDARIES.md (inventory verified 2026-07-22).
+# see docs/architecture/COMPONENT_BOUNDARIES.md (inventory verified 2026-07-24).
 #
 # Each stage keeps these concerns as SEPARATE fields; they must not be conflated:
 #
@@ -83,26 +83,45 @@ stages:
   - id: model_coordination
     platform: Autodesk Forma
     primary_system: Model Coordination
-    # Model-set listing tool is implemented and confirmed; the Harrismith example
-    # currently has no model sets, so this is a data gap, not a missing-tool gap.
+    # Five read-only model-set/version tools are implemented and live-verified
+    # (model-set discovery and detail, snapshot version history, latest/specific
+    # coordination snapshot with its participating document versions).
+    # Data readiness is satisfied: the dedicated Harrismith training coordination
+    # data exists, and MODEL_SET_1 with its coordination snapshots was read
+    # successfully. The earlier no_harrismith_model_sets blocker is closed.
+    # Phase 3 is complete at outcome shared_model_context_proven.
+    # Clash-level reads are NOT implemented: clash results, identifiers, groups,
+    # membership and status are unavailable, so direct clash-to-issue provenance
+    # and geometric resolution remain unproven. The native Autodesk clash engine
+    # is never re-implemented here.
     api_families:
       - Model Coordination API
     mcp_component: aps-forma-mcp
     mcp_implementation_status: confirmed
     api_maturity: to-be-verified
-    data_readiness: blocked
-    data_readiness_reason: no_harrismith_model_sets
+    data_readiness: ready
     automation_policy: use_native_coordination_engine
 
   - id: reviews_and_issues
     platform: Autodesk Forma
     primary_system: Forma Data Management
-    # Issues MCP reads are confirmed. Reviews MCP capability is not implemented
-    # (planned); its API-family name is left unasserted until verified.
+    # Confirmed READ scope only: Issues reads, seven Reviews reads, and the issue
+    # Relationships read, all implemented and live-verified. This stage's read
+    # capability is no longer a gap.
+    # This status covers reads only. No review, issue, or relationship write is
+    # implemented; write workflows remain deferred. The project's sole guarded
+    # write tool is unrelated (Forma Site Design, concept_design stage).
+    # No direct clash-to-issue relationship was returned, and the Relationships
+    # API returned no document record for ISSUE_1; an empty result proves only
+    # that no matching record was returned.
+    # RFIs, Assets, Submittals, Sheets and Meetings are NOT implemented here.
+    # Reviews and Relationships API-family names remain unasserted until verified
+    # from an official Autodesk/APS source (ADR-0003: a product-module name is
+    # not automatically an API family name).
     api_families:
       - APS Issues API
     mcp_component: aps-forma-mcp
-    mcp_implementation_status: partial
+    mcp_implementation_status: confirmed
     api_maturity: to-be-verified
     data_readiness: ready
     automation_policy: stable_api_preferred

@@ -40,6 +40,95 @@ Tokens match the pattern `^[A-Z][A-Z0-9_]*$`.
 The same real value always maps to the same alias within a run (via the local
 map), so cross-references in the evidence stay coherent.
 
+### Coordination and governance alias tokens
+
+Additional tokens used by the governance and coordination evidence. These extend
+the table above; they do not redefine it.
+
+| Real value (never committed) | Alias token |
+|---|---|
+| Model Coordination model-set id | `MODEL_SET_1` |
+| Model Coordination model-set (snapshot) version | `MODEL_SET_VERSION_1` |
+| participating document / model lineage | `MODEL_1`, `MODEL_2` |
+| exact document version used for coordination or review | `VERSION_1`, `VERSION_2` |
+| document lineage referenced by an issue | `DOCUMENT_1` |
+| issue id | `ISSUE_1` |
+| issue type id | `ISSUE_TYPE_1` |
+| issue reference / relationship record | `ISSUE_REFERENCE_1` |
+| review id | `REVIEW_1` |
+| review workflow id | `WORKFLOW_1` |
+| review workflow step id | `STEP_1`, `STEP_2` |
+| approval-status id | `APPROVAL_STATUS_1` |
+
+Notes on specific tokens:
+
+- **`MODEL_SET_1`** — a sanitised alias for **one Model Coordination model set**.
+  It replaces the raw model-set identifier. Numbering is **local to the evidence
+  artifact** (or to one bounded evidence package) and implies **no ordering, no
+  chronology, and no importance**.
+- **`MODEL_SET_VERSION_1`** — a sanitised alias for **one Model Coordination
+  coordination snapshot**. It replaces the raw model-set-version identifier. It is
+  **not** a Data Management document version. Its numeric suffix does **not**
+  represent Autodesk's snapshot number unless a separate sanitised ordinal is
+  explicitly recorded alongside it. It must **never** be substituted for
+  `VERSION_1`.
+- **`MODEL_1`** — the model/document **lineage** alias. Where a stored file name is
+  needed, the same alias is used with the extension preserved (`MODEL_1.rvt`, as in
+  the table above); the alias identifies the same model in both forms.
+- **`VERSION_1`** — an **exact document-version** alias. Distinct from
+  `URN_VERSION_1`, which aliases a raw version **URN**. A published result records
+  the version alias, never the URN it came from.
+
+## Identifier domains are not interchangeable
+
+Each alias family names a **different kind of thing**. Mixing them silently
+manufactures a relationship that the API never returned.
+
+| Alias | Domain |
+|---|---|
+| `MODEL_SET_1` | coordination **model-set** domain |
+| `MODEL_SET_VERSION_1` | coordination **snapshot** domain |
+| `MODEL_1` | participating **document/model lineage** domain |
+| `VERSION_1` | exact participating **Data Management document-version** domain |
+| `ISSUE_1` | **issue** domain |
+
+Rules:
+
+- Aliases from different domains are **not interchangeable**, and one is never
+  written where another is meant.
+- **Matching numeric suffixes imply nothing.** `MODEL_1`, `VERSION_1`,
+  `MODEL_SET_VERSION_1` and `ISSUE_1` sharing the suffix `_1` does **not** imply
+  identity, correspondence, or a relationship between them. Suffixes are
+  per-domain counters, never evidence.
+- **Raw identifiers, URNs, GUIDs, and hrefs must never be published** — in any
+  field, note, warning, or free-text string.
+- **No numeric document version is inferred from a URN.** If no authoritative
+  version number was returned, the recorded version number stays `null`.
+- **`tip_version_urn` is never substituted for `version_urn`.** The coordinated
+  version is the exact version the snapshot used, not the current lineage tip.
+
+## Evidence-wording rules
+
+How a match was obtained must survive sanitisation. Sanitising values must never
+upgrade the strength of a claim.
+
+- A **viewer-state-derived** version match must be labelled as such (for example
+  `evidence_class: viewer_state_derived`). It must **not** be rewritten as a typed
+  relationship, a Relationships API record, clash membership, or clash provenance.
+- A **typed issue-field** match (for example a placement lineage returned inside
+  issue details) is labelled as a typed issue field — it is **not** automatically a
+  Relationships API record.
+- A **shared model-context** result must **not** be described as a direct clash
+  link. `shared_model_context_proven` means the issue and the coordination snapshot
+  refer to the same models at the same coordinated versions. It does **not**
+  establish a typed issue-to-model-set relationship, a typed issue-to-snapshot
+  relationship, a direct clash-to-issue relationship, clash membership, or
+  geometric resolution.
+- A **UI observation** is contextual only (`evidence_class: ui_context`) and is
+  never sufficient for a `proven` machine-readable relationship.
+- An **empty API result** is recorded as "no matching record was returned" — never
+  as proof that no relationship exists.
+
 ## Values that are removed or reduced
 
 | Kind | Handling |
@@ -90,6 +179,14 @@ omit it rather than reduce it.
 4. All timestamps are date-only or omitted.
 5. `selected_properties` contains only allowlisted fields within the sample cap.
 6. `runtime_status` is a structured object, not a raw response body.
-7. The result validates against
-   [`schemas/phase-1-result.schema.json`](../../schemas/phase-1-result.schema.json).
+7. The result validates against its phase's schema — for example
+   [`schemas/phase-1-result.schema.json`](../../schemas/phase-1-result.schema.json)
+   for the Phase 1 trace, and the corresponding Phase 2 / Phase 3 schema for those
+   slices.
 8. `.local/` is confirmed git-ignored and was not staged.
+9. Every alias belongs to the correct identifier domain, and no alias was written
+   where a different domain was meant.
+10. No conclusion was strengthened during sanitisation: viewer-state-derived and
+    typed-issue-field matches are still labelled as such, UI observations are still
+    contextual only, an empty API result is still recorded as "no matching record
+    returned", and no shared model context is described as a direct clash link.
