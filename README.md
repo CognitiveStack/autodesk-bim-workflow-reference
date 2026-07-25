@@ -75,11 +75,15 @@ operations — owned by the **APS/Forma MCP**
 ([ADR-0004](docs/decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
 RFIs are the preferred second capability.
 
-**Current state: Gate 2 (authentication) and Gate 6 (component boundary) are
-closed. Gate 5 (privacy and sanitisation) and Gate 8 (project activation,
-permission and training data) remain open, so the capability is planned and
-nothing is implemented yet** — no Transmittals MCP tool exists and no
-implementation is authorised.
+**Current state: Gates 2 (authentication), 5 (privacy and sanitisation) and 6
+(component boundary) are closed. Gate 8 (project activation, permission and
+training data) remains open, so the capability is planned and nothing is
+implemented yet** — no Transmittals MCP tool exists and no implementation is
+authorised.
+
+The Transmittals public-evidence sanitisation profile is governed by
+[ADR-0005](docs/decisions/0005-approve-transmittals-sanitisation-profile.md) and
+[SANITISATION_CONVENTION.md](docs/guides/SANITISATION_CONVENTION.md).
 
 See the
 [PRD](docs/prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) for the

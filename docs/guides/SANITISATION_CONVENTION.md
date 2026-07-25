@@ -79,6 +79,169 @@ Notes on specific tokens:
   `URN_VERSION_1`, which aliases a raw version **URN**. A published result records
   the version alias, never the URN it came from.
 
+### Transmittals public-evidence profile
+
+**Approved by [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)
+(2026-07-25), profile version 1.** This section governs public evidence for the
+Phase 4A Transmittals read slice. It **extends** the conventions above and
+**redefines nothing**; every existing rule continues to apply.
+
+#### Approved alias registry
+
+**Existing reused aliases** — already defined above, unchanged:
+
+| Alias | Domain |
+|---|---|
+| `PROJECT_n` | the Autodesk project |
+| `USER_n` | an Autodesk user, where a user-domain alias is needed |
+| `VERSION_n` | an **exact** Data Management document version |
+| `FOLDER_n` | a Data Management folder |
+
+**Newly approved aliases** for Transmittals:
+
+| Alias | Domain |
+|---|---|
+| `TRANSMITTAL_n` | a Transmittals record |
+| `RECIPIENT_n` | a **recipient-list record** — *not* a reusable global person identity |
+| `EXTERNAL_MEMBER_n` | an external-recipient record |
+| `COMPANY_n` | a company record or displayed company identity |
+| `ROLE_n` | a custom project-role value |
+
+All match the token pattern `^[A-Z][A-Z0-9_]*$` and use numbered continuation
+(`TRANSMITTAL_2`, `RECIPIENT_2`, `EXTERNAL_MEMBER_2`, `COMPANY_2`, `ROLE_2`,
+`FOLDER_2`, `VERSION_2`, `USER_2`, …).
+
+**Not approved, and not to be introduced:** `LINEAGE_n`, `STORAGE_n` /
+`STORAGE_OBJECT_n`, `MESSAGE_n`, `EMAIL_n`, `TIMESTAMP_n`. `DOCUMENT_n` exists
+for the *document-lineage* domain from earlier phases and is **deliberately not
+used** in this profile — `VERSION_n` is the evidence terminal node here, and
+borrowing a lineage-domain alias would imply lineage evidence that is not
+returned.
+
+**Alias scope.** Aliases are assigned **deterministically within one private
+evidence capture**. They carry **no meaning across unrelated captures** unless an
+explicit private mapping says otherwise. `RECIPIENT_1` in one artifact and
+`RECIPIENT_1` in another are not the same person.
+
+#### Field-handling policy
+
+**Always remove from public evidence** — never published in any form, aliased,
+hashed, truncated or otherwise:
+
+raw project IDs · raw transmittal IDs · `sequenceId` · Autodesk user IDs ·
+email addresses · real personal names · company Autodesk IDs · `storageUrn` ·
+raw folder URNs · raw document/version URNs · `parentFolderUrn` · raw API URLs
+containing identifiers · OAuth tokens or request headers · comments and private
+diagnostic payloads.
+
+**Omit by default** — publishable only as a synthetic value or an approved alias
+where a teaching artifact genuinely needs one:
+
+`title` · `message` · `description` · folder names · file names ·
+`revisionLabel` · company names · role names · exact `createdAt` · exact
+`lastUpdatedAt` · exact `receivedAt` · exact `viewedAt` · exact `downloadedAt`.
+
+**May retain as controlled categorical evidence:**
+
+Transmittals status enums (`SENDING` / `COMPLETED` / `FAILED`) ·
+`displayRecipients` enum (`ALL` / `LIMITED`) · HTTP method and endpoint family ·
+HTTP status class or an approved exact status code · processing-pending boolean ·
+`isDeleted` boolean where required · exact-version-returned boolean ·
+stable-lineage-returned classification, whose only approved value is
+**`not_proven`** · authentication-mode category · the required OAuth scope name
+**`data:read`**.
+
+**May retain as aggregate evidence:**
+
+transmittal count · recipient count · external-recipient count · folder count ·
+document-version count · recipients-viewed count · recipients-downloaded count ·
+pagination page count.
+
+Exact counts are permitted **only** when the scenario uses synthetic training
+data, **or** the count presents no reasonable re-identification risk. Otherwise
+bucket the value or omit it.
+
+#### Behavioural telemetry policy
+
+`receivedAt`, `viewedAt` and `downloadedAt` are **behavioural / read-receipt
+telemetry**: they record whether and when an identified person received, opened
+or downloaded a transmittal. **They receive stricter treatment than ordinary
+technical timestamps** and are *not* covered by the date-only reduction that
+applies elsewhere in this document.
+
+**Public evidence must never expose the exact timestamps.** Allowed
+transformations are:
+
+- `received: true` / `false`;
+- `viewed: true` / `false`;
+- `downloaded: true` / `false`;
+- aggregate counts;
+- omission.
+
+**Never publish:** event ordering tied to named people · time intervals between
+events · exact or rounded timestamps · per-person activity chronology.
+
+#### Narrative and name policy
+
+- `title` and `message` are **omitted** or replaced with clearly synthetic text.
+- Descriptions are **omitted** or synthetic.
+- File and folder names are synthetic or represented by aliases.
+- Company names use `COMPANY_n` unless deliberately fictional.
+- Custom project roles use `ROLE_n` unless deliberately fictional.
+- **External recipients are always synthetic** in the training scenario.
+- **Do not use realistic-but-modified email addresses.** Where an email-shaped
+  value is unavoidable in private test preparation or a screenshot, use a
+  clearly synthetic domain such as `example.invalid`. **Prefer omission in
+  published JSON.**
+
+#### Exact version and lineage policy
+
+- `VERSION_n` represents an **exact Data Management document version**.
+- **Raw version URNs and raw numeric versions are not published.**
+- Public evidence **may** state `exact_version_returned: true`.
+- Public evidence **may** state `exact_version_alias: VERSION_1`.
+- Public evidence **must** record stable lineage only as **`not_proven`**.
+- **No `LINEAGE_n` alias is approved for Phase 4A.**
+- **Parsing or splitting a version URN does not create returned lineage
+  evidence** — it is a client-side derivation.
+- **Alias-number matches never prove joins.**
+
+#### Private evidence boundary — two-artifact workflow
+
+**Private evidence may include** raw API responses, raw identifiers, raw
+timestamps, raw names and email addresses, and request correlation data.
+
+**Private evidence must:**
+
+- remain **outside Git**, in the designated private evidence location;
+- never be copied into issues, commit messages, or public documentation;
+- be **transformed into a fresh public artifact**;
+- **never be sanitised in place and then committed from the same file.**
+
+The required workflow is **two artifacts**:
+
+1. a **private raw capture**; then
+2. a **separately generated public sanitised artifact**.
+
+Editing the raw capture down to a publishable state in one file is not
+permitted — it leaves the original content recoverable in history and invites
+partial redaction.
+
+#### Minimum public evidence shape (policy guidance, not a schema)
+
+An illustrative shape only:
+
+`project_alias` · `transmittal_alias` · `status` · `display_recipients` ·
+`recipient_count` · `external_recipient_count` · `folder_count` ·
+`document_version_count` · `recipient_activity_summary` · `included_folders`
+(using `FOLDER_n`) · `included_versions` (using `VERSION_n`) ·
+`exact_version_returned` · `stable_lineage_returned` · `endpoint_evidence` ·
+`sanitisation_profile_version`.
+
+**This is policy guidance, not the Phase 4 schema.** No artifact is created by
+this profile, and **no Phase 4 schema exists yet**. The eventual schema may
+refine these field names but **must not weaken the policy**.
+
 ## Identifier domains are not interchangeable
 
 Each alias family names a **different kind of thing**. Mixing them silently
@@ -91,6 +254,12 @@ manufactures a relationship that the API never returned.
 | `MODEL_1` | participating **document/model lineage** domain |
 | `VERSION_1` | exact participating **Data Management document-version** domain |
 | `ISSUE_1` | **issue** domain |
+| `TRANSMITTAL_1` | **Transmittals record** domain |
+| `RECIPIENT_1` | **recipient-list record** domain (not a global person identity) |
+| `EXTERNAL_MEMBER_1` | **external-recipient record** domain |
+| `COMPANY_1` | **company** domain |
+| `ROLE_1` | **project-role** domain |
+| `FOLDER_1` | **Data Management folder** domain |
 
 Rules:
 
@@ -190,3 +359,18 @@ omit it rather than reduce it.
     typed-issue-field matches are still labelled as such, UI observations are still
     contextual only, an empty API result is still recorded as "no matching record
     returned", and no shared model context is described as a direct clash link.
+
+### Additional checks for Transmittals evidence
+
+11. No email address, personal name, Autodesk user ID, company Autodesk ID,
+    `sequenceId`, `storageUrn`, folder URN, `parentFolderUrn` or version URN
+    appears — not hashed, not truncated, not partially masked.
+12. No exact `receivedAt`, `viewedAt` or `downloadedAt` value appears; behavioural
+    telemetry is reduced to booleans, counts, or omitted, with no per-person
+    chronology, ordering or interval.
+13. `title`, `message` and `description` are omitted or clearly synthetic.
+14. External recipients are synthetic.
+15. Stable lineage is recorded only as `not_proven`, and no `LINEAGE_n` alias
+    appears.
+16. The public artifact was **generated separately** from the private capture —
+    the private file was not sanitised in place.

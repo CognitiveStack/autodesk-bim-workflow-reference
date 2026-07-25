@@ -8,8 +8,8 @@ unimplemented**, so a direct clash-to-issue link and geometric resolution remain
 **unproven**. **Phase 4A capability research is complete and its first slice is
 selected**: Autodesk Forma **Transmittals** read-only, owned by the APS/Forma MCP
 ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
-It is **planned, not implemented** — Gates 2 and 6 are passed, **Gates 5 and 8
-remain open, and no implementation is authorised**.
+It is **planned, not implemented** — Gates 2, 5 and 6 are passed, **Gate 8
+remains open, and no implementation is authorised**.
 **Created:** 2026-07-22 · **Last reviewed:** 2026-07-25
 **Terminology last verified:** 2026-07-23 (see
 [GLOSSARY.md](../guides/GLOSSARY.md) and
@@ -485,7 +485,7 @@ No MCP tool exists for any Phase 4A module.
 
 | Module | Classification | Status |
 |---|---|---|
-| **Transmittals** | **Adopted first Phase 4A read-only capability** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)). Autodesk Forma Data Management module; five documented `GET` operations; owning component **APS/Forma MCP** | **Gate 2 passed · Gate 6 passed**; Gates 5 and 8 unresolved. **Planned, not implemented**; implementation not yet authorised |
+| **Transmittals** | **Adopted first Phase 4A read-only capability** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)). Autodesk Forma Data Management module; five documented `GET` operations; owning component **APS/Forma MCP**; sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) | **Gates 2, 5 and 6 passed**; Gate 8 unresolved. **Planned, not implemented**; implementation not yet authorised |
 | **RFIs** | **Preferred second Phase 4A capability.** Closest structural analogue to the Issues reads already proven in Phases 2 and 3 | Researched; **not first** (privacy exposure, larger surface, POST-based listing). Implementation not approved |
 | **Submittals** | **Later candidate** | GA capability researched; not selected first |
 | **Sheets** | **Later candidate**, requiring **domain disambiguation** — must **not** be confused with the component's Model Derivative model views (`list_model_views`) or manifests (`get_derivative_manifest`) | GA capability researched, including a genuine read surface; not selected first |
@@ -548,24 +548,40 @@ The ten items above are unchanged and all still apply. Current status for
 | Gate | Status |
 |---|---|
 | 2 — authentication-scope verification | **passed**, on normative Autodesk documentation |
+| 5 — privacy and sanitisation rules | **passed** — Transmittals sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) |
 | 6 — component-boundary decision | **passed** — APS/Forma MCP owns it ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)) |
-| 5 — privacy and sanitisation rules | **unresolved** — alias families remain provisional and unapproved |
 | 8 — Harrismith scenario and data readiness | **unresolved** — module activation, caller permission and synthetic training data are unverified |
 | 1, 3, 4, 7, 9, 10 | substantially supported by the recorded research |
 
-**The Phase 4A entry gate as a whole has not passed.** Gates 5 and 8 are
-load-bearing and open, so **no implementation increment is authorised**. Closing
-Gates 2 and 6 selects and assigns the capability; it does not start it.
+**The Phase 4A entry gate as a whole has not passed.** Gate 8 is load-bearing and
+open, so **no implementation increment is authorised**. Closing Gates 2, 5 and 6
+selects the capability, assigns it, and defines how its evidence must be
+sanitised; it does not start implementation.
+
+**Approved privacy governance** ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md),
+detailed in [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md)):
+
+- **Alias families** — reused: `PROJECT_n`, `USER_n`, `VERSION_n`, `FOLDER_n`;
+  newly approved: `TRANSMITTAL_n`, `RECIPIENT_n`, `EXTERNAL_MEMBER_n`,
+  `COMPANY_n`, `ROLE_n`. `LINEAGE_n`, `STORAGE_n`, `EMAIL_n`, `MESSAGE_n` and
+  `TIMESTAMP_n` are **not approved**.
+- **Behavioural timestamp reduction** — `receivedAt`, `viewedAt` and
+  `downloadedAt` are read-receipt telemetry and are reduced to presence booleans,
+  counts, or omitted. Exact values are never published.
+- **Synthetic recipients are required** for the Harrismith training scenario.
+- **Two-artifact workflow** — a private raw capture and a **separately
+  generated** public sanitised artifact; the private file is never sanitised in
+  place.
+- Stable document lineage is recorded only as `not_proven`.
 
 ##### Phase 4A implementation sequence
 
-1. **Close Gate 5** — approve the Transmittals alias and privacy rules in
-   [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md).
-2. **Close Gate 8** — verify module activation, caller permission and synthetic
+1. **Close Gate 8** — verify module activation, caller permission and synthetic
    training data in the approved training project.
-3. **Create the Phase 4 result schema and execution plan.**
-4. **Implement the five MCP reads** in the component repository.
-5. **Capture private live evidence** under the git-ignored `.local/` boundary.
-6. **Publish sanitised public evidence**, schema-validated.
+2. **Create the Phase 4 result schema and execution plan.**
+3. **Implement the five MCP reads** in the component repository.
+4. **Capture private live evidence** under the git-ignored `.local/` boundary.
+5. **Generate and validate the public evidence** through the approved profile.
+6. **Publish the sanitised artifact separately.**
 
-Steps 3 onward are conditional on steps 1 and 2 completing.
+Steps 2 onward are conditional on step 1 completing.

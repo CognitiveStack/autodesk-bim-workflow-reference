@@ -136,11 +136,16 @@ stages:
     # recipients; list folders; list included document versions. No write
     # operation is in scope.
     # NOT IMPLEMENTED: no Transmittals MCP tool exists, so status stays planned.
-    # BLOCKERS: Gate 5 (privacy/sanitisation alias approval) and Gate 8 (project
-    # module activation, caller permission and synthetic training data) are both
-    # unresolved; implementation is not authorised until they close.
-    # Gate 2 (authentication scopes) and Gate 6 (component boundary/roadmap) are
-    # closed for Transmittals.
+    # Gates 2 (authentication scopes), 5 (privacy/sanitisation) and 6 (component
+    # boundary/roadmap) are CLOSED for the Transmittals first slice.
+    # SANITISATION: governed by ADR-0005 and the Transmittals public-evidence
+    # profile in docs/guides/SANITISATION_CONVENTION.md. Approved aliases reuse
+    # PROJECT_n, USER_n, VERSION_n and FOLDER_n, and add TRANSMITTAL_n,
+    # RECIPIENT_n, EXTERNAL_MEMBER_n, COMPANY_n and ROLE_n. Behavioural
+    # timestamps (receivedAt/viewedAt/downloadedAt) reduce to booleans or counts.
+    # BLOCKER: Gate 8 (project module activation, caller permission and synthetic
+    # training data) remains unresolved; implementation is NOT authorised until it
+    # closes. Hence data_readiness stays not-assessed.
     # RFIs are the preferred SECOND Phase 4A slice; no RFI MCP tool exists and its
     # API-family name stays unasserted here until verified (ADR-0003). Submittals
     # and Sheets are later candidates; Meetings is deferred (public API not

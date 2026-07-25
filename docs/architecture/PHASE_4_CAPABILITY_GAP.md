@@ -6,10 +6,12 @@ then extended by a Transmittals normative-documentation evidence spike
 sufficiently verified** (§16.1) and **Gate 6 is passed** — Transmittals is the
 **adopted** first Phase 4A read-only capability, owned by the APS/Forma MCP
 ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md),
-§16.2). **Gates 5 and 8 remain unresolved.** No Phase 4 MCP capability is
+§16.2), with its **sanitisation profile approved and Gate 5 passed**
+([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md),
+§16.3). **Gate 8 remains unresolved.** No Phase 4 MCP capability is
 implemented, and **no implementation is authorised by this document**.
 **Research date:** 2026-07-24 · **Transmittals normative spike:** 2026-07-25 ·
-**Architecture decision:** 2026-07-25
+**Architecture and privacy decisions:** 2026-07-25
 
 This document is the authoritative repository record of the Phase 4A capability
 research assessment. It records what was verified against first-party Autodesk
@@ -39,7 +41,8 @@ source is recorded as **unresolved**, never as a negative finding.
 | Transmittals normative research | **`normative_transmittals_research_complete`** |
 | Transmittals Gate 2 | **sufficiently verified** (§16.1) |
 | Transmittals Gate 6 | **passed** — adopted, owned by APS/Forma MCP ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md), §16.2) |
-| Phase 4 overall | **additional privacy and data-readiness work remains required** (Gates 5 and 8) |
+| Transmittals Gate 5 | **passed** — sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md), §16.3) |
+| Phase 4 overall | **data-readiness work remains required** (Gate 8) |
 | Phase 4 MCP capability implemented | **None** |
 | Implementation authorised by this document | **None** |
 
@@ -931,12 +934,27 @@ Consequent rules for Transmittals public evidence:
   aliased person;
 - **synthetic recipients remain required**; a real recipient must not appear even
   in aliased form if the alias could be correlated back;
-- **alias families remain provisional and unapproved** (§13.2).
+- **the Transmittals alias families are now approved** by
+  [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)
+  (§16.3), and the binding rules are the **Transmittals public-evidence profile**
+  in [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md). Alias
+  families for **RFIs, Submittals, Sheets and Meetings remain proposals**
+  (§13.2).
 
-### 13.2 Proposed alias families — provisional only
+### 13.2 Proposed alias families
 
-These are **proposed for future consideration and are not approved**. No change
-has been made to
+> **Transmittals superseded (2026-07-25).** The Transmittals families below are
+> **now approved** by
+> [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md) and
+> recorded in
+> [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) — see §16.3
+> for the approved registry, which reuses `FOLDER_n` rather than minting it and
+> adds `EXTERNAL_MEMBER_n`, `COMPANY_n` and `ROLE_n`. The families for **RFIs,
+> Submittals, Sheets and Meetings remain proposals and are not approved.** The
+> original proposal table is preserved below unchanged.
+
+These were **proposed for future consideration**. No change had been made at the
+time of writing to
 [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md), and none of
 these tokens may be used in committed evidence until that convention is amended by
 a separate, explicitly approved increment.
@@ -1068,7 +1086,7 @@ and proven across three phases.
 | 2 | Authentication-scope verification | **unresolved** | **unresolved** | **sufficiently verified** (§16.1) | **unresolved** | fail |
 | 3 | Read/write operation inventory | pass | pass | **pass** | pass | fail |
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
-| 5 | Privacy and sanitisation planning | **unresolved** | **unresolved** | **unresolved** | **unresolved** | fail |
+| 5 | Privacy and sanitisation planning | **unresolved** | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **unresolved** | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass, conditional on an explicit POST-as-read policy decision (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **unresolved** | **unresolved** | fail |
@@ -1078,13 +1096,14 @@ and proven across three phases.
 Recorded explicitly:
 
 - For **Transmittals**, gates **1, 3, 4, 7, 9 and 10 are substantially supported**
-  by the research, **Gate 2 is sufficiently verified** (§16.1), and **Gate 6 is
-  passed** (§16.2).
-- Gates **5 and 8 remain unresolved** for Transmittals, and gates **2, 5, 6 and 8
+  by the research, **Gate 2 is sufficiently verified** (§16.1), **Gate 6 is
+  passed** (§16.2), and **Gate 5 is passed** (§16.3).
+- **Gate 8 remains unresolved** for Transmittals, and gates **2, 5, 6 and 8
   remain unresolved** for every other candidate.
 - **No candidate is implementation-ready.**
-- **Closing Gates 2 and 6 does not authorise implementation** — it selects and
-  assigns the capability; it does not start it.
+- **Closing Gates 2, 5 and 6 does not authorise implementation** — it selects the
+  capability, assigns it, and defines how its evidence must be sanitised; it does
+  not start implementation.
 - **Implementation cannot begin while any load-bearing gate remains unresolved.**
 
 A research recommendation is not gate approval. Nothing in §15 or §17 converts an
@@ -1154,7 +1173,55 @@ architecture status** (§17).
 **Gate 6 closure does not**: authorise MCP implementation; authorise any Autodesk
 project API call; close Gate 5 or Gate 8; approve alias families; prove live data
 readiness; prove APS/Forma MCP runtime compatibility; add any write operation; or
-assert that stable document lineage is returned.
+assert that stable document lineage is returned. (Gate 5 has since been closed
+separately — see §16.3.)
+
+### 16.3 Transmittals Gate 5 — passed (2026-07-25)
+
+**Gate 5 (privacy and sanitisation planning) is passed for Transmittals**, by
+[ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md). The
+governing detail lives in
+[SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) as the
+**Transmittals public-evidence profile, version 1**.
+
+**Approved alias registry.** Reused unchanged: `PROJECT_n`, `USER_n`, `VERSION_n`,
+`FOLDER_n`. Newly approved: `TRANSMITTAL_n`, `RECIPIENT_n`, `EXTERNAL_MEMBER_n`,
+`COMPANY_n`, `ROLE_n`. **Not approved:** `LINEAGE_n`, `STORAGE_n` /
+`STORAGE_OBJECT_n`, `MESSAGE_n`, `EMAIL_n`, `TIMESTAMP_n`; `DOCUMENT_n` is
+deliberately unused here because it belongs to the lineage domain.
+
+**Field-policy summary:**
+
+- **Always removed** — raw project, transmittal, user and company identifiers;
+  `sequenceId`; email addresses; real personal names; `storageUrn`; folder,
+  `parentFolderUrn` and version URNs; identifier-bearing URLs; headers and
+  diagnostic payloads. Not hashed, not truncated — **hashing and truncation are
+  explicitly rejected as anonymisation**.
+- **Omitted by default** — `title`, `message`, `description`, folder and file
+  names, `revisionLabel`, company and role names, and all exact timestamps.
+- **Retained as controlled categorical evidence** — status and
+  `displayRecipients` enums, HTTP method/endpoint family, status class,
+  processing-pending and `isDeleted` booleans, `exact_version_returned`,
+  `stable_lineage_returned: not_proven`, authentication-mode category, and the
+  scope name `data:read`.
+- **Retained as aggregate evidence** — transmittal, recipient, external-recipient,
+  folder, document-version, viewed, downloaded and page counts, subject to a
+  re-identification check.
+- **Behavioural telemetry** — `receivedAt`, `viewedAt`, `downloadedAt` reduce to
+  booleans, counts or omission; **never** exact times, intervals, ordering or
+  per-person chronology.
+- **Two-artifact workflow** — a private raw capture and a **separately generated**
+  public artifact; sanitising the private file in place is prohibited.
+
+**Gate 5 closure does not**: close Gate 8; authorise MCP implementation;
+authorise any Autodesk project API call; create an evidence schema or artifact;
+create synthetic Transmittals records; prove live data readiness; approve any
+write operation; permit raw private evidence into Git; or assert that stable
+document lineage is returned.
+
+**Scope.** This profile covers the **Transmittals** read slice. Alias families for
+RFIs, Submittals, Sheets and Meetings **remain unapproved** except where existing
+conventions already cover a domain.
 
 ## 17. Adopted first capability
 
@@ -1258,19 +1325,23 @@ Completed:
 - **The Phase 4A roadmap and component-boundary decision** — taken in
   [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md),
   closing Gate 6 (§16.2).
+- **The Transmittals sanitisation profile** — approved in
+  [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md) and
+  recorded in
+  [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md), closing
+  Gate 5 (§16.3).
 
 Remaining, in order:
 
-1. **Approve the privacy aliases and evidence rules** — amending
-   [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) in its own
-   increment (**Gate 5**). Until then the §13.2 families remain provisional.
-2. **Verify Transmittals module activation, permissions and synthetic training
+1. **Verify Transmittals module activation, permissions and synthetic training
    data** in the approved training project (**Gate 8**).
-3. **Only after Gates 5 and 8 close**, create the Phase 4 result schema and
-   execution plan.
-4. **Implement the five MCP reads separately**, in the component repository, per
+2. **Only after Gate 8 closes**, create the Phase 4 result schema and execution
+   plan — encoding the approved sanitisation profile.
+3. **Implement the five MCP reads separately**, in the component repository, per
    [ADR-0002](../decisions/0002-multi-repo-no-submodules.md).
-5. **Capture private live evidence** under the git-ignored `.local/` boundary.
-6. **Publish sanitised evidence separately**, validated against the Phase 4 schema.
+4. **Capture private live evidence** under the git-ignored `.local/` boundary.
+5. **Generate and validate the public evidence** through the approved profile, as
+   a separate artifact.
+6. **Publish the sanitised artifact separately.**
 
-Steps 3 onward are conditional on every load-bearing gate in §16 being resolved.
+Steps 2 onward are conditional on every load-bearing gate in §16 being resolved.
