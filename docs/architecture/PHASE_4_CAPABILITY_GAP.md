@@ -3,11 +3,13 @@
 **Status:** Phase 4A authoritative APS capability research assessment recorded,
 then extended by a Transmittals normative-documentation evidence spike
 (**`normative_transmittals_research_complete`**). **Transmittals Gate 2 is
-sufficiently verified** (§16.1); **Phase 4 overall still requires additional
-architecture and data-readiness work** — Gates 5, 6 and 8 remain unresolved for
-every candidate. No Phase 4 MCP capability is implemented, and **no
-implementation is authorised by this document**.
-**Research date:** 2026-07-24 · **Transmittals normative spike:** 2026-07-25
+sufficiently verified** (§16.1) and **Gate 6 is passed** — Transmittals is the
+**adopted** first Phase 4A read-only capability, owned by the APS/Forma MCP
+([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md),
+§16.2). **Gates 5 and 8 remain unresolved.** No Phase 4 MCP capability is
+implemented, and **no implementation is authorised by this document**.
+**Research date:** 2026-07-24 · **Transmittals normative spike:** 2026-07-25 ·
+**Architecture decision:** 2026-07-25
 
 This document is the authoritative repository record of the Phase 4A capability
 research assessment. It records what was verified against first-party Autodesk
@@ -36,7 +38,8 @@ source is recorded as **unresolved**, never as a negative finding.
 | Registered MCP tool count | 30 (28 read-only Autodesk, 1 guarded Autodesk write, 1 local-only) |
 | Transmittals normative research | **`normative_transmittals_research_complete`** |
 | Transmittals Gate 2 | **sufficiently verified** (§16.1) |
-| Phase 4 overall | **additional architecture and data-readiness work remains required** (Gates 5, 6 and 8) |
+| Transmittals Gate 6 | **passed** — adopted, owned by APS/Forma MCP ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md), §16.2) |
+| Phase 4 overall | **additional privacy and data-readiness work remains required** (Gates 5 and 8) |
 | Phase 4 MCP capability implemented | **None** |
 | Implementation authorised by this document | **None** |
 
@@ -228,7 +231,7 @@ another module. Verdicts are recorded in §16.
 |---|---|---|---|---|---|---|---|---|
 | **RFIs** | Autodesk Forma Build RFI API (S1) | v3 | General availability, announced 2025-07-23 (S1) | Forma Build | Verified present; includes a read-semantic POST search (S1, S9) | Verified present (S1, S9) | 3-legged or SSA evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
 | **Submittals** | Autodesk Forma Build Submittals API (S3) | v2 | General availability, read phase 2024-02-22, write phase 2024-08-05 (S3, S4) | Forma Build | Verified present and broad (S3, S4, S9) | Verified present, sharing the same base path (S4, S9) | 3-legged evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
-| **Transmittals** | Autodesk Forma Transmittals API (N1, S2) | v1 | General availability, announced 2025-12-10 (S2) | **Autodesk Forma Data Management** (S2) | **Normatively verified** — five read-only operations (N1, N3–N7) | **Normatively excluded** — the Field Guide lists creating, updating settings, adding recipients and exporting as unsupported (N1) | **Normatively verified** — `data:read`, user context optional, 2-legged **or** 3-legged (N3–N7). Module activation and entitlement **unresolved** | verified GA capability; **Gate 2 sufficiently verified** (§16.1); **recommended candidate pending decisions**; **not yet an adopted Phase 4A module**; **not implementation-ready** |
+| **Transmittals** | Autodesk Forma Transmittals API (N1, S2) | v1 | General availability, announced 2025-12-10 (S2) | **Autodesk Forma Data Management** (S2) | **Normatively verified** — five read-only operations (N1, N3–N7) | **Normatively excluded** — the Field Guide lists creating, updating settings, adding recipients and exporting as unsupported (N1) | **Normatively verified** — `data:read`, user context optional, 2-legged **or** 3-legged (N3–N7). Module activation and entitlement **unresolved** | verified GA capability; **Gate 2 sufficiently verified** (§16.1) and **Gate 6 passed** (§16.2); **adopted first Phase 4A read-only capability**, owned by the **APS/Forma MCP**; **planned, not implemented**; **not implementation-ready** — Gates 5 and 8 remain unresolved |
 | **Sheets** | Autodesk Forma Build Sheets API (S5) | v1 | General availability (S5, S6, S7) | Forma Build | **Genuine read surface verified present** — sheets, version sets, collections (S5, S6, S10) | Verified present, including asynchronous export creation (S5, S7, S10) | 2-legged **and** 3-legged evidenced (S5, S6) | verified GA capability with a genuine read surface; **later candidate**; **not implementation-ready** |
 | **Meetings** | — | — | — | — | — | — | — | **`meetings_public_api_not_verified`** |
 
@@ -1066,7 +1069,7 @@ and proven across three phases.
 | 3 | Read/write operation inventory | pass | pass | **pass** | pass | fail |
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
 | 5 | Privacy and sanitisation planning | **unresolved** | **unresolved** | **unresolved** | **unresolved** | fail |
-| 6 | Component-boundary decision | **unresolved** | **unresolved** | **unresolved** | **unresolved** | fail |
+| 6 | Component-boundary decision | **unresolved** | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass, conditional on an explicit POST-as-read policy decision (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **unresolved** | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
@@ -1075,11 +1078,13 @@ and proven across three phases.
 Recorded explicitly:
 
 - For **Transmittals**, gates **1, 3, 4, 7, 9 and 10 are substantially supported**
-  by the research, and **Gate 2 is sufficiently verified** (§16.1).
-- Gates **5, 6 and 8 remain unresolved** for Transmittals, and gates **2, 5, 6 and
-  8 remain unresolved** for every other candidate.
+  by the research, **Gate 2 is sufficiently verified** (§16.1), and **Gate 6 is
+  passed** (§16.2).
+- Gates **5 and 8 remain unresolved** for Transmittals, and gates **2, 5, 6 and 8
+  remain unresolved** for every other candidate.
 - **No candidate is implementation-ready.**
-- **Closing Gate 2 alone does not authorise implementation.**
+- **Closing Gates 2 and 6 does not authorise implementation** — it selects and
+  assigns the capability; it does not start it.
 - **Implementation cannot begin while any load-bearing gate remains unresolved.**
 
 A research recommendation is not gate approval. Nothing in §15 or §17 converts an
@@ -1112,44 +1117,82 @@ data readiness; approve alias families; prove Secure Service Account support;
 prove webhook support; prove regional availability; or prove that stable document
 lineage is returned.
 
-**Gate 6 requires the human roadmap and component-boundary decision. Gate 8
-requires live project and interface verification.** Neither is affected by this
-closure.
+**Gate 8 requires live project and interface verification** and is not affected by
+this closure. **Gate 6 required a human roadmap and component-boundary decision;
+that decision has since been taken — see §16.2.**
 
-## 17. Recommended candidate and pending decision
+### 16.2 Transmittals Gate 6 — passed (2026-07-25)
 
-**Architecture status: `transmittals_read_slice_recommended_pending_decision`**
+**Gate 6 (component-boundary and roadmap decision) is passed for Transmittals**,
+by
+[ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md).
 
-Transmittals is the **recommended candidate — pending roadmap, entitlement,
-sanitisation, component-boundary and data-readiness decisions**. The
-*authentication* qualifier has been discharged by the normative spike (§16.1);
-every other qualifier stands.
+The approved decision:
 
-What this status means, precisely:
+- **Transmittals v1 is adopted as the first Phase 4A read-only capability.**
+- **The APS/Forma MCP is the owning component** for all Transmittals API calls
+  and authentication, per
+  [ADR-0001](../decisions/0001-orchestration-layer-not-mcp-server.md) and
+  [ADR-0002](../decisions/0002-multi-repo-no-submodules.md); this repository
+  documents, orchestrates, validates and records evidence, and never
+  re-implements the API.
+- **The first-slice scope is fixed** at the five documented `GET` operations:
+  list transmittals; get one transmittal; list recipients; list folders; list
+  included document versions. **No write operation is in scope.**
+- **RFIs are the preferred second Phase 4A capability**, and are not rejected.
+- **Phase 4A now spans Autodesk Forma Data Management and Autodesk Forma Build**,
+  rather than Forma Build alone.
 
-- it is a **research recommendation** arising from the assessment in §7 and §15;
-- **Gate 2 closing does not change it.** The status remains
-  `transmittals_read_slice_recommended_pending_decision`, because adoption turns
-  on the roadmap and component decisions, not on authentication evidence;
-- it is **not a PRD amendment**, and the
-  [PRD](../prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) is unchanged
-  by this document;
-- it **does not add Transmittals formally to Phase 4A**, whose declared module set
-  remains RFIs, Submittals, Sheets and Meetings;
-- it **does not authorise implementation**, and no MCP tool may be built on the
-  strength of it;
-- adopting it would require a **deliberate roadmap decision**, because its module
-  ownership is **Autodesk Forma Data Management** rather than Forma Build, whereas
-  Phase 4A is currently scoped as Forma Build construction information exchange.
+**Why this needed a human decision, retained as context.** Transmittals is a
+Forma **Data Management** module, whereas Phase 4A had been scoped conceptually
+to Forma **Build**. Adopting it therefore changed the phase boundary — a roadmap
+judgement that capability research could recommend but not make. For exactly that reason
+the research deliberately stopped at the now-superseded status
+`transmittals_read_slice_recommended_pending_decision`, which is **no longer the
+architecture status** (§17).
 
-**Preferred second candidate.** If the Transmittals recommendation is later
-rejected — for example because the roadmap decision keeps Phase 4A strictly within
-Forma Build — or blocked by entitlement, authentication or data readiness, then
-**RFIs are the preferred second candidate**. RFIs are the strongest Forma Build
-module by read-surface completeness, documentation quality and teaching value
-(§5, §15), and remain the module the PRD provisionally named. Selecting RFIs would
+**Gate 6 closure does not**: authorise MCP implementation; authorise any Autodesk
+project API call; close Gate 5 or Gate 8; approve alias families; prove live data
+readiness; prove APS/Forma MCP runtime compatibility; add any write operation; or
+assert that stable document lineage is returned.
+
+## 17. Adopted first capability
+
+**Architecture status: adopted — Transmittals read-only slice, owned by the
+APS/Forma MCP, planned and not implemented.**
+
+**Transmittals v1 is the adopted first Phase 4A read-only capability**, decided in
+[ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)
+on 2026-07-25 and recorded in the
+[PRD](../prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) and
+[COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §6.1.
+
+What the adopted state means, precisely:
+
+- the **owning component is the APS/Forma MCP**; this repository never
+  re-implements the API;
+- the **first-slice scope is fixed** at the five documented `GET` operations, and
+  **no write operation is in scope**;
+- **Phase 4A now spans Autodesk Forma Data Management and Autodesk Forma Build**;
+- **RFIs are the preferred second Phase 4A capability**, not rejected;
+- **implementation is still not authorised.** Adoption is a roadmap and ownership
+  decision. **Gates 5 and 8 remain unresolved**, and both are load-bearing;
+- **no MCP tool exists**, no Autodesk project API has been called, **no alias
+  family is approved**, and **live data readiness is unproven**.
+
+**Historical note, retained deliberately.** Before 2026-07-25 this section carried
+the status `transmittals_read_slice_recommended_pending_decision`. The research
+stopped at a recommendation because Transmittals is a Forma **Data Management**
+module while Phase 4A had been scoped to Forma **Build** — a roadmap judgement
+that capability research could recommend but not make. That boundary question is
+what ADR-0004 resolved (§16.2).
+
+**Preferred second capability.** **RFIs** remain the strongest Forma Build module
+by read-surface completeness, documentation quality and teaching value (§5, §15),
+and are the preferred second Phase 4A capability. Selecting RFIs later would
 additionally require the POST-as-read policy decision recorded in §5 and a
-correspondingly stricter free-text evidence policy (§13).
+correspondingly stricter free-text evidence policy (§13). Submittals and Sheets
+remain later candidates; Meetings remains deferred (§9).
 
 ## 18. Missing evidence and open questions
 
@@ -1208,22 +1251,26 @@ These are closed **for Transmittals only** and remain open for the other modules
 The following sequence must be kept **separate**; research must not be combined
 with component implementation, and no increment may be collapsed into another.
 
-1. **This Gate 2 closure update** — recording the normative Transmittals evidence
-   and closing Gate 2 for Transmittals only (§16.1).
-2. **Make the Phase 4A roadmap and component-boundary decision** — whether a Forma
-   Data Management module may lead Phase 4A, and which component would own it.
-   **This decision has not been made and is not approved by this document.**
-3. **Approve the privacy aliases and evidence rules** — amending
-   [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) in its own
-   increment. Until then the §13.2 families remain provisional.
-4. **Verify Transmittals module activation, permissions and synthetic data** in
-   the training project — the live Gate 8 check.
-5. **Only after Gates 5, 6 and 8 close**, create the Phase 4 result schema and
-   execution plan.
-6. **Implement the MCP reads separately**, in the component repository, per
-   [ADR-0002](../decisions/0002-multi-repo-no-submodules.md).
-7. **Capture private live evidence** under the git-ignored `.local/` boundary.
-8. **Publish sanitised evidence separately**, validated against the Phase 4 schema.
+Completed:
 
-Steps 5 onward are conditional on every load-bearing gate in §16 being resolved.
-Step 2 is a **pending human decision**, not a completed one.
+- **Gate 2 closure update** — the normative Transmittals evidence, closing Gate 2
+  for Transmittals only (§16.1).
+- **The Phase 4A roadmap and component-boundary decision** — taken in
+  [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md),
+  closing Gate 6 (§16.2).
+
+Remaining, in order:
+
+1. **Approve the privacy aliases and evidence rules** — amending
+   [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) in its own
+   increment (**Gate 5**). Until then the §13.2 families remain provisional.
+2. **Verify Transmittals module activation, permissions and synthetic training
+   data** in the approved training project (**Gate 8**).
+3. **Only after Gates 5 and 8 close**, create the Phase 4 result schema and
+   execution plan.
+4. **Implement the five MCP reads separately**, in the component repository, per
+   [ADR-0002](../decisions/0002-multi-repo-no-submodules.md).
+5. **Capture private live evidence** under the git-ignored `.local/` boundary.
+6. **Publish sanitised evidence separately**, validated against the Phase 4 schema.
+
+Steps 3 onward are conditional on every load-bearing gate in §16 being resolved.

@@ -184,13 +184,63 @@ observation is **historical** and is not restated as current behaviour; see
 
 | Stage | Capability | Status |
 |---|---|---|
-| construction_information | RFI | planned |
+| construction_information | **Transmittals** (Autodesk Forma Transmittals API v1) — **adopted first Phase 4A read slice**, owning component **APS/Forma MCP** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)) | **planned** — component assignment **confirmed**, implementation **not started** |
+| construction_information | RFI — preferred second Phase 4A capability | planned |
 | asset_handover | Assets | planned |
 
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
-and live-verified (§3); they are no longer a gap. API-family names for RFI and
-Assets are not asserted here until they are verified from an official Autodesk/APS
-or component source.
+and live-verified (§3); they are no longer a gap. The **Transmittals** API-family
+name is asserted because it is verified from official Autodesk/APS documentation;
+API-family names for RFI and Assets are still not asserted here until they are
+verified from an official Autodesk/APS or component source.
+
+### 6.1 Transmittals ownership split (adopted, not implemented)
+
+The component assignment below is **confirmed** by
+[ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md).
+The implementation status remains **planned**: **no Transmittals MCP tool exists**,
+and none is authorised until Gates 5 and 8 close.
+
+**APS/Forma MCP owns:**
+
+- Transmittals authentication;
+- construction of Transmittals endpoint paths;
+- pagination handling;
+- request execution;
+- response normalisation;
+- structured error handling;
+- the five read tools, once implemented.
+
+**This reference repository owns:**
+
+- architecture and roadmap;
+- workflow orchestration;
+- the evidence schema;
+- sanitisation policy;
+- validation;
+- public evidence artifacts.
+
+**Autodesk Forma owns (native, never re-implemented):**
+
+- the Transmittals records themselves;
+- recipient visibility;
+- document-version associations;
+- permission enforcement;
+- transmittal processing state.
+
+**Explicitly prohibited:**
+
+- rebuilding Transmittals behaviour anywhere in this repository;
+- creating synthetic relationships that Autodesk did not return;
+- deriving stable document lineage and representing it as returned evidence —
+  the documented response carries a version-qualified URN and an authoritative
+  numeric version, and **no separate lineage field is verified**;
+- placing credentials or raw Autodesk responses in this repository;
+- adding any write endpoint to the first slice.
+
+The first slice is fixed at the five documented read operations: list
+transmittals; get one transmittal; list recipients; list folders; list included
+document versions.
 
 ## 7. Experimental boundary
 
@@ -224,6 +274,7 @@ names, element IDs, model-set IDs, URNs, GUIDs, or timestamps are recorded here.
 | Forma Data Management (CDE) | — | Owns | Documents, invokes, validates |
 | Model Derivative / properties | — | Owns | Documents, invokes, validates |
 | Issues, Reviews & Relationships (RFI/assets planned) | — | Owns | Documents, invokes, validates |
+| Transmittals reads (adopted, planned — §6.1) | — | Owns | Documents, invokes, validates |
 | Model Coordination model-set/version reads | — | Owns | Documents, invokes, validates |
 | Model Coordination clash engine (native) | — | Consumes / surfaces | Documents only |
 | Clash detection | Must not build | Must not build | Must not build |

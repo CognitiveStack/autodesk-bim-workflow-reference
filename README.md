@@ -68,11 +68,21 @@ coordination issue and a coordination snapshot were proven to refer to the same
 models at the same coordinated versions. Clash-level reads remain unimplemented, so
 a **direct clash-to-issue link and geometric resolution remain unproven**.
 
-**Next: Phase 4A — construction information exchange, beginning with authoritative
-APS capability research, not implementation.** RFIs are the provisional first
-research candidate; Submittals and Sheets are research-only candidates; Meetings
-are deferred. None of these is implemented, and no MCP tool exists for any of them.
+**Next: Phase 4A — construction information exchange across Forma Data Management
+and Forma Build.** Capability research is complete and the first slice is
+selected: **Autodesk Forma Transmittals, read-only** — five documented `GET`
+operations — owned by the **APS/Forma MCP**
+([ADR-0004](docs/decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
+RFIs are the preferred second capability.
+
+**Current state: Gate 2 (authentication) and Gate 6 (component boundary) are
+closed. Gate 5 (privacy and sanitisation) and Gate 8 (project activation,
+permission and training data) remain open, so the capability is planned and
+nothing is implemented yet** — no Transmittals MCP tool exists and no
+implementation is authorised.
 
 See the
 [PRD](docs/prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) for the
-roadmap and the Phase 4A entry gate.
+roadmap and the Phase 4A entry gate, and
+[PHASE_4_CAPABILITY_GAP.md](docs/architecture/PHASE_4_CAPABILITY_GAP.md) for the
+capability research.

@@ -128,10 +128,27 @@ stages:
 
   - id: construction_information
     platform: Autodesk Forma
-    primary_system: Forma Build
-    # No RFI MCP tool exists yet (planned). API-family name left unasserted until
-    # verified from an official/component source.
-    api_families: []
+    primary_system: Forma Data Management
+    # Phase 4A now spans Forma Data Management and Forma Build (ADR-0004).
+    # SELECTED FIRST READ-ONLY SLICE: Autodesk Forma Transmittals v1, adopted by
+    # ADR-0004 and owned by the APS/Forma MCP. Scope is fixed at the five
+    # documented GET operations: list transmittals; get one transmittal; list
+    # recipients; list folders; list included document versions. No write
+    # operation is in scope.
+    # NOT IMPLEMENTED: no Transmittals MCP tool exists, so status stays planned.
+    # BLOCKERS: Gate 5 (privacy/sanitisation alias approval) and Gate 8 (project
+    # module activation, caller permission and synthetic training data) are both
+    # unresolved; implementation is not authorised until they close.
+    # Gate 2 (authentication scopes) and Gate 6 (component boundary/roadmap) are
+    # closed for Transmittals.
+    # RFIs are the preferred SECOND Phase 4A slice; no RFI MCP tool exists and its
+    # API-family name stays unasserted here until verified (ADR-0003). Submittals
+    # and Sheets are later candidates; Meetings is deferred (public API not
+    # verified). Their API families are deliberately not listed in this task.
+    # The Transmittals API family name is asserted because it is verified from
+    # official Autodesk/APS documentation.
+    api_families:
+      - Autodesk Forma Transmittals API
     mcp_component: aps-forma-mcp
     mcp_implementation_status: planned
     api_maturity: to-be-verified
