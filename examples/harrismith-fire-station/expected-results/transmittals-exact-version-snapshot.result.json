@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "phase": "4A",
+    "slice": "transmittals-exact-version-snapshot",
+    "execution_date": "2026-07-27",
+    "read_only": true,
+    "status": "complete"
+  },
+  "scenario": {
+    "scenario_key": "harrismith-fire-station",
+    "capture_context": "approved_training_project",
+    "scenario_project_contains_fixture": false
+  },
+  "capability": {
+    "modules": [
+      "transmittals",
+      "data_management"
+    ],
+    "read_only": true,
+    "operations_verified": [
+      "list_transmittals",
+      "get_transmittal",
+      "get_transmittal_recipients",
+      "get_transmittal_folders",
+      "get_transmittal_documents",
+      "list_folder_contents",
+      "list_item_versions",
+      "get_item_details"
+    ]
+  },
+  "component_provenance": {
+    "aps_forma_mcp": {
+      "repository_slug": "CognitiveStack/autodesk-aps-forma-mcp",
+      "inspected_revision": "295c2530acdd25cc5cfa8e4b361c4c2358a355f4",
+      "runtime_worktree_state": "clean",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": [
+        "list_transmittals",
+        "get_transmittal",
+        "get_transmittal_recipients",
+        "get_transmittal_folders",
+        "get_transmittal_documents",
+        "list_folder_contents",
+        "list_item_versions",
+        "get_item_details"
+      ]
+    }
+  },
+  "transmittal_observation": {
+    "available": true,
+    "transmittal_alias": "TRANSMITTAL_1",
+    "status": "COMPLETED",
+    "folder_alias": "FOLDER_1",
+    "issued_version_alias": "VERSION_1",
+    "exact_version_returned": true,
+    "folder_count": 1,
+    "document_version_count": 1
+  },
+  "item_observation": {
+    "available": true,
+    "item_alias": "ITEM_1",
+    "item_alias_directly_returned": true,
+    "version_set": {
+      "version_aliases": [
+        "VERSION_1",
+        "VERSION_2"
+      ],
+      "count": 2,
+      "has_more": false,
+      "complete": true
+    },
+    "current_tip_version_alias": "VERSION_2",
+    "current_tip_directly_returned": true
+  },
+  "surface_claims": [
+    {
+      "surface": "transmittals",
+      "claim": "stable_lineage",
+      "status": "not_proven",
+      "basis": "not_established",
+      "note": "The Transmittals response alone does not provide a stable source-document lineage identity. No lineage was inferred from the issued version identifier by URN splitting, suffix removal, reconstruction, canonicalisation or pattern inference."
+    },
+    {
+      "surface": "transmittals",
+      "claim": "exact_version_returned",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "The issued document version identity was returned as a field by the Transmittals documents read."
+    },
+    {
+      "surface": "data_management",
+      "claim": "item_lineage_identity",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "ITEM_1 is the Data Management item resource, returned directly as a field by a first-party Data Management read. It was not derived from any version identifier."
+    },
+    {
+      "surface": "data_management",
+      "claim": "current_tip_relation",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "The lineage tip relation was returned directly by Data Management, not inferred from client-side ordering."
+    },
+    {
+      "surface": "cross_surface",
+      "claim": "exact_version_relation",
+      "status": "proven",
+      "basis": "byte_for_byte_exact_equality",
+      "note": "Established during the controlled live run while both surface operands were simultaneously available. This proves an exact version relationship only; it does not make the Transmittals surface a lineage source."
+    }
+  ],
+  "proofs": [
+    {
+      "code": "P1_ISSUED_VERSION_MATCHES_SOURCE",
+      "statement": "The version issued by the completed transmittal is the same exact version identity as the corresponding version in the source Data Management lineage.",
+      "left_alias": "VERSION_1",
+      "left_surface": "transmittals",
+      "right_alias": "VERSION_1",
+      "right_surface": "data_management",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": false,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "The freeze retains one canonical VERSION_1 identity rather than two independent surface operands, so this historically established equality is not recomputable from the frozen evidence alone."
+    },
+    {
+      "code": "P2_TIP_IS_LATER_VERSION",
+      "statement": "The current tip version of the source Data Management lineage is the same exact version identity as the second returned version.",
+      "left_alias": "VERSION_2",
+      "left_surface": "data_management",
+      "right_alias": "VERSION_2",
+      "right_surface": "data_management",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": false,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "Recorded alongside the current_tip_relation surface claim. The freeze retains the canonical VERSION_2 identity rather than the independent tip operand, so this historically established equality is not recomputable from the frozen evidence alone."
+    },
+    {
+      "code": "P3_ISSUED_VERSION_IS_NOT_TIP",
+      "statement": "The version issued by the transmittal and the current tip version of the source lineage are different exact version identities.",
+      "left_alias": "VERSION_1",
+      "left_surface": "data_management",
+      "right_alias": "VERSION_2",
+      "right_surface": "data_management",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "not_equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": true,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "Both canonical version identities survive independently in the frozen private evidence, so this inequality can be independently re-checked there."
+    }
+  ],
+  "evidence_integrity": {
+    "freeze_policy": "VERIFIED_SURVIVING_VALUE",
+    "strict_originating_result_preflight_passed": false,
+    "recovery_reads_performed": false,
+    "note": "Provenance classes describe how each retained alias is trusted. They describe evidence provenance only, never Autodesk resource semantics, and permit no reconstruction, inference or derivation of an identifier."
+  },
+  "aliases": [
+    {
+      "alias": "TRANSMITTAL_1",
+      "domain": "transmittal",
+      "provenance_class": "ORIGINATING_RESULT"
+    },
+    {
+      "alias": "FOLDER_1",
+      "domain": "folder",
+      "provenance_class": "ORIGINATING_RESULT"
+    },
+    {
+      "alias": "ITEM_1",
+      "domain": "item",
+      "provenance_class": "EQUALITY_VERIFIED_LATER_RESULT",
+      "note": "Provenance is EQUALITY_VERIFIED_LATER_RESULT because the original establishing response aged out. That concerns the surviving evidence source only; the item identity itself was returned first-party by Data Management."
+    },
+    {
+      "alias": "VERSION_1",
+      "domain": "version",
+      "provenance_class": "ORIGINATING_RESULT"
+    },
+    {
+      "alias": "VERSION_2",
+      "domain": "version",
+      "provenance_class": "ORIGINATING_RESULT"
+    }
+  ],
+  "outcome": "exact_version_snapshot_proven",
+  "outcome_scope": "controlled_fixture",
+  "governance_checks": [
+    {
+      "code": "TRANSMITTALS_STABLE_LINEAGE_NOT_PROVEN",
+      "outcome": "pass",
+      "statement": "Transmittals-surface stable lineage is recorded only as not_proven."
+    },
+    {
+      "code": "NO_LINEAGE_INFERRED_FROM_VERSION",
+      "outcome": "pass",
+      "statement": "No lineage was inferred from a Transmittals version identifier by any client-side transformation."
+    },
+    {
+      "code": "ITEM_LINEAGE_DIRECTLY_RETURNED",
+      "outcome": "pass",
+      "statement": "ITEM_1 is recorded as proven item/lineage identity only because it was returned directly by the first-party Data Management resource."
+    },
+    {
+      "code": "NO_LINEAGE_ALIAS",
+      "outcome": "pass",
+      "statement": "No LINEAGE_n alias appears."
+    },
+    {
+      "code": "CROSS_SURFACE_EQUALITY_EXACT_ONLY",
+      "outcome": "pass",
+      "statement": "Cross-surface version equality is claimed only from byte-for-byte exact comparison, and no raw operand is published."
+    },
+    {
+      "code": "NO_RAW_NUMERIC_VERSION",
+      "outcome": "pass",
+      "statement": "No raw Autodesk numeric version property is published; version structure uses aliases plus count and has_more."
+    },
+    {
+      "code": "PROVENANCE_CLASSES_DECLARED",
+      "outcome": "pass",
+      "statement": "Every retained alias carries an evidence-provenance class, and classes weaker than ORIGINATING_RESULT are disclosed rather than upgraded."
+    },
+    {
+      "code": "VERDICT_SCOPED_TO_FIXTURE",
+      "outcome": "pass",
+      "statement": "The verdict is scoped to the controlled fixture and makes no universal, tenant-wide, gate-wide or phase-completion claim."
+    },
+    {
+      "code": "SCENARIO_NOT_CAPTURE_CONTEXT",
+      "outcome": "pass",
+      "statement": "Teaching-scenario placement is recorded separately from capture provenance; the scenario project is not asserted to contain the fixture."
+    },
+    {
+      "code": "TWO_ARTIFACT_WORKFLOW",
+      "outcome": "pass",
+      "statement": "This artifact was generated separately from the private capture; the private file was not sanitised in place."
+    }
+  ],
+  "sanitisation": {
+    "convention_version": 1,
+    "profile_version": 2,
+    "tokens_used": [
+      "TRANSMITTAL_1",
+      "FOLDER_1",
+      "ITEM_1",
+      "VERSION_1",
+      "VERSION_2"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "ORIGINATING_RESULT_AGED_OUT",
+      "stage": "evidence_integrity",
+      "message": "The strict originating-result preflight did not pass: two establishing responses had aged out of the capture session. An explicit provenance policy accepted verified surviving values under named classes, and no recovery read was performed."
+    },
+    {
+      "code": "PUBLIC_ARTIFACT_NOT_SELF_REDERIVABLE",
+      "stage": "proof",
+      "message": "This alias-only artifact records historically established proof outcomes. Raw operands are deliberately excluded, so no proof is recomputable from the public artifact. That is intentional and is not an evidence defect."
+    }
+  ]
+}

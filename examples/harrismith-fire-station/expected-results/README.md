@@ -135,3 +135,93 @@ Unsupported ceilings (not established by this artifact):
 
 Clash-level reads remain deferred, and no clash-level aliases are used because no
 clash-level API data was returned.
+
+## Phase 4A — Transmittals exact-version snapshot
+
+- **Capability gap:** [`docs/architecture/PHASE_4_CAPABILITY_GAP.md`](../../../docs/architecture/PHASE_4_CAPABILITY_GAP.md)
+- **Schema:** [`schemas/phase-4-result.schema.json`](../../../schemas/phase-4-result.schema.json)
+- **Sanitisation:** [`docs/guides/SANITISATION_CONVENTION.md`](../../../docs/guides/SANITISATION_CONVENTION.md) —
+  Transmittals public-evidence profile **version 2**
+- **Governance:** [`ADR-0005`](../../../docs/decisions/0005-approve-transmittals-sanitisation-profile.md)
+  (profile baseline) as extended by
+  [`ADR-0006`](../../../docs/decisions/0006-approve-cross-surface-transmittals-evidence-semantics.md)
+  (cross-surface evidence semantics)
+
+Phase 4A follows the same public/private boundary as Phases 1–3: raw observations
+and the alias map live under the git-ignored private evidence area; only the
+sanitised result JSON is committed here.
+
+### Artifact
+
+- `transmittals-exact-version-snapshot.result.json` — present. A **complete**,
+  read-only, sanitised Phase 4A evidence artifact from a live run on 2026-07-27,
+  with outcome **`exact_version_snapshot_proven`**.
+
+### Scenario and capture provenance
+
+This directory is the repository's Harrismith BIM teaching/reference **scenario
+namespace**. It is not an assertion that every fixture originated in the Autodesk
+project of that name. For this artifact:
+
+1. the controlled fixture was **captured in the approved training project**;
+2. the evidence **belongs to the Harrismith BIM learning/reference scenario**;
+3. **no claim** is made that the Harrismith Autodesk project itself contains the
+   Transmittals fixture;
+4. **no Harrismith-project Transmittals readiness** is inferred from this artifact;
+5. **no real Autodesk project title and no alias-to-real-project mapping** is
+   published — that mapping stays outside Git.
+
+The artifact records these as separate fields, so teaching-scenario placement and
+capture provenance are never collapsed into one another.
+
+### What the evidence establishes (the narrow proof)
+
+- The completed transmittal **retained the immutable issued version** `VERSION_1`.
+- The source Data Management item lineage `ITEM_1` was returned **directly** by a
+  first-party Data Management read, and later carried **`VERSION_2` as its current
+  tip** — so the issued version was no longer the source's current version.
+- The **cross-surface relationship was established by byte-for-byte exact string
+  comparison** during the controlled live run: the version issued by the
+  transmittal and the corresponding Data Management version are the same exact
+  version identity. **Neither raw operand is published** — the artifact records the
+  comparison, its method, and its result.
+- The returned version set is **complete** on `count` together with
+  `has_more: false`; a count alone would not establish completeness.
+- For this controlled fixture, the transmittal therefore behaved as an **issued
+  version snapshot** rather than following the source document's current version.
+
+Distinctions kept honest:
+
+- **Lineage is recorded per surface.** Transmittals-surface stable lineage remains
+  **`not_proven`** — that response alone does not provide a stable source-document
+  lineage identity, and none was inferred from a version identifier by URN
+  splitting, suffix removal, reconstruction, canonicalisation or pattern inference.
+  The Data Management item lineage is separately **proven**, because it was
+  returned directly as a field.
+- **Historical attestation vs re-derivable proof.** Each proof records whether it
+  can be independently re-checked. The version **inequality** is re-derivable from
+  the frozen private evidence; the two **equality** results are historical
+  attestations, because the freeze deliberately retains one canonical identity per
+  version rather than duplicate operands from each surface. **No proof is
+  re-derivable from this public artifact**, which is intentional and not an
+  evidence defect.
+- **Evidence provenance is disclosed, not smoothed.** Each retained alias carries a
+  provenance class. Two establishing responses had aged out of the capture session,
+  so `ITEM_1` is classified `EQUALITY_VERIFIED_LATER_RESULT` rather than upgraded
+  for consistency. Provenance describes how evidence is trusted; it never describes
+  Autodesk resource semantics, and no class permits reconstructing an identifier.
+- **Read-only throughout.** Every operation was a documented `GET`; the fixture
+  itself was authored in the Autodesk product interface, not through any API write.
+- **No raw identifiers.** No project, transmittal, folder, item or version URN, no
+  numeric Autodesk version property, no recipient identity, and no behavioural
+  timestamp appears here.
+
+### What the evidence does not establish
+
+- **universal Transmittals behaviour**, or behaviour **across every tenant, region
+  or configuration** — the verdict is scoped to the controlled fixture;
+- **Gate 8 as a global verdict** — Gate 8 closed for the Transmittals first slice
+  only, under the operative §14 criteria of the capability gap;
+- **overall Phase 4A completion** — no other Phase 4A module is implemented;
+- **that the Harrismith Autodesk project contains the fixture**;
+- **Transmittals stable lineage from the Transmittals surface itself**.
