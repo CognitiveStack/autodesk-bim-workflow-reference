@@ -68,8 +68,8 @@ For the Revit MCP, the inventory was verified from the committed tree at
 
 - **confirmed** — MCP tool implemented and verified in component source at the
   inspected commit.
-- **partial** — the stage's sub-capabilities are split; some tools exist, others
-  are planned.
+- **partial** — the capability's own tool surface is partly implemented; some
+  tools exist, others are planned.
 - **planned** — no MCP tool yet; a later-phase capability.
 - **experimental** — MCP tool exists but targets a Beta / `v1alpha` API.
 - **data-readiness-blocked** — the tool works, but the approved example or
@@ -77,10 +77,15 @@ For the Revit MCP, the inventory was verified from the committed tree at
 - **mediated-by-revit-mcp** — reached through the Revit MCP / Revit API rather
   than APS.
 
-In `config/workflows/end-to-end-reference.yaml` these concerns are expressed as
-separate fields (`mcp_component`, `mcp_implementation_status`, `api_maturity`,
-`data_readiness`) so MCP coverage, API maturity, and project-data readiness are
-never conflated.
+In `config/workflows/end-to-end-reference.yaml` (`schema_version: 2`) a **stage**
+is the BIM workflow category and carries only `id`, `platform`,
+`automation_policy` and `capabilities`; a **capability** inside it is the unit of
+implementation governance. MCP ownership (`mcp_component`), MCP coverage
+(`mcp_implementation_status`), API maturity (`api_maturity`) and project-data
+readiness (`data_readiness`) are **capability-level** fields, and remain separate
+axes that are never conflated
+([reference-repo ADR-0008](../decisions/0008-govern-implementation-state-per-capability.md),
+[reference-repo ADR-0009](../decisions/0009-define-capability-record-cardinality-for-schema-v2.md)).
 
 The **read / write class** used in the tables below is a semantic classification,
 not an HTTP-verb label:

@@ -83,41 +83,32 @@ git-ignored):
   path environment variables (`FORMA_MCP_REPO`, `REVIT_MCP_REPO`).
 - `config/projects/harrismith.example.yaml` — the Harrismith project and its
   safety switches.
-- `config/workflows/end-to-end-reference.yaml` — the lifecycle stages. Each stage
-  keeps separate, non-conflated fields: `api_families` (a list of relevant
-  developer APIs), `mcp_component` (owning integration component),
-  `mcp_implementation_status` (`confirmed` / `partial` / `planned` /
-  `not-applicable`), `api_maturity` (`beta-v1alpha` / `ga` / `to-be-verified` /
-  `not-applicable`), `data_readiness` (`ready` / `blocked` / `not-assessed`),
-  and `data_readiness_reason` (an optional sanitised machine-readable
-  explanation of that value, used for example to identify a non-default
-  approved project scope where relevant), alongside `platform`,
-  `primary_system`, and `automation_policy`.
+- `config/workflows/end-to-end-reference.yaml` — the lifecycle stages,
+  `schema_version: 2`. A **stage** is the BIM workflow / teaching category and
+  carries only `id`, `platform`, `automation_policy` and `capabilities`. A
+  **capability** inside a stage is the unit of implementation governance and
+  carries `id`, `primary_system`, `api_maturity`, `mcp_component`,
+  `mcp_implementation_status` and `data_readiness` (required), `api_family` and
+  `api_version` (conditional), and `data_readiness_reason` (optional).
+  Vocabularies: `api_maturity` (`beta` / `ga` / `to-be-verified` /
+  `not-applicable`), `mcp_implementation_status` (`confirmed` / `partial` /
+  `planned` / `not-applicable`), `data_readiness` (`ready` / `blocked` /
+  `not-assessed`).
 
-`api_families` is always a list and names API families only. MCP implementation
-coverage, API maturity, and project-data readiness are recorded as separate
-fields so they are never conflated; no GA/stable maturity is claimed without a
-cited source
+Capabilities within one stage may differ independently on every axis: MCP
+ownership and coverage, API maturity, and project-data readiness are recorded as
+separate capability-level fields so they are never conflated, and no GA/stable
+maturity is claimed without a cited source
 ([ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md)).
-
-> **Schema-v2 target — migration pending; the contract above is unchanged.** The
-> shape described above is **schema v1**, and it **remains authoritative**:
-> `config/workflows/end-to-end-reference.yaml` is still `schema_version: 1` and
-> still carries the stage-level fields listed here.
-> [Reference-repo ADR-0008](../decisions/0008-govern-implementation-state-per-capability.md)
-> records the agreed **target** for schema v2, in which the capability-specific
-> fields (`primary_system`, `api_families` → `api_family` plus a new
-> `api_version`, `api_maturity`, `mcp_component`, `mcp_implementation_status`,
-> `data_readiness`, `data_readiness_reason`) move into per-capability records
-> inside each stage, leaving the stage itself as workflow taxonomy and
-> pedagogical posture. **Not every capability field is mandatory:**
-> [reference-repo ADR-0009](../decisions/0009-define-capability-record-cardinality-for-schema-v2.md)
-> defines which fields are required, conditional or optional, and clarifies that
-> `capabilities: []` means a stage has **no governed capability** — not merely no
-> implementation, no asserted API family, or no ready data. **No migration has
-> been made.** The Site Design lifecycle/version reconciliation prerequisite named
-> in ADR-0008 is now satisfied; the migration itself remains pending its own
-> separately reviewed increment.
+`api_version` records the API contract / request-route version — not the
+documentation-set version — and is required whenever `api_maturity` makes a
+concrete lifecycle assertion (`beta` or `ga`). `capabilities: []` means a stage
+has **no governed capability**, not merely no implementation, no asserted API
+family, or no ready data. The governing decisions are
+[reference-repo ADR-0008](../decisions/0008-govern-implementation-state-per-capability.md)
+(stage versus capability granularity) and
+[reference-repo ADR-0009](../decisions/0009-define-capability-record-cardinality-for-schema-v2.md),
+which carries the authoritative cardinality table.
 
 ## 5. Trust and security boundaries
 

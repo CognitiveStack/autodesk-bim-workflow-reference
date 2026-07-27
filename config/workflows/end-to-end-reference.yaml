@@ -1,36 +1,85 @@
-schema_version: 1
+schema_version: 2
 
 # Terminology model: see docs/decisions/0003-autodesk-platform-product-and-api-terminology.md
 # and docs/guides/GLOSSARY.md. Confirmed component capability inventory:
 # see docs/architecture/COMPONENT_BOUNDARIES.md (inventory verified 2026-07-27).
 #
-# Each stage keeps these concerns as SEPARATE fields; they must not be conflated:
+# Schema v2 governance model (docs/decisions/0008-govern-implementation-state-per-capability.md
+# and docs/decisions/0009-define-capability-record-cardinality-for-schema-v2.md):
+# a STAGE is the BIM workflow / teaching category; a CAPABILITY inside it is the
+# unit of implementation governance. Capabilities within one stage may differ
+# independently on every axis below, and those axes must never be conflated or
+# collapsed into a single capability status.
 #
+# STAGE-LEVEL fields:
+#
+#   id                        Stage identifier (BIM lifecycle ordering below).
 #   platform                  Autodesk platform the stage lives on (branding tier).
-#   primary_system            The Forma product/offering that carries the stage.
-#   api_families              List of relevant developer API families. Named only
-#                             where confirmed from component source/documentation
-#                             or official Autodesk/APS documentation; otherwise
-#                             left empty ([]) with a note. Not a maturity claim.
-#   mcp_component             Owning integration component: aps-forma-mcp |
-#                             revit-mcp | none.
-#   mcp_implementation_status Whether THIS project's MCP tooling exists for the
-#                             stage: confirmed | partial | planned | not-applicable.
+#   automation_policy         This project's chosen automation posture.
+#   capabilities              The governed capabilities in this stage. An empty
+#                             list ([]) means NO governed capability is
+#                             represented — not merely that no MCP tool exists,
+#                             no API family is asserted, or no data is ready.
+#
+# CAPABILITY-LEVEL fields — REQUIRED:
+#
+#   id                        Stable machine-oriented capability identity, scoped
+#                             within the stage. Human-readable Autodesk API-family
+#                             terminology is a value, never the record key.
+#   primary_system            The product/system surface associated with the
+#                             governed capability.
 #   api_maturity              Separately verified lifecycle classification of the
 #                             underlying Autodesk developer API:
-#                             beta-v1alpha | ga | to-be-verified | not-applicable.
+#                             beta | ga | to-be-verified | not-applicable.
 #                             ga = General Availability. A concrete lifecycle
 #                             classification is asserted only where verified
 #                             against an official Autodesk/APS source and cited
-#                             in the documentation; otherwise use to-be-verified.
+#                             in the documentation; otherwise use to-be-verified,
+#                             which is this repository's epistemic sentinel and is
+#                             NOT an Autodesk lifecycle state. not-applicable means
+#                             the capability/API is identified but this lifecycle
+#                             vocabulary does not apply to that API context.
+#   mcp_component             Owning integration component: aps-forma-mcp |
+#                             revit-mcp | none. Asserts ownership, not
+#                             implementation.
+#   mcp_implementation_status Whether THIS project's MCP tooling exists for the
+#                             capability: confirmed | partial | planned |
+#                             not-applicable. `partial` describes THAT
+#                             capability's own tool surface, never several
+#                             capabilities aggregated together.
 #   data_readiness            Whether the approved example or training project for
-#                             this stage holds enough data to demonstrate the
-#                             capability: ready | blocked | not-assessed. The
-#                             Harrismith example is the default; where a stage was
+#                             this capability holds enough data to demonstrate it:
+#                             ready | blocked | not-assessed. The Harrismith
+#                             example is the default; where a capability was
 #                             verified in a different approved project, name that
-#                             scope in data_readiness_reason.
-#   data_readiness_reason     Optional sanitised machine-readable explanation.
-#   automation_policy         This project's chosen automation posture.
+#                             scope in data_readiness_reason. Never derived from
+#                             implementation status.
+#
+# CAPABILITY-LEVEL fields — CONDITIONAL:
+#
+#   api_family                The developer API family. Present when asserted from
+#                             component source/documentation or official
+#                             Autodesk/APS documentation. ABSENT means UNASSERTED
+#                             (deliberately not yet named, per ADR-0003) — never
+#                             "no API exists". Not a maturity claim.
+#   api_version               The API contract / request-route version of the
+#                             governed API surface — NOT the documentation-set
+#                             version. REQUIRED whenever api_maturity is a concrete
+#                             lifecycle assertion (beta or ga), because a lifecycle
+#                             claim binds to a version. May be omitted for
+#                             to-be-verified and not-applicable. There is no closed
+#                             value set: versions are API-specific. `to-be-verified`
+#                             is never used as an api_version value; an unknown
+#                             version is represented by omission.
+#
+# CAPABILITY-LEVEL fields — OPTIONAL:
+#
+#   data_readiness_reason     Optional sanitised machine-readable explanation of
+#                             data_readiness. Never invented where none exists.
+#
+# Live-verification, public-evidence and gate status remain SEPARATE governance
+# axes and are deliberately not machine-readable fields here; they are governed by
+# the evidence and gate documents (ADR-0008).
 #
 # Terminology last verified: 2026-07-22
 
@@ -42,78 +91,101 @@ workflow:
 stages:
   - id: site_and_context
     platform: Autodesk Forma
-    primary_system: Forma Site Design
-    api_families:
-      - Forma Site Design API
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: confirmed
-    api_maturity: beta-v1alpha
-    data_readiness: ready
     automation_policy: experimental_and_read_first
+    capabilities:
+      - id: site_context
+        primary_system: Forma Site Design
+        # api_version/api_maturity are the verified decomposition of the retired
+        # schema-v1 compound maturity value. Both facts are independently
+        # established and cited in docs/guides/GLOSSARY.md: the route version is
+        # v1alpha and the Autodesk lifecycle classification is Beta.
+        api_family: Forma Site Design API
+        api_version: v1alpha
+        api_maturity: beta
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: ready
 
   - id: concept_design
     platform: Autodesk Forma
-    primary_system: Forma
-    # MCP proposal read + one guarded proposal-create tool exist (Beta). This does
-    # NOT mean all concept-design operations are automated, hence status: partial.
-    api_families:
-      - Forma Site Design API
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: partial
-    api_maturity: beta-v1alpha
-    data_readiness: ready
     automation_policy: limited_guarded_automation
+    capabilities:
+      - id: concept_proposals
+        primary_system: Forma
+        # MCP proposal read + one guarded proposal-create tool exist (Beta). This does
+        # NOT mean all concept-design operations are automated, hence status: partial.
+        # Same verified decomposition of the retired compound maturity value as
+        # site_context above.
+        api_family: Forma Site Design API
+        api_version: v1alpha
+        api_maturity: beta
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: partial
+        data_readiness: ready
 
   - id: revit_authoring
     platform: Autodesk Revit
-    primary_system: Revit
-    api_families:
-      - Autodesk Revit API
-    mcp_component: revit-mcp
-    mcp_implementation_status: confirmed
-    api_maturity: not-applicable
-    data_readiness: not-assessed
     automation_policy: pyrevit_mcp
+    capabilities:
+      - id: revit_authoring
+        primary_system: Revit
+        # api_version is deliberately OMITTED: no applicable API contract/request-route
+        # version fact is established in this repository, and api_maturity:
+        # not-applicable makes no concrete lifecycle assertion requiring a version
+        # binding.
+        api_family: Autodesk Revit API
+        api_maturity: not-applicable
+        mcp_component: revit-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: not-assessed
 
   - id: cde_information_management
     platform: Autodesk Forma
-    primary_system: Forma Data Management
-    api_families:
-      - APS Data Management API
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: confirmed
-    api_maturity: to-be-verified
-    data_readiness: ready
     automation_policy: stable_api_preferred
+    capabilities:
+      - id: document_management
+        primary_system: Forma Data Management
+        # api_version is deliberately OMITTED: no route/API-contract version is
+        # established in this repository, and it must not be inferred from the
+        # documentation-set version or from current MCP route segments. The
+        # lifecycle remains to-be-verified, so no version binding is required.
+        api_family: APS Data Management API
+        api_maturity: to-be-verified
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: ready
 
   - id: model_coordination
     platform: Autodesk Forma
-    primary_system: Model Coordination
-    # Five read-only model-set/version tools are implemented and live-verified
-    # (model-set discovery and detail, snapshot version history, latest/specific
-    # coordination snapshot with its participating document versions).
-    # Data readiness is satisfied: the dedicated Harrismith training coordination
-    # data exists, and MODEL_SET_1 with its coordination snapshots was read
-    # successfully. The earlier no_harrismith_model_sets blocker is closed.
-    # Phase 3 is complete at outcome shared_model_context_proven.
-    # Clash-level reads are NOT implemented: clash results, identifiers, groups,
-    # membership and status are unavailable, so direct clash-to-issue provenance
-    # and geometric resolution remain unproven. The native Autodesk clash engine
-    # is never re-implemented here.
-    api_families:
-      - Model Coordination API
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: confirmed
-    api_maturity: to-be-verified
-    data_readiness: ready
     automation_policy: use_native_coordination_engine
+    capabilities:
+      - id: model_coordination
+        primary_system: Model Coordination
+        # Five read-only model-set/version tools are implemented and live-verified
+        # (model-set discovery and detail, snapshot version history, latest/specific
+        # coordination snapshot with its participating document versions).
+        # Data readiness is satisfied: the dedicated Harrismith training coordination
+        # data exists, and MODEL_SET_1 with its coordination snapshots was read
+        # successfully. The earlier no_harrismith_model_sets blocker is closed.
+        # Phase 3 is complete at outcome shared_model_context_proven.
+        # Clash-level reads are NOT implemented: clash results, identifiers, groups,
+        # membership and status are unavailable, so direct clash-to-issue provenance
+        # and geometric resolution remain unproven. The native Autodesk clash engine
+        # is never re-implemented here.
+        # api_version is deliberately OMITTED: no route/API-contract version is
+        # established here and the lifecycle remains to-be-verified.
+        api_family: Model Coordination API
+        api_maturity: to-be-verified
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: ready
 
   - id: reviews_and_issues
     platform: Autodesk Forma
-    primary_system: Forma Data Management
-    # Confirmed READ scope only: Issues reads, seven Reviews reads, and the issue
-    # Relationships read, all implemented and live-verified. This stage's read
-    # capability is no longer a gap.
+    automation_policy: stable_api_preferred
+    # STAGE SCOPE. Confirmed READ scope only: Issues reads, seven Reviews reads, and
+    # the issue Relationships read, all implemented and live-verified. This stage's
+    # read capability is no longer a gap.
     # This status covers reads only. No review, issue, or relationship write is
     # implemented; write workflows remain deferred. The project's sole guarded
     # write tool is unrelated (Forma Site Design, concept_design stage).
@@ -123,66 +195,82 @@ stages:
     # RFIs, Assets, Submittals, Sheets and Meetings are NOT implemented here.
     # Reviews and Relationships API-family names remain unasserted until verified
     # from an official Autodesk/APS source (ADR-0003: a product-module name is
-    # not automatically an API family name).
-    api_families:
-      - APS Issues API
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: confirmed
-    api_maturity: to-be-verified
-    data_readiness: ready
-    automation_policy: stable_api_preferred
+    # not automatically an API family name). Because those families are unasserted,
+    # Reviews and Relationships are NOT separate capability records here; their
+    # adoption as governed capabilities is a later increment.
+    capabilities:
+      - id: issues
+        primary_system: Forma Data Management
+        # api_version is deliberately OMITTED: no route/API-contract version is
+        # established here and the lifecycle remains to-be-verified.
+        api_family: APS Issues API
+        api_maturity: to-be-verified
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: ready
 
   - id: construction_information
     platform: Autodesk Forma
-    primary_system: Forma Data Management
-    # Phase 4A now spans Forma Data Management and Forma Build (ADR-0004).
-    # SELECTED FIRST READ-ONLY SLICE: Autodesk Forma Transmittals v1, adopted by
-    # ADR-0004 and owned by the APS/Forma MCP. Scope is fixed at the five
-    # documented GET operations: list transmittals; get one transmittal; list
-    # recipients; list folders; list included document versions. No write
-    # operation is in scope.
-    # IMPLEMENTED and LIVE-VERIFIED 2026-07-27: the five read-only Transmittals MCP
-    # operations exist in the APS/Forma MCP (see COMPONENT_BOUNDARIES.md 3.3), so
-    # mcp_implementation_status is `confirmed` — the vocabulary's value for a tool
-    # implemented and verified in component source (COMPONENT_BOUNDARIES.md 2).
-    # Gates 2 (authentication scopes), 5 (privacy/sanitisation), 6 (component
-    # boundary/roadmap) and 8 (activation, permission, training data) are CLOSED for
-    # the Transmittals first slice.
-    # SANITISATION: governed by ADR-0005 and the Transmittals public-evidence
-    # profile in docs/guides/SANITISATION_CONVENTION.md. Approved aliases reuse
-    # PROJECT_n, USER_n, VERSION_n and FOLDER_n, and add TRANSMITTAL_n,
-    # RECIPIENT_n, EXTERNAL_MEMBER_n, COMPANY_n and ROLE_n. Behavioural
-    # timestamps (receivedAt/viewedAt/downloadedAt) reduce to booleans or counts.
-    # GATE 8: closed for the Transmittals first slice on 2026-07-27 under the
-    # operative section-14 criteria of PHASE_4_CAPABILITY_GAP.md (see 16.4).
-    # SCOPE OF data_readiness BELOW: readiness was established in the APPROVED
-    # TRAINING PROJECT for the Transmittals first slice — NOT in the Harrismith
-    # example project, which is not asserted to hold a Transmittals fixture.
-    # data_readiness_reason names that scope, per the header definition.
+    automation_policy: focused_reference_examples
+    # STAGE SCOPE. Phase 4A now spans Forma Data Management and Forma Build (ADR-0004).
     # PHASE 4A IS NOT COMPLETE: this stage covers the Transmittals first slice only.
     # RFIs are the preferred SECOND Phase 4A slice; no RFI MCP tool exists and its
-    # API-family name stays unasserted here until verified (ADR-0003). Submittals
-    # and Sheets are later candidates; Meetings is deferred (public API not
-    # verified). Their API families are deliberately not listed in this task.
-    # The Transmittals API family name is asserted because it is verified from
-    # official Autodesk/APS documentation.
-    api_families:
-      - Autodesk Forma Transmittals API
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: confirmed
-    api_maturity: ga
-    data_readiness: ready
-    data_readiness_reason: transmittals-first-slice-ready-in-approved-training-project
-    automation_policy: focused_reference_examples
+    # API-family name stays unasserted until verified (ADR-0003), so no RFI
+    # capability record exists here. Submittals and Sheets are later candidates;
+    # Meetings is deferred (public API not verified). Their API families are
+    # deliberately not listed in this task.
+    capabilities:
+      - id: transmittals
+        primary_system: Forma Data Management
+        # SELECTED FIRST READ-ONLY SLICE: Autodesk Forma Transmittals v1, adopted by
+        # ADR-0004 and owned by the APS/Forma MCP. Scope is fixed at the five
+        # documented GET operations: list transmittals; get one transmittal; list
+        # recipients; list folders; list included document versions. No write
+        # operation is in scope.
+        # IMPLEMENTED and LIVE-VERIFIED 2026-07-27: the five read-only Transmittals MCP
+        # operations exist in the APS/Forma MCP (see COMPONENT_BOUNDARIES.md 3.3), so
+        # mcp_implementation_status is `confirmed` — the vocabulary's value for a tool
+        # implemented and verified in component source (COMPONENT_BOUNDARIES.md 2).
+        # Gates 2 (authentication scopes), 5 (privacy/sanitisation), 6 (component
+        # boundary/roadmap) and 8 (activation, permission, training data) are CLOSED for
+        # the Transmittals first slice.
+        # SANITISATION: governed by ADR-0005 and the Transmittals public-evidence
+        # profile in docs/guides/SANITISATION_CONVENTION.md. Approved aliases reuse
+        # PROJECT_n, USER_n, VERSION_n and FOLDER_n, and add TRANSMITTAL_n,
+        # RECIPIENT_n, EXTERNAL_MEMBER_n, COMPANY_n and ROLE_n. Behavioural
+        # timestamps (receivedAt/viewedAt/downloadedAt) reduce to booleans or counts.
+        # GATE 8: closed for the Transmittals first slice on 2026-07-27 under the
+        # operative section-14 criteria of PHASE_4_CAPABILITY_GAP.md (see 16.4).
+        # The API family name is asserted because it is verified from official
+        # Autodesk/APS documentation; api_version v1 is the route/API-contract
+        # version established in the published Phase 4 evidence, and is required
+        # here because api_maturity: ga is a concrete lifecycle assertion.
+        api_family: Autodesk Forma Transmittals API
+        api_version: v1
+        api_maturity: ga
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: confirmed
+        # SCOPE OF data_readiness BELOW: readiness was established in the APPROVED
+        # TRAINING PROJECT for the Transmittals first slice — NOT in the Harrismith
+        # example project, which is not asserted to hold a Transmittals fixture.
+        # data_readiness_reason names that scope, per the header definition.
+        data_readiness: ready
+        data_readiness_reason: transmittals-first-slice-ready-in-approved-training-project
 
   - id: asset_handover
     platform: Autodesk Forma
-    primary_system: Forma Build
-    # No Assets MCP tool exists yet (planned). API-family name left unasserted
-    # until verified from an official/component source.
-    api_families: []
-    mcp_component: aps-forma-mcp
-    mcp_implementation_status: planned
-    api_maturity: to-be-verified
-    data_readiness: not-assessed
     automation_policy: focused_reference_example
+    capabilities:
+      - id: assets
+        primary_system: Forma Build
+        # No Assets MCP tool exists yet (planned). api_family is deliberately
+        # OMITTED — the API-family name is left unasserted until verified from an
+        # official/component source (ADR-0003); omission means UNASSERTED, not that
+        # no API exists. api_version is likewise OMITTED: the lifecycle remains
+        # to-be-verified, so no version binding is required. This is a GOVERNED
+        # PLANNED capability, which is why it is a capability record rather than
+        # `capabilities: []` (ADR-0009).
+        api_maturity: to-be-verified
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: planned
+        data_readiness: not-assessed
