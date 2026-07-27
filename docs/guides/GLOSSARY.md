@@ -41,7 +41,12 @@ should be named explicitly rather than assumed from the umbrella name.
 ### Forma Site Design
 The Forma offering for early-stage site and context design. In this project its
 API automation is treated as experimental and read-first; write automation is
-deferred. *(Tier: product / offering. Site Design API maturity: to be verified.)*
+deferred. Its developer API is the **Forma Site Design API**: the route version is
+**`v1alpha`** and the Autodesk lifecycle classification is **Beta**. These are
+separate facts — a version identifier is not a maturity claim, and `v1alpha` alone
+would not establish Beta. Both verified 2026-07-27 against the official Autodesk
+sources in [References](#references). *(Tier: product / offering. Developer API:
+Forma Site Design API — route version `v1alpha`, maturity Beta.)*
 
 ### Model Coordination
 The Forma capability for coordinating discipline models and detecting clashes.
@@ -118,3 +123,10 @@ verified 2026-07-22).
   <https://aps.autodesk.com/en/docs/data/v2>
 - APS Model Derivative API —
   <https://aps.autodesk.com/en/docs/model-derivative/v2>
+- Forma Site Design API (Beta) — official APS documentation; the API name carries
+  the Beta lifecycle marker and the Reference Guides publish the `v1alpha` route
+  version —
+  <https://aps.autodesk.com/en/docs/forma/v1>
+- Use the open Forma Site Design API to add custom extensions and contextual data
+  — official APS announcement; records the API as being in public beta —
+  <https://aps.autodesk.com/blog/use-open-forma-api-add-custom-extensions-and-contextual-data>
