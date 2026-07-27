@@ -397,6 +397,184 @@ retained alias · **proof-reproducibility classification** · `endpoint_evidence
 this profile, and **no Phase 4 schema exists yet**. The eventual schema may
 refine these field names but **must not weaken the policy**.
 
+### RFI public-evidence profile
+
+**Approved by [ADR-0010](../decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)
+(2026-07-27), profile version 1.** This section governs public evidence for the
+Phase 4A RFI read slice. It **extends** the conventions above and **redefines
+nothing**; every existing rule continues to apply. It does not change the
+Transmittals profile.
+
+**Scope.** The adopted first read-only slice only: `GET users/me`,
+`POST search:rfis`, `GET rfis/:rfiId`. `GET rfis/:rfiId` embeds `responses[]`, so
+response narrative is covered here by necessity. Comments, attachments, separate
+response operations, and all writes are outside this profile.
+
+**Boundary.** This profile governs **what may cross into public repository
+evidence**. Raw RFI narrative may exist transiently during authenticated
+processing and inside the git-ignored `.local/` raw-observation boundary under the
+rules already in force. **Real RFI narrative must never appear in public
+evidence.** The allowed standard representation is enums, booleans, safe
+aggregates, approved aliases, and narrative-presence facts.
+
+#### Approved alias registry
+
+**Existing reused aliases** — unchanged: `PROJECT_n` (the Autodesk project),
+`USER_n` (a person reference, only where one is genuinely required).
+
+**Newly approved alias:**
+
+| Alias | Domain |
+|---|---|
+| `RFI_n` | an **RFI record** |
+
+`RFI_n` is the only RFI-specific alias in version 1.
+
+**Not approved, and not to be introduced:** `RFI_TYPE_n` · `RESPONSE_n` ·
+`WORKFLOW_n` · `TEXT_n` · `QUESTION_n` · `ANSWER_n` · `LOCATION_n` · `MESSAGE_n`.
+
+- **`RFI_TYPE_n`** — `rfiTypeId` is omitted from version-1 public evidence; type
+  identity proves none of the first-slice propositions.
+- **`RESPONSE_n`** — responses reduce to a count and a state/status distribution.
+- **`WORKFLOW_n`** — already denotes **Review workflow identity**; RFI
+  `workflowType` is an enum (`US` / `EMEA`), not an identifier. Reuse would merge
+  two identifier domains.
+- **Narrative aliases** — text is content, not stable repository identity.
+
+#### Identifier policy
+
+**Raw values are always removed from public evidence.** The raw identifier value
+must never appear unmodified, hashed, truncated, partially masked, or otherwise
+transformed in a way that preserves the operand. **Where an identity, reference,
+or equality proof is genuinely required, replace the raw value only with an
+approved domain-specific alias under this convention** — approved alias
+replacement is permitted, and is the mechanism by which equality is expressed
+without disclosure.
+
+The raw values covered are:
+
+RFI IDs · project and container IDs · Autodesk user IDs · actor, assignee,
+reviewer, manager and watcher IDs · response IDs · `rfiTypeId` · LBS /
+location-node IDs · custom-attribute IDs · `virtualFolderUrn` and any URN ·
+identifier-bearing URLs.
+
+Also never published in any form: `user.name` · email and contact fields · raw
+permitted/required-attribute operands carrying user, company or role IDs · OAuth
+tokens and request headers · raw upstream error bodies and diagnostic payloads.
+
+Equality is expressed through **deterministic capture-local alias equality** —
+`RFI_1` returned by search is the same `RFI_1` fetched by detail — while the raw
+operand is never published.
+
+#### Field-handling policy
+
+**Omit** — not published in version 1, and not aliased:
+
+`customIdentifier` (treated as the Transmittals `sequenceId` is treated) ·
+`discipline` · `category` · `locationDescription` · `locations[]` · `reference` ·
+`customAttributes[]` · `bridgedSource` · `bridgedTarget` · `bridgeSyncOutdated` ·
+`syncVersion` · `isSelectable`.
+
+**May retain as controlled categorical evidence:**
+
+`status` · `previousStatus` · `workflowType` · `officialResponseStatus` ·
+response `state` / `status` distributions · `priority` · `costImpact` ·
+`scheduleImpact` · `user.role` · permitted-status enums · attribute
+`values[].type` enums where no operand is exposed · HTTP method and endpoint
+family · HTTP status class or an approved exact status code · authentication-mode
+category · the required OAuth scope name **`data:read`** · `read_semantic_post`
+(ADR-0007 endpoint-level approval) · `projection_used`.
+
+**May retain as aggregate evidence,** subject to the existing aggregate rule:
+
+result count · `commentsCount` · response count · assignee, reviewer and watcher
+counts · `maxAssignees` · allowed-value counts · pagination page count.
+
+#### Narrative policy
+
+- **Default: omit the content.** The standard public representation is **derived
+  machine-safe properties** — `question_present`, `official_response_present`,
+  `suggested_answer_present`, `response_count`, `narrative_content_published`.
+- **Never published as real content:** `title` · `question` · `officialResponse` ·
+  `suggestedAnswer` · `responses[].text` · `locationDescription` · `reference` ·
+  custom text attribute values.
+- **No narrative aliases are created.**
+- **Character counts are discouraged** — length is weakly identifying and proves
+  nothing a presence boolean does not.
+
+#### `users/me` minimisation
+
+**Default posture: no `USER_n` is published for the authenticated caller.** The
+evidence proves which role and permissions the caller holds; the identity is not
+required, and omission is safer than an alias.
+
+Publishable: role enum · workflow-type enum · `can_create_rfi` boolean ·
+permitted-status enums · max-assignee count · required/permitted attribute
+**names** · allowed-value **counts** · attribute type enums without operands.
+
+#### `search:rfis` public-evidence projection
+
+The server-side `fields` projection **should be used where supported**, so
+collection is minimised before sanitisation.
+
+Public evidence may include `RFI_n` · `status` · `workflow_type` · safe
+aggregate/count metadata · `projection_used` · `read_semantic_post`. It does
+**not** include `rfiTypeId`, `title`, `question`, `customIdentifier`,
+`discipline` or `category`.
+
+#### `rfis/:rfiId` public-evidence projection
+
+Public evidence may prove RFI alias continuity, status and workflow state, safe
+categorical metadata, safe counts, and presence booleans. **No real narrative, no
+`rfiTypeId`, no `discipline` or `category`.**
+
+#### Workflow-timestamp policy
+
+RFI workflow timestamps are **person-linked** — `respondedAt`/`respondedBy`,
+`answeredAt`/`answeredBy`, `closedAt`/`closedBy` pair a time with an actor. They
+receive the stricter treatment applied to behavioural telemetry above, **not** the
+ordinary date-only reduction.
+
+- `respondedAt`, `answeredAt`, `closedAt` → **booleans only**. No exact or rounded
+  values, no intervals, no person-linked ordering or chronology.
+- `responses[].createdAt` → **omitted**.
+- `createdAt`, `updatedAt` → **omitted by default**; date-only permitted only for
+  controlled synthetic teaching evidence where non-identifying.
+- `dueDate` → `has_due_date` boolean by default.
+
+#### Error policy
+
+**The raw upstream RFI error body is never published.** Permitted: HTTP status
+code or class · a stable **local** error category (`authentication_failed`,
+`permission_denied`, `not_found`, `rate_limited`, `transport_error`, `timeout`) ·
+a fixed sanitised **local** reason · safe booleans.
+
+#### Controlled synthetic fixture rule
+
+**Readable narrative may be publicly published only when it originates from an
+explicitly controlled synthetic fixture satisfying this profile.**
+
+A deliberately controlled synthetic RFI **materially reduces disclosure risk and
+is more mechanically auditable** than post-hoc sanitisation of arbitrary real
+narrative. **Synthetic status does not waive any requirement of this profile** —
+synthetic content must still satisfy the identifier rules, narrative rules,
+timestamp rules, identity rules, error rules and the full checklist below. The
+label "synthetic" is not, by itself, proof of safety.
+
+Synthetic narrative is **optional**; omission is always acceptable. **This is a
+policy rule and does not assert that such a fixture exists** — that is Gate 8.
+
+#### Gate 5 / Gate 6 boundary
+
+This profile specifies the **public-evidence contract**. It does **not** prescribe
+the complete caller-facing MCP interface. Gate 6 later decides tool boundaries,
+caller-facing fields, any optional narrative exposure, client design and the
+enforcement mechanism. This profile requires only that **any future path producing
+public evidence must be capable of enforcing it**.
+
+**This is policy guidance, not the Phase 4 schema.** No artifact is created by
+this profile.
+
 ## Identifier domains are not interchangeable
 
 Each alias family names a **different kind of thing**. Mixing them silently
@@ -548,3 +726,29 @@ omit it rather than reduce it.
     claim.
 23. The public artifact was **generated separately** from the private capture —
     the private file was not sanitised in place.
+
+### Additional checks for RFI evidence
+
+24. **No raw RFI, project, container, user, actor, response, `rfiTypeId`,
+    location-node or custom-attribute identifier value appears**, and no
+    `virtualFolderUrn` or other URN — not unmodified, hashed, truncated or
+    partially masked. Where a reference was required, an **approved alias** was
+    used instead.
+25. **`customIdentifier` does not appear**, and was not aliased.
+26. **No real RFI narrative appears** — no `title`, `question`,
+    `officialResponse`, `suggestedAnswer`, `responses[].text`,
+    `locationDescription`, `reference` or custom text value. Narrative is
+    represented by presence booleans and counts.
+27. **Any readable narrative present came from a controlled synthetic fixture, is
+    clearly labelled synthetic, and satisfies every other rule in this checklist** —
+    synthetic status waived nothing.
+28. **`user.name`, `user.id`, email/contact fields and permitted/required-attribute
+    operands are absent**, and no `USER_n` is published for the authenticated
+    caller unless a reference is genuinely required.
+29. **No exact `respondedAt`, `answeredAt` or `closedAt` value appears**; workflow
+    chronology is reduced to booleans, with no interval or person-linked ordering.
+30. **`rfiTypeId`, `discipline` and `category` are absent** from version-1 RFI
+    evidence.
+31. **No `RFI_TYPE_n`, `RESPONSE_n`, `WORKFLOW_n` or narrative alias appears.**
+32. **No raw upstream RFI error body appears** — errors are a status, a local
+    category, a fixed sanitised local reason, and booleans.

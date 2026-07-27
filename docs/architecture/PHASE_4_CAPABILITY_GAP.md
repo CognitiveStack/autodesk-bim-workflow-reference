@@ -1124,7 +1124,7 @@ and proven across three phases.
 | 2 | Authentication-scope verification | **unresolved** | **unresolved** | **sufficiently verified** (§16.1) | **unresolved** | fail |
 | 3 | Read/write operation inventory | pass | pass | **pass** | pass | fail |
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
-| 5 | Privacy and sanitisation planning | **unresolved** | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
+| 5 | Privacy and sanitisation planning | **passed** (§16.5) | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **unresolved** | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
@@ -1319,6 +1319,55 @@ not close any gate for RFIs, Submittals, Sheets or Meetings; does not make Phase
 complete; does not create the Phase 4 result schema; and does not settle the
 public-evidence governance for the exact-version behavioural finding observed
 during the run — that remains outstanding, and §18.2 item 11 is unchanged.
+
+### 16.5 RFIs Gate 5 — passed (2026-07-27)
+
+**Gate 5 (privacy and sanitisation planning) is passed for RFIs**, by
+[ADR-0010](../decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md).
+The governing detail lives in
+[SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) as the **RFI
+public-evidence profile, version 1**. **The privacy and sanitisation policy is
+complete; nothing else is asserted by this closure.**
+
+**Scope.** The adopted first read-only slice only — `GET users/me`,
+`POST search:rfis`, `GET rfis/:rfiId`.
+
+**Approved alias registry.** Reused unchanged: `PROJECT_n`, `USER_n`. Newly
+approved: **`RFI_n`** — the only RFI-specific alias. **Not approved:**
+`RFI_TYPE_n`, `RESPONSE_n`, `WORKFLOW_n` (already the Review workflow domain),
+`TEXT_n`, `QUESTION_n`, `ANSWER_n`, `LOCATION_n`, `MESSAGE_n`.
+
+**Field-policy summary:**
+
+- **Raw identifier values always removed** — RFI, project, container, user, actor,
+  response, `rfiTypeId`, location-node and custom-attribute IDs;
+  `virtualFolderUrn` and any URN; `user.name`; emails; permitted/required-attribute
+  operands; identifier-bearing URLs; headers; raw upstream error bodies. Not
+  unmodified, hashed, truncated or partially masked. **Where a reference or
+  equality proof is genuinely required, an approved domain alias replaces the raw
+  value** — alias replacement is the permitted mechanism, not a prohibited one.
+- **Omitted in version 1** — `customIdentifier` (treated as `sequenceId` is),
+  `discipline`, `category`, `locationDescription`, `locations`, `reference`,
+  custom attributes.
+- **Retained as controlled categorical evidence** — status, previous status,
+  workflow type, official-response status, response state/status distributions,
+  priority, cost and schedule impact, role enum, permitted-status enums, HTTP
+  method/endpoint family, status class, authentication-mode category, the scope
+  name `data:read`, `read_semantic_post` and `projection_used`.
+- **Retained as aggregate evidence** — result, comment, response, assignee,
+  reviewer, watcher and page counts, subject to the existing aggregate rule.
+- **Narrative** — content omitted by default and represented by presence
+  booleans; readable text only from a controlled synthetic fixture, clearly
+  labelled. **Synthetic status waives no requirement of the profile.**
+- **Workflow timestamps** — `respondedAt`, `answeredAt`, `closedAt` reduce to
+  booleans; no exact values, intervals or person-linked ordering.
+
+**Gate 5 closure does not**: authorise MCP implementation; authorise any Autodesk
+call; assert that a controlled fixture exists; establish data readiness; assert
+that live verification occurred; prescribe the caller-facing MCP interface (that
+is Gate 6); or close Gate 6 or Gate 8. **Gate 6 and Gate 8 remain unresolved**,
+`mcp_implementation_status` remains `planned`, and `data_readiness` remains
+`not-assessed`.
 
 ## 17. Adopted first capability
 
