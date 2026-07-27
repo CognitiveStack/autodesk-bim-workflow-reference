@@ -82,6 +82,23 @@ separate fields (`mcp_component`, `mcp_implementation_status`, `api_maturity`,
 `data_readiness`) so MCP coverage, API maturity, and project-data readiness are
 never conflated.
 
+The **read / write class** used in the tables below is a semantic classification,
+not an HTTP-verb label:
+
+- **read** — no observable Autodesk state mutation, and the OAuth scope Autodesk
+  requires for the operation is read-only. `GET` is the normal read transport, but
+  it is not the definition of read.
+- **write** — any operation that creates, modifies, deletes or transitions
+  Autodesk state. Mutation endpoints stay outside the read boundary **regardless
+  of HTTP verb**, and this project's only write tool is guarded (§7).
+
+A **non-GET** operation may be classified `read` only through explicit
+endpoint-level approval under
+[reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md);
+`POST` is not presumed read-safe, and approval never generalises from one endpoint
+to another. Arbitrary URLs, caller-supplied paths and HTTP methods, and generic
+request helpers remain prohibited in every case (§3.1).
+
 ## 3. APS/Forma MCP — 35 tools (33 read · 1 guarded write · 1 local)
 
 | Capability group | Tools | Class | Status |

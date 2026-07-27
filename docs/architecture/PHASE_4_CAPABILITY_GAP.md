@@ -322,13 +322,18 @@ users/me
 
 Creation, patching, responding, transitioning and upload are excluded.
 
-**POST-as-read policy decision required.** Because listing RFIs is only possible
+**POST-as-read policy decision — resolved by
+[reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md);
+implementation remains pending.** Because listing RFIs is only possible
 through `POST /search:rfis`, an RFI read slice cannot be built without permitting
 a POST inside the read-only boundary. The component's existing Model Coordination
 reads are documented as **GET-only with internally constructed request paths**
 ([COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §3.1). Permitting POST-as-read
-would therefore require an **explicit repository policy decision**, recorded before
-implementation — it is not an implementation detail.
+therefore required an **explicit repository policy decision**, recorded before
+implementation — it is not an implementation detail. That decision was taken on
+2026-07-27: read/write class follows observable state semantics rather than HTTP
+verb, and **`POST …/search:rfis` is approved at endpoint level** as read-semantic.
+The approval is endpoint-specific and authorises no implementation.
 
 ## 6. Submittals v2 assessment
 
@@ -1121,7 +1126,7 @@ and proven across three phases.
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
 | 5 | Privacy and sanitisation planning | **unresolved** | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **unresolved** | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
-| 7 | Read-only-first sequencing | pass, conditional on an explicit POST-as-read policy decision (§5) | pass | **pass** | pass | fail |
+| 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
 | 10 | No monolithic Forma Build API assumption | pass | pass | **pass** | pass | pass |
@@ -1354,9 +1359,10 @@ what ADR-0004 resolved (§16.2).
 **Preferred second capability.** **RFIs** remain the strongest Forma Build module
 by read-surface completeness, documentation quality and teaching value (§5, §15),
 and are the preferred second Phase 4A capability. Selecting RFIs later would
-additionally require the POST-as-read policy decision recorded in §5 and a
-correspondingly stricter free-text evidence policy (§13). Submittals and Sheets
-remain later candidates; Meetings remains deferred (§9).
+additionally require the POST-as-read policy decision recorded in §5 — **now taken
+(reference-repo ADR-0007)** — and a correspondingly stricter free-text evidence
+policy (§13), which remains outstanding. Submittals and Sheets remain later
+candidates; Meetings remains deferred (§9).
 
 ## 18. Missing evidence and open questions
 

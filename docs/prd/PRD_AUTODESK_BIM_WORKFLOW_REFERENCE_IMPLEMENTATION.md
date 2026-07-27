@@ -360,7 +360,11 @@ Open:
 
 - **RFI** capabilities: no MCP tools yet (**planned**); now the **preferred second**
   Phase 4A capability, in the APS/Forma MCP. Listing requires a POST-based search,
-  so a POST-as-read policy decision is needed before any RFI read slice.
+  so a POST-as-read policy decision was needed before any RFI read slice; that
+  decision has now been **taken** by
+  [reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md),
+  which approves that one search endpoint as read-semantic. **RFI implementation
+  remains unauthorised**, and the other RFI prerequisites remain unresolved.
 - **Assets** capabilities: no MCP tools yet (**planned**); when and in which component?
 - **Submittals**: GA capability researched; **later candidate**, not selected first;
   no MCP tool exists.
