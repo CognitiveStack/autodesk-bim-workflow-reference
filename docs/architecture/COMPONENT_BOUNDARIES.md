@@ -283,7 +283,7 @@ of the component boundary.
 
 | Stage | Capability | Status |
 |---|---|---|
-| construction_information | RFI — preferred second Phase 4A capability | planned |
+| construction_information | RFI — adopted second Phase 4A capability | planned |
 | asset_handover | Assets | planned |
 
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
@@ -291,10 +291,12 @@ and live-verified (§3); they are no longer a gap. The **Transmittals** first sl
 is likewise **implemented and live-verified** (§3.3) and is no longer a gap — it
 has been removed from the table above; **Phase 4A as a whole is not complete**,
 and RFIs, Submittals, Sheets and Meetings remain unimplemented. The
-**Transmittals** API-family name is asserted because it is verified from official
-Autodesk/APS documentation; API-family names for RFI and Assets are still not
-asserted here until they are verified from an official Autodesk/APS or component
-source.
+**Transmittals** and **RFI** API-family names are asserted because they are
+verified from official Autodesk/APS documentation; the **Assets** API-family name
+is still not asserted here until it is verified from an official Autodesk/APS or
+component source. **RFI is an adopted governed capability in the schema-v2
+workflow contract, not an implemented one** — its `mcp_implementation_status` is
+`planned` and its `data_readiness` is `not-assessed`; adoption closes no gate.
 
 ### 6.1 Transmittals ownership split (adopted, implemented)
 

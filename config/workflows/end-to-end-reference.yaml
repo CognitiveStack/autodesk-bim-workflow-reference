@@ -213,12 +213,12 @@ stages:
     platform: Autodesk Forma
     automation_policy: focused_reference_examples
     # STAGE SCOPE. Phase 4A now spans Forma Data Management and Forma Build (ADR-0004).
-    # PHASE 4A IS NOT COMPLETE: this stage covers the Transmittals first slice only.
-    # RFIs are the preferred SECOND Phase 4A slice; no RFI MCP tool exists and its
-    # API-family name stays unasserted until verified (ADR-0003), so no RFI
-    # capability record exists here. Submittals and Sheets are later candidates;
-    # Meetings is deferred (public API not verified). Their API families are
-    # deliberately not listed in this task.
+    # PHASE 4A IS NOT COMPLETE. Two capabilities are governed here: Transmittals
+    # (first capability — implemented and live-verified; confirmed / ready) and
+    # RFIs (second governed capability — API identity, version and lifecycle
+    # established; implementation planned; data readiness not-assessed).
+    # Submittals and Sheets are later candidates; Meetings is deferred (public API
+    # not verified). Their API families are deliberately not listed in this task.
     capabilities:
       - id: transmittals
         primary_system: Forma Data Management
@@ -256,6 +256,36 @@ stages:
         # data_readiness_reason names that scope, per the header definition.
         data_readiness: ready
         data_readiness_reason: transmittals-first-slice-ready-in-approved-training-project
+
+      - id: rfis
+        primary_system: Forma Build
+        # ADOPTED as the second governed Phase 4A capability. ADOPTION IS NOT
+        # IMPLEMENTATION.
+        # API IDENTITY: asserted because it is verified from official Autodesk/APS
+        # documentation (see PHASE_4_CAPABILITY_GAP.md 4 and 5) — Autodesk Forma
+        # Build RFI API, contract/request-route version v3 under
+        # /construction/rfis/v3/projects/:projectId, general availability announced
+        # 2025-07-23. api_version is REQUIRED here because api_maturity: ga is a
+        # concrete lifecycle assertion (ADR-0009).
+        # IMPLEMENTATION: no RFI MCP tool currently exists in the APS/Forma MCP, so
+        # mcp_implementation_status is `planned`. Shared authentication and HTTP
+        # infrastructure does not count as RFI implementation.
+        # DATA READINESS: `not-assessed` — readiness has not yet been established
+        # under the repository's approved evidence process, and no controlled RFI
+        # training fixture has yet been established. Readiness is never inferred
+        # from module availability, API documentation or authentication capability.
+        # GATES / VERIFICATION: no RFI gate is closed, and no RFI live verification
+        # has occurred.
+        # FUTURE FIRST READ-ONLY SLICE — ROADMAP ONLY, NOT IMPLEMENTED:
+        # 1. GET users/me; 2. POST search:rfis (approved as read-semantic at
+        # endpoint level by ADR-0007); 3. GET rfis/:rfiId. Comments, attachments,
+        # responses and all writes are excluded from that initial slice.
+        api_family: Autodesk Forma Build RFI API
+        api_version: v3
+        api_maturity: ga
+        mcp_component: aps-forma-mcp
+        mcp_implementation_status: planned
+        data_readiness: not-assessed
 
   - id: asset_handover
     platform: Autodesk Forma

@@ -1356,13 +1356,22 @@ module while Phase 4A had been scoped to Forma **Build** — a roadmap judgement
 that capability research could recommend but not make. That boundary question is
 what ADR-0004 resolved (§16.2).
 
-**Preferred second capability.** **RFIs** remain the strongest Forma Build module
-by read-surface completeness, documentation quality and teaching value (§5, §15),
-and are the preferred second Phase 4A capability. Selecting RFIs later would
-additionally require the POST-as-read policy decision recorded in §5 — **now taken
-(reference-repo ADR-0007)** — and a correspondingly stricter free-text evidence
-policy (§13), which remains outstanding. Submittals and Sheets remain later
-candidates; Meetings remains deferred (§9).
+**Adopted second capability.** **RFIs** remain the strongest Forma Build module by
+read-surface completeness, documentation quality and teaching value (§5, §15), and
+are now **adopted as the second governed Phase 4A capability** in the schema-v2
+workflow contract: `api_family: Autodesk Forma Build RFI API`, `api_version: v3`,
+`api_maturity: ga`.
+
+**ADOPTION IS NOT IMPLEMENTATION.** The capability is governed by the workflow
+contract; its implementation preconditions are unchanged. `mcp_implementation_status`
+is **`planned`** — no RFI MCP tool exists. `data_readiness` is **`not-assessed`** —
+no readiness determination has yet been made under the approved evidence process,
+and no controlled RFI training fixture has been established. **No RFI gate in §16
+is closed** (Gate 5, Gate 6 and Gate 8 all remain open), and **no RFI live
+verification has occurred**. The POST-as-read policy decision recorded in §5 is
+**taken (reference-repo ADR-0007)**; a correspondingly stricter free-text evidence
+policy (§13) remains outstanding. Submittals and Sheets remain later candidates;
+Meetings remains deferred (§9).
 
 ## 18. Missing evidence and open questions
 
