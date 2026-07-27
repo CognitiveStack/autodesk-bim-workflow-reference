@@ -88,8 +88,11 @@ git-ignored):
   developer APIs), `mcp_component` (owning integration component),
   `mcp_implementation_status` (`confirmed` / `partial` / `planned` /
   `not-applicable`), `api_maturity` (`beta-v1alpha` / `to-be-verified` /
-  `not-applicable`), and `data_readiness` (`ready` / `blocked` / `not-assessed`),
-  alongside `platform`, `primary_system`, and `automation_policy`.
+  `not-applicable`), `data_readiness` (`ready` / `blocked` / `not-assessed`),
+  and `data_readiness_reason` (an optional sanitised machine-readable
+  explanation of that value, used for example to identify a non-default
+  approved project scope where relevant), alongside `platform`,
+  `primary_system`, and `automation_policy`.
 
 `api_families` is always a list and names API families only. MCP implementation
 coverage, API maturity, and project-data readiness are recorded as separate

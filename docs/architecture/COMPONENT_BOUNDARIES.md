@@ -72,8 +72,8 @@ For the Revit MCP, the inventory was verified from the committed tree at
   are planned.
 - **planned** — no MCP tool yet; a later-phase capability.
 - **experimental** — MCP tool exists but targets a Beta / `v1alpha` API.
-- **data-readiness-blocked** — the tool works, but the Harrismith example lacks
-  the data to exercise it.
+- **data-readiness-blocked** — the tool works, but the approved example or
+  training project for the stage lacks the data to exercise it.
 - **mediated-by-revit-mcp** — reached through the Revit MCP / Revit API rather
   than APS.
 
