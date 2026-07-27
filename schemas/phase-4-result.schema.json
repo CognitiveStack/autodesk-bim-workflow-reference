@@ -1,0 +1,727 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cognitivestack.example/schemas/phase-4-result.schema.json",
+  "title": "Phase 4A Construction Information Exchange Result",
+  "description": "Small, sanitised evidence artifact for a Phase 4A read-only construction-information slice. The first governed slice is the Transmittals exact-version snapshot: an issued Transmittals document version -> the source Data Management item lineage -> that lineage's version set and current tip -> cross-surface exact-version comparison. Governed by ADR-0005 (Transmittals sanitisation profile v1) as extended by ADR-0006 (cross-surface Transmittals and Data Management evidence semantics, profile v2), and by the Transmittals public-evidence profile in docs/guides/SANITISATION_CONVENTION.md. Lineage claims are recorded PER SURFACE and are never blended: the Transmittals surface alone never proves stable lineage. Phase 4A evidence schema only, not a general workflow language. Consistent with schemas/phase-1-result.schema.json, schemas/phase-2-result.schema.json and schemas/phase-3-result.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "execution",
+    "scenario",
+    "capability",
+    "component_provenance",
+    "transmittal_observation",
+    "item_observation",
+    "surface_claims",
+    "proofs",
+    "evidence_integrity",
+    "aliases",
+    "outcome",
+    "outcome_scope",
+    "governance_checks",
+    "sanitisation",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "slice", "execution_date", "read_only", "status"],
+      "properties": {
+        "phase": { "type": "string", "const": "4A" },
+        "slice": {
+          "description": "The governed Phase 4A slice this artifact evidences. A deliberate extension point: additional Phase 4A modules are admitted by adding an enum value, not by leaving the field an open string.",
+          "type": "string",
+          "enum": ["transmittals-exact-version-snapshot"]
+        },
+        "execution_date": { "$ref": "#/definitions/date_only_required" },
+        "read_only": { "type": "boolean", "const": true },
+        "status": { "type": "string", "enum": ["complete", "partial", "failed"] }
+      }
+    },
+
+    "scenario": {
+      "type": "object",
+      "description": "Teaching-scenario identity kept SEPARATE from capture provenance. The scenario namespace an artifact is published under is NOT an assertion that the scenario's Autodesk project holds the fixture. No real Autodesk project title, raw project id, or alias-to-real-project binding is ever recorded here.",
+      "additionalProperties": false,
+      "required": ["scenario_key", "capture_context", "scenario_project_contains_fixture"],
+      "properties": {
+        "scenario_key": {
+          "description": "Slug of the learning/reference scenario this artifact belongs to, matching the project_key convention in config/projects/ (for example harrismith-bim-learning-project). A scenario slug, never an Autodesk project identifier or title.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "capture_context": {
+          "description": "Where the controlled fixture was actually captured. approved_training_project: an explicitly approved training project, distinct from the scenario's own project. scenario_project: the scenario's own project held the fixture. unspecified: not recorded.",
+          "type": "string",
+          "enum": ["approved_training_project", "scenario_project", "unspecified"]
+        },
+        "scenario_project_contains_fixture": {
+          "description": "Whether the scenario's own Autodesk project is asserted to contain the fixture. MUST be false when capture_context is approved_training_project, so that publishing under a scenario namespace never implies scenario-project data readiness.",
+          "type": "boolean"
+        }
+      }
+    },
+
+    "capability": {
+      "type": "object",
+      "description": "The Autodesk capability being evidenced. Kept generic so future Phase 4A modules reuse this envelope rather than forking it.",
+      "additionalProperties": false,
+      "required": ["modules", "read_only", "operations_verified"],
+      "properties": {
+        "modules": {
+          "description": "Autodesk modules whose reads contributed evidence. A deliberate extension point for later Phase 4A modules.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "enum": ["transmittals", "data_management"] }
+        },
+        "read_only": { "type": "boolean", "const": true },
+        "operations_verified": {
+          "description": "MCP tool identifiers invoked. These are code identifiers read from component source and are NOT Autodesk data (see COMPONENT_BOUNDARIES.md). No endpoint URL, request header, or payload is recorded.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }
+        }
+      }
+    },
+
+    "component_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aps_forma_mcp"],
+      "properties": {
+        "aps_forma_mcp": { "$ref": "#/definitions/provenance" }
+      }
+    },
+
+    "transmittal_observation": {
+      "type": "object",
+      "description": "Transmittals-surface evidence. The issued document version is the terminal identity on this surface: no document-lineage node sits between the transmittal and its version. Recipient evidence is structural counts only.",
+      "additionalProperties": false,
+      "required": ["available", "transmittal_alias", "issued_version_alias", "exact_version_returned"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "transmittal_alias": { "$ref": "#/definitions/alias" },
+        "status": { "type": ["string", "null"], "enum": ["SENDING", "COMPLETED", "FAILED", null] },
+        "display_recipients": { "type": ["string", "null"], "enum": ["ALL", "LIMITED", null] },
+        "folder_alias": { "$ref": "#/definitions/alias" },
+        "issued_version_alias": {
+          "description": "Alias of the EXACT immutable document version as issued by the transmittal (for example VERSION_1). Never a raw URN, and never a numeric Autodesk version.",
+          "$ref": "#/definitions/alias"
+        },
+        "exact_version_returned": { "type": "boolean" },
+        "recipient_summary": {
+          "type": "object",
+          "description": "Structural recipient counts only. No name, email, user or company identity, and no received/viewed/downloaded telemetry.",
+          "additionalProperties": false,
+          "properties": {
+            "project_member_recipient_count": { "type": "integer", "minimum": 0 },
+            "external_member_count": { "type": "integer", "minimum": 0 },
+            "total_recipient_count": { "type": "integer", "minimum": 0 },
+            "has_external_members": { "type": "boolean" },
+            "approved_test_recipients": {
+              "description": "Whether every recipient was an approved test or synthetic recipient for the controlled fixture. Asserting an approved test recipient does NOT assert that the underlying account is a synthetic identity.",
+              "type": "boolean"
+            }
+          }
+        },
+        "folder_count": { "type": ["integer", "null"], "minimum": 0 },
+        "document_version_count": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+
+    "item_observation": {
+      "type": "object",
+      "description": "Data Management-surface evidence. The item resource IS the stable item/lineage identity for this surface, aliased as ITEM_n, and may be recorded as proven only when it was returned directly as a field by the first-party Data Management resource. No raw numeric Autodesk version property is recorded anywhere in this object.",
+      "additionalProperties": false,
+      "required": ["available", "item_alias", "item_alias_directly_returned", "version_set"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "item_alias": { "$ref": "#/definitions/alias" },
+        "item_alias_directly_returned": {
+          "description": "Whether the item identity was returned directly as a field by the Data Management resource. False forbids recording item lineage as proven.",
+          "type": "boolean"
+        },
+        "version_set": {
+          "type": "object",
+          "description": "The returned version set for the item lineage, expressed as aliases plus safe structural completeness metadata. Autodesk's numeric version property is deliberately NOT representable here.",
+          "additionalProperties": false,
+          "required": ["version_aliases", "count", "has_more", "complete"],
+          "properties": {
+            "version_aliases": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+            },
+            "count": { "type": "integer", "minimum": 0 },
+            "has_more": { "type": "boolean" },
+            "complete": {
+              "description": "Whether the returned set is established as complete. Requires has_more false: a count alone never establishes completeness.",
+              "type": "boolean"
+            }
+          }
+        },
+        "current_tip_version_alias": {
+          "description": "Alias of the lineage's current tip version. Semantically DISTINCT from a cross-surface version equality: this is a tip relation on one surface, not a comparison between two surfaces.",
+          "$ref": "#/definitions/alias"
+        },
+        "current_tip_directly_returned": {
+          "description": "Whether the tip relation was returned directly by the Data Management resource, rather than inferred or ordered client-side.",
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+
+    "surface_claims": {
+      "type": "array",
+      "description": "Lineage and version claims recorded PER SURFACE. This array exists so the ADR-0006 asymmetry survives sanitisation: a single blended 'lineage_proven' flag is deliberately not representable anywhere in this schema.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["surface", "claim", "status", "basis"],
+        "properties": {
+          "surface": {
+            "type": "string",
+            "enum": ["transmittals", "data_management", "cross_surface"]
+          },
+          "claim": {
+            "description": "stable_lineage: a stable source-document/item lineage identity on that surface. item_lineage_identity: the Data Management item resource as the lineage-bearing identity. exact_version_returned: an exact immutable version identity was returned. exact_version_relation: two returned version identities stand in a proven relation across surfaces. current_tip_relation: a lineage's current tip version.",
+            "type": "string",
+            "enum": [
+              "stable_lineage",
+              "item_lineage_identity",
+              "exact_version_returned",
+              "exact_version_relation",
+              "current_tip_relation"
+            ]
+          },
+          "status": { "type": "string", "enum": ["proven", "not_proven", "not_applicable"] },
+          "basis": {
+            "description": "How the claim was established. directly_returned_field: the identity arrived as a returned field. byte_for_byte_exact_equality: established by exact string comparison. structural_completeness_metadata: established from permitted counts. not_established: no basis; only valid with status not_proven or not_applicable. Client-side URN splitting, suffix removal, reconstruction, canonicalisation and pattern inference are NOT bases and have no representation here.",
+            "type": "string",
+            "enum": [
+              "directly_returned_field",
+              "byte_for_byte_exact_equality",
+              "structural_completeness_metadata",
+              "not_established"
+            ]
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "proofs": {
+      "type": "array",
+      "description": "Explicit comparisons between sanitised aliases. WHAT was compared (left_alias/right_alias and their surfaces), HOW it was compared (comparison_method), the relation asserted (expected_relation) and WHAT the comparison returned (outcome) are kept as separate fields; outcome is never overloaded with the method. Raw operands are never recorded: alias operands are constrained to the alias token pattern, which no Autodesk URN can satisfy.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "left_alias",
+          "left_surface",
+          "right_alias",
+          "right_surface",
+          "comparison_method",
+          "expected_relation",
+          "outcome",
+          "reproducibility"
+        ],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "statement": { "type": "string" },
+          "left_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "left_surface": { "type": "string", "enum": ["transmittals", "data_management"] },
+          "right_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "right_surface": { "type": "string", "enum": ["transmittals", "data_management"] },
+          "comparison_method": {
+            "type": "string",
+            "enum": ["byte_for_byte_exact_string_comparison"]
+          },
+          "expected_relation": { "type": "string", "enum": ["equal", "not_equal"] },
+          "outcome": { "type": "string", "enum": ["pass", "fail", "unproven", "not_applicable"] },
+          "reproducibility": { "$ref": "#/definitions/reproducibility" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "evidence_integrity": {
+      "type": "object",
+      "description": "How the retained aliases are trusted. This describes EVIDENCE PROVENANCE, not Autodesk resource type, and confers no identity on anything. No class permits reconstruction, inference, derivation, string transformation, or substituting one identifier for another.",
+      "additionalProperties": false,
+      "required": ["freeze_policy"],
+      "properties": {
+        "freeze_policy": {
+          "description": "VERIFIED_SURVIVING_VALUE permits the explicitly classified surviving sources below, rather than requiring every value to remain in its first-ever originating response.",
+          "type": "string",
+          "enum": ["VERIFIED_SURVIVING_VALUE"]
+        },
+        "strict_originating_result_preflight_passed": { "type": ["boolean", "null"] },
+        "recovery_reads_performed": {
+          "description": "Whether any additional read was made to recover an aged-out value. Recorded so a reader can tell a freeze from a re-fetch.",
+          "type": ["boolean", "null"]
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "aliases": {
+      "type": "array",
+      "description": "Registry of every alias used, with its identifier domain and evidence-provenance class. Domains are per-surface resource kinds and are never interchangeable; matching numeric suffixes prove nothing. No lineage domain exists: the Data Management item resource is already the lineage-bearing resource, so LINEAGE_n is neither approved nor necessary and is explicitly unusable as a token here.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["alias", "domain", "provenance_class"],
+        "properties": {
+          "alias": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "not": { "pattern": "^LINEAGE_" }
+          },
+          "domain": {
+            "description": "The approved alias domains for this profile: project, transmittal, folder, item, version, user, recipient, external_member, company, role. DOCUMENT_n is deliberately absent from this profile — VERSION_n is the terminal identity on the Transmittals surface and ITEM_n carries lineage on the Data Management surface.",
+            "type": "string",
+            "enum": [
+              "project",
+              "transmittal",
+              "folder",
+              "item",
+              "version",
+              "user",
+              "recipient",
+              "external_member",
+              "company",
+              "role"
+            ]
+          },
+          "provenance_class": {
+            "description": "ORIGINATING_RESULT: the raw value remains available from the original live result that established the alias. VALIDATED_RETAINED_INVOCATION: the original establishing result aged out, but the genuine previously resolved value survives verbatim as an invocation parameter used in subsequent successful controlled live operations. EQUALITY_VERIFIED_LATER_RESULT: the original establishing result aged out, but the same resource identity was returned directly by a later first-party read and had previously been established equal to the retained alias through exact comparison.",
+            "type": "string",
+            "enum": [
+              "ORIGINATING_RESULT",
+              "VALIDATED_RETAINED_INVOCATION",
+              "EQUALITY_VERIFIED_LATER_RESULT"
+            ]
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "outcome": {
+      "type": "string",
+      "description": "Small Phase 4A outcome vocabulary, scoped by outcome_scope. exact_version_snapshot_proven: for the controlled fixture, the completed transmittal preserved its issued exact version while the source Data Management lineage later carried a different current tip. exact_version_relation_not_proven: the cross-surface comparison was not established. transmittals_read_slice_verified: the read operations returned evidence but no cross-surface version proposition is claimed. phase_4_evidence_incomplete: a required observation is missing. This vocabulary describes ONE evidence claim about a tested fixture; it never describes an entry-gate status and never asserts that Phase 4A as a whole is complete.",
+      "enum": [
+        "exact_version_snapshot_proven",
+        "exact_version_relation_not_proven",
+        "transmittals_read_slice_verified",
+        "phase_4_evidence_incomplete"
+      ]
+    },
+
+    "outcome_scope": {
+      "description": "The reach of the outcome. controlled_fixture is the only permitted value: every Phase 4A outcome is scoped to the tested fixture and observed API behaviour. Universal, tenant-wide, region-wide, gate-wide and phase-completion claims are deliberately unrepresentable.",
+      "type": "string",
+      "enum": ["controlled_fixture"]
+    },
+
+    "governance_checks": {
+      "type": "array",
+      "description": "Explicit governance checks. Outcomes are pass/fail/unproven/not_applicable (distinct from a proof's expected_relation).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "outcome"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "statement": { "type": "string" },
+          "outcome": { "type": "string", "enum": ["pass", "fail", "unproven", "not_applicable"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "sanitisation": {
+      "type": "object",
+      "description": "Sanitisation governance declared by the artifact. convention_version is the SANITISATION_CONVENTION.md document version; profile_version is the Transmittals public-evidence profile version, which ADR-0006 advanced to 2. The convention's policy guidance names this concept sanitisation_profile_version; it is nested here for consistency with convention_version.",
+      "additionalProperties": false,
+      "required": ["convention_version", "profile_version", "tokens_used"],
+      "properties": {
+        "convention_version": { "type": "integer", "minimum": 1 },
+        "profile_version": {
+          "description": "Transmittals public-evidence profile version. Fixed at 2: this schema describes the currently governed Phase 4A contract. No Phase 4A artifact was ever produced under profile v1, so permitting 1 would describe a contract that never existed.",
+          "type": "integer",
+          "const": 2
+        },
+        "tokens_used": { "type": "array", "items": { "$ref": "#/definitions/alias" } }
+      }
+    },
+
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "stage", "message"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "scenario",
+              "capability",
+              "transmittals",
+              "data_management",
+              "cross_surface",
+              "proof",
+              "evidence_integrity",
+              "governance",
+              "provenance",
+              "sanitisation"
+            ]
+          },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "SURFACE ASYMMETRY, ADR-0006. A stable_lineage claim on the transmittals surface may only ever be not_proven with no established basis. The Transmittals response alone does not provide a stable source-document lineage identity, and no comparison, count or aliasing changes that.",
+      "if": {
+        "properties": {
+          "surface_claims": {
+            "contains": {
+              "required": ["surface", "claim"],
+              "properties": {
+                "surface": { "const": "transmittals" },
+                "claim": { "const": "stable_lineage" }
+              }
+            }
+          }
+        },
+        "required": ["surface_claims"]
+      },
+      "then": {
+        "properties": {
+          "surface_claims": {
+            "items": {
+              "if": {
+                "required": ["surface", "claim"],
+                "properties": {
+                  "surface": { "const": "transmittals" },
+                  "claim": { "const": "stable_lineage" }
+                }
+              },
+              "then": {
+                "properties": {
+                  "status": { "const": "not_proven" },
+                  "basis": { "const": "not_established" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "A proven Data Management item_lineage_identity claim requires a directly returned field as its basis, and requires item_observation.item_alias_directly_returned true. An identity that did not arrive as a returned field is not proven, however it is aliased.",
+      "if": {
+        "properties": {
+          "surface_claims": {
+            "contains": {
+              "required": ["surface", "claim", "status"],
+              "properties": {
+                "surface": { "const": "data_management" },
+                "claim": { "const": "item_lineage_identity" },
+                "status": { "const": "proven" }
+              }
+            }
+          }
+        },
+        "required": ["surface_claims"]
+      },
+      "then": {
+        "properties": {
+          "item_observation": {
+            "required": ["item_alias", "item_alias_directly_returned"],
+            "properties": {
+              "item_alias_directly_returned": { "const": true },
+              "item_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+            }
+          },
+          "surface_claims": {
+            "items": {
+              "if": {
+                "required": ["surface", "claim", "status"],
+                "properties": {
+                  "surface": { "const": "data_management" },
+                  "claim": { "const": "item_lineage_identity" },
+                  "status": { "const": "proven" }
+                }
+              },
+              "then": { "properties": { "basis": { "const": "directly_returned_field" } } }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "A proven cross_surface exact_version_relation may only rest on byte-for-byte exact equality.",
+      "if": {
+        "properties": {
+          "surface_claims": {
+            "contains": {
+              "required": ["surface", "claim", "status"],
+              "properties": {
+                "surface": { "const": "cross_surface" },
+                "claim": { "const": "exact_version_relation" },
+                "status": { "const": "proven" }
+              }
+            }
+          }
+        },
+        "required": ["surface_claims"]
+      },
+      "then": {
+        "properties": {
+          "surface_claims": {
+            "items": {
+              "if": {
+                "required": ["surface", "claim", "status"],
+                "properties": {
+                  "surface": { "const": "cross_surface" },
+                  "claim": { "const": "exact_version_relation" },
+                  "status": { "const": "proven" }
+                }
+              },
+              "then": { "properties": { "basis": { "const": "byte_for_byte_exact_equality" } } }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "A proven current_tip_relation requires item_observation.current_tip_directly_returned true and a non-null current_tip_version_alias. A tip inferred from client-side ordering is not a returned relation.",
+      "if": {
+        "properties": {
+          "surface_claims": {
+            "contains": {
+              "required": ["claim", "status"],
+              "properties": {
+                "claim": { "const": "current_tip_relation" },
+                "status": { "const": "proven" }
+              }
+            }
+          }
+        },
+        "required": ["surface_claims"]
+      },
+      "then": {
+        "properties": {
+          "item_observation": {
+            "required": ["current_tip_version_alias", "current_tip_directly_returned"],
+            "properties": {
+              "current_tip_directly_returned": { "const": true },
+              "current_tip_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Completeness of a returned version set requires has_more false. A count alone never establishes that a returned set is complete.",
+      "if": {
+        "properties": {
+          "item_observation": {
+            "properties": { "version_set": { "properties": { "complete": { "const": true } } } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "item_observation": {
+            "properties": {
+              "version_set": {
+                "required": ["count", "has_more"],
+                "properties": { "has_more": { "const": false } }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "PUBLICATION PROVENANCE. When the fixture was captured in an approved training project, the scenario's own Autodesk project must NOT be asserted to contain it. Publishing under a teaching-scenario namespace never implies scenario-project data readiness.",
+      "if": {
+        "properties": {
+          "scenario": { "properties": { "capture_context": { "const": "approved_training_project" } } }
+        },
+        "required": ["scenario"]
+      },
+      "then": {
+        "properties": {
+          "scenario": {
+            "required": ["scenario_project_contains_fixture"],
+            "properties": { "scenario_project_contains_fixture": { "const": false } }
+          }
+        }
+      }
+    },
+    {
+      "description": "exact_version_snapshot_proven requires the full cross-surface proof: an available transmittal with an issued exact version and exact_version_returned true; an available item lineage whose identity was directly returned, with a complete version set of at least two aliases and a directly returned current tip; surface claims recording transmittals stable_lineage as not_proven, data_management item_lineage_identity as proven, and cross_surface exact_version_relation as proven; and at least one passing byte-for-byte proof asserting equality across the two surfaces plus at least one passing proof asserting inequality between two versions. Draft-7 cannot express that the two version aliases are semantically DISTINCT, nor that a proof's operands correspond to the observed aliases; both remain runtime governance checks.",
+      "if": {
+        "properties": { "outcome": { "const": "exact_version_snapshot_proven" } },
+        "required": ["outcome"]
+      },
+      "then": {
+        "properties": {
+          "transmittal_observation": {
+            "required": ["available", "transmittal_alias", "issued_version_alias", "exact_version_returned"],
+            "properties": {
+              "available": { "const": true },
+              "exact_version_returned": { "const": true },
+              "transmittal_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "issued_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+            }
+          },
+          "item_observation": {
+            "required": ["available", "item_alias", "item_alias_directly_returned", "version_set", "current_tip_version_alias", "current_tip_directly_returned"],
+            "properties": {
+              "available": { "const": true },
+              "item_alias_directly_returned": { "const": true },
+              "current_tip_directly_returned": { "const": true },
+              "item_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "current_tip_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "version_set": {
+                "required": ["version_aliases", "count", "has_more", "complete"],
+                "properties": {
+                  "version_aliases": { "minItems": 2 },
+                  "has_more": { "const": false },
+                  "complete": { "const": true }
+                }
+              }
+            }
+          },
+          "surface_claims": {
+            "allOf": [
+              {
+                "contains": {
+                  "required": ["surface", "claim", "status"],
+                  "properties": {
+                    "surface": { "const": "transmittals" },
+                    "claim": { "const": "stable_lineage" },
+                    "status": { "const": "not_proven" }
+                  }
+                }
+              },
+              {
+                "contains": {
+                  "required": ["surface", "claim", "status"],
+                  "properties": {
+                    "surface": { "const": "data_management" },
+                    "claim": { "const": "item_lineage_identity" },
+                    "status": { "const": "proven" }
+                  }
+                }
+              },
+              {
+                "contains": {
+                  "required": ["surface", "claim", "status"],
+                  "properties": {
+                    "surface": { "const": "cross_surface" },
+                    "claim": { "const": "exact_version_relation" },
+                    "status": { "const": "proven" }
+                  }
+                }
+              }
+            ]
+          },
+          "proofs": {
+            "allOf": [
+              {
+                "contains": {
+                  "required": ["left_surface", "right_surface", "comparison_method", "expected_relation", "outcome"],
+                  "properties": {
+                    "left_surface": { "const": "transmittals" },
+                    "right_surface": { "const": "data_management" },
+                    "comparison_method": { "const": "byte_for_byte_exact_string_comparison" },
+                    "expected_relation": { "const": "equal" },
+                    "outcome": { "const": "pass" }
+                  }
+                }
+              },
+              {
+                "contains": {
+                  "required": ["comparison_method", "expected_relation", "outcome"],
+                  "properties": {
+                    "comparison_method": { "const": "byte_for_byte_exact_string_comparison" },
+                    "expected_relation": { "const": "not_equal" },
+                    "outcome": { "const": "pass" }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+
+  "definitions": {
+    "alias": {
+      "type": ["string", "null"],
+      "description": "Sanitised deterministic alias token (e.g. PROJECT_1, TRANSMITTAL_1, FOLDER_1, ITEM_1, VERSION_1). Never a live Autodesk identifier, URN, or GUID. LINEAGE_n is not an approved token for this profile.",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "date_only_required": {
+      "type": "string",
+      "description": "Date only, YYYY-MM-DD. No time-of-day or timezone. Behavioural read-receipt timestamps are never recorded in any form.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "reproducibility": {
+      "type": "object",
+      "description": "Whether a proof can be independently re-checked, and from where. An alias-only public artifact will normally set re_derivable_from_public_evidence false; that is intentional and does NOT invalidate the proof, and raw identifiers must never be duplicated into the public artifact to make a historical proof re-runnable.",
+      "additionalProperties": false,
+      "required": ["basis", "re_derivable_from_private_evidence", "re_derivable_from_public_evidence"],
+      "properties": {
+        "basis": {
+          "description": "historical_attestation: the result was established while the independent operands were simultaneously available, and is recorded as an outcome.",
+          "type": "string",
+          "enum": ["historical_attestation"]
+        },
+        "re_derivable_from_private_evidence": { "type": "boolean" },
+        "re_derivable_from_public_evidence": { "type": "boolean" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_slug", "inspected_revision", "runtime_worktree_state", "runtime_status", "tools_invoked"],
+      "properties": {
+        "repository_slug": { "type": "string" },
+        "inspected_revision": { "type": "string" },
+        "runtime_worktree_state": { "type": "string", "enum": ["clean", "dirty", "unknown"] },
+        "runtime_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reachable", "reported_status", "server_version"],
+          "properties": {
+            "reachable": { "type": "boolean" },
+            "reported_status": { "type": "string", "enum": ["ok", "error", "unavailable"] },
+            "server_version": { "type": "string" }
+          }
+        },
+        "tools_invoked": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
