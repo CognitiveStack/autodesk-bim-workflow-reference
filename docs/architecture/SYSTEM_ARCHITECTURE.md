@@ -100,6 +100,19 @@ fields so they are never conflated; no GA/stable maturity is claimed without a
 cited source
 ([ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md)).
 
+> **Schema-v2 target — migration pending; the contract above is unchanged.** The
+> shape described above is **schema v1**, and it **remains authoritative**:
+> `config/workflows/end-to-end-reference.yaml` is still `schema_version: 1` and
+> still carries the stage-level fields listed here.
+> [Reference-repo ADR-0008](../decisions/0008-govern-implementation-state-per-capability.md)
+> records the agreed **target** for schema v2, in which the capability-specific
+> fields (`primary_system`, `api_families` → `api_family` plus a new
+> `api_version`, `api_maturity`, `mcp_component`, `mcp_implementation_status`,
+> `data_readiness`, `data_readiness_reason`) move into per-capability records
+> inside each stage, leaving the stage itself as workflow taxonomy and
+> pedagogical posture. **No migration has been made**, and none may proceed until
+> the Site Design lifecycle/version reconciliation named in that ADR lands.
+
 ## 5. Trust and security boundaries
 
 - Credentials and tokens live only in the component repositories' own runtime and
