@@ -8,10 +8,21 @@ sufficiently verified** (§16.1) and **Gate 6 is passed** — Transmittals is th
 ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md),
 §16.2), with its **sanitisation profile approved and Gate 5 passed**
 ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md),
-§16.3). **Gate 8 remains unresolved.** No Phase 4 MCP capability is
-implemented, and **no implementation is authorised by this document**.
+§16.3). **Gate 8 is closed for the Transmittals first slice** under the operative
+§14 criteria, with readiness established in the **approved training project**
+(§16.4). The **Transmittals first slice is implemented and live-verified**
+(2026-07-27); **no other Phase 4A module is implemented**, and **Phase 4A as a
+whole is not complete**.
 **Research date:** 2026-07-24 · **Transmittals normative spike:** 2026-07-25 ·
-**Architecture and privacy decisions:** 2026-07-25
+**Architecture and privacy decisions:** 2026-07-25 · **Transmittals
+implementation and live verification:** 2026-07-27
+
+> **Superseded 2026-07-27 for Transmittals.** This document's research sections
+> were written before any live Autodesk call had been made and before any Phase 4A
+> tool existed. The Transmittals first slice is now implemented and live-verified,
+> and Gate 8 is closed for that slice under the §14 operative criteria. Dated
+> research statements are **preserved unchanged** beneath their own notices; the
+> current-state sections (§1, §4, §16, §17, §19) have been updated in place.
 
 This document is the authoritative repository record of the Phase 4A capability
 research assessment. It records what was verified against first-party Autodesk
@@ -36,15 +47,17 @@ source is recorded as **unresolved**, never as a negative finding.
 | Transmittals normative spike date | 2026-07-25 |
 | Reference-repository baseline (initial pass) | `cc4321a0f585662367d940ae1c9b109d4b0f3753` (`main`, clean) |
 | Reference-repository baseline (normative spike) | `08eb2a24ac33c6519d15be3a238f09efa708baef` (`main`, clean) |
-| APS/Forma MCP baseline | `75b36b2635de3a5707fd1ff3dbf5cd487e3f0e0a` |
-| Registered MCP tool count | 30 (28 read-only Autodesk, 1 guarded Autodesk write, 1 local-only) |
+| APS/Forma MCP baseline | `6ec64110f506ff96ac5744c5e6481c13a3f43806` (implementation revision `295c2530acdd25cc5cfa8e4b361c4c2358a355f4`) |
+| Registered MCP tool count | 35 (33 read-only Autodesk, 1 guarded Autodesk write, 1 local-only); offline doctor `TOOL_COUNT=35`, `RESULT=PASS`, 2026-07-27 |
 | Transmittals normative research | **`normative_transmittals_research_complete`** |
 | Transmittals Gate 2 | **sufficiently verified** (§16.1) |
 | Transmittals Gate 6 | **passed** — adopted, owned by APS/Forma MCP ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md), §16.2) |
 | Transmittals Gate 5 | **passed** — sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md), §16.3) |
-| Phase 4 overall | **data-readiness work remains required** (Gate 8) |
-| Phase 4 MCP capability implemented | **None** |
-| Implementation authorised by this document | **None** |
+| Transmittals Gate 8 | **closed for the Transmittals first slice** under the operative §14 criteria, readiness established in the approved training project (§16.4) |
+| Transmittals first slice | **implemented · live-verified 2026-07-27** — five read-only MCP operations |
+| Phase 4 overall | **not complete** — the Transmittals first slice only; RFIs, Submittals, Sheets and Meetings are unimplemented, and the Phase 4 result schema, public-evidence governance and public evidence remain outstanding |
+| Phase 4 MCP capability implemented | **Transmittals first slice only** (5 read-only operations) |
+| Implementation authorised by this document | **None** — this document authorises nothing; it records state |
 
 The initial pass concluded `additional_authoritative_research_required`. The
 2026-07-25 spike retrieved the normative Transmittals documentation and closes
@@ -234,7 +247,7 @@ another module. Verdicts are recorded in §16.
 |---|---|---|---|---|---|---|---|---|
 | **RFIs** | Autodesk Forma Build RFI API (S1) | v3 | General availability, announced 2025-07-23 (S1) | Forma Build | Verified present; includes a read-semantic POST search (S1, S9) | Verified present (S1, S9) | 3-legged or SSA evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
 | **Submittals** | Autodesk Forma Build Submittals API (S3) | v2 | General availability, read phase 2024-02-22, write phase 2024-08-05 (S3, S4) | Forma Build | Verified present and broad (S3, S4, S9) | Verified present, sharing the same base path (S4, S9) | 3-legged evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
-| **Transmittals** | Autodesk Forma Transmittals API (N1, S2) | v1 | General availability, announced 2025-12-10 (S2) | **Autodesk Forma Data Management** (S2) | **Normatively verified** — five read-only operations (N1, N3–N7) | **Normatively excluded** — the Field Guide lists creating, updating settings, adding recipients and exporting as unsupported (N1) | **Normatively verified** — `data:read`, user context optional, 2-legged **or** 3-legged (N3–N7). Module activation and entitlement **unresolved** | verified GA capability; **Gate 2 sufficiently verified** (§16.1) and **Gate 6 passed** (§16.2); **adopted first Phase 4A read-only capability**, owned by the **APS/Forma MCP**; **planned, not implemented**; **not implementation-ready** — Gates 5 and 8 remain unresolved |
+| **Transmittals** | Autodesk Forma Transmittals API (N1, S2) | v1 | General availability, announced 2025-12-10 (S2) | **Autodesk Forma Data Management** (S2) | **Normatively verified** — five read-only operations (N1, N3–N7) | **Normatively excluded** — the Field Guide lists creating, updating settings, adding recipients and exporting as unsupported (N1) | **Normatively verified** — `data:read`, user context optional, 2-legged **or** 3-legged (N3–N7). Module activation and entitlement **live-verified 2026-07-27** in the approved training project | verified GA capability; **Gates 2, 5, 6 and 8 closed** for this slice (§16.1–§16.4); **adopted first Phase 4A read-only capability**, owned by the **APS/Forma MCP**; **implemented · live-verified 2026-07-27** |
 | **Sheets** | Autodesk Forma Build Sheets API (S5) | v1 | General availability (S5, S6, S7) | Forma Build | **Genuine read surface verified present** — sheets, version sets, collections (S5, S6, S10) | Verified present, including asynchronous export creation (S5, S7, S10) | 2-legged **and** 3-legged evidenced (S5, S6) | verified GA capability with a genuine read surface; **later candidate**; **not implementation-ready** |
 | **Meetings** | — | — | — | — | — | — | — | **`meetings_public_api_not_verified`** |
 
@@ -594,6 +607,16 @@ Two constraints carry forward from
   documents, rather than requiring new source material to be authored.
 
 ### 7.7 Why Transmittals is not yet adopted
+
+> **Superseded 2026-07-27.** Transmittals was adopted by
+> [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)
+> (Gate 6, §16.2), its sanitisation profile approved by
+> [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)
+> (Gate 5, §16.3), and the first slice is now implemented and live-verified with
+> Gate 8 closed for that slice (§16.4). In particular, the statement below that
+> "no Autodesk project API was called at any point" was accurate on 2026-07-25 and
+> is no longer current. The historical research baseline is preserved unchanged
+> beneath this notice.
 
 Gate 2 closing does **not** move any of the following. Each remains a reason
 Transmittals is not adopted:
@@ -995,6 +1018,16 @@ record exists.
 
 ## 14. Harrismith data-readiness plans
 
+> **Superseded 2026-07-27 for Transmittals — this section's criteria are now the
+> operative Gate 8 checklist, and all are satisfied (§16.4).** The Transmittals
+> readiness conditions listed below were live-verified on 2026-07-27 in the
+> **approved training project**, not in the Harrismith example project; the
+> Harrismith example project is **not** asserted to hold a Transmittals fixture.
+> The closing statement below that "none of these conditions has been
+> live-verified" was accurate on 2026-07-25 and remains true for **RFIs,
+> Submittals and Sheets**. The historical readiness plan is preserved unchanged
+> beneath this notice.
+
 No Autodesk call was made and no live project inspection was performed. The five
 readiness axes are kept **separate**, as they were in Phase 3, where capability
 and data readiness blocked independently.
@@ -1089,7 +1122,7 @@ and proven across three phases.
 | 5 | Privacy and sanitisation planning | **unresolved** | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **unresolved** | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass, conditional on an explicit POST-as-read policy decision (§5) | pass | **pass** | pass | fail |
-| 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **unresolved** | **unresolved** | fail |
+| 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
 | 10 | No monolithic Forma Build API assumption | pass | pass | **pass** | pass | pass |
 
@@ -1097,14 +1130,17 @@ Recorded explicitly:
 
 - For **Transmittals**, gates **1, 3, 4, 7, 9 and 10 are substantially supported**
   by the research, **Gate 2 is sufficiently verified** (§16.1), **Gate 6 is
-  passed** (§16.2), and **Gate 5 is passed** (§16.3).
-- **Gate 8 remains unresolved** for Transmittals, and gates **2, 5, 6 and 8
-  remain unresolved** for every other candidate.
-- **No candidate is implementation-ready.**
-- **Closing Gates 2, 5 and 6 does not authorise implementation** — it selects the
-  capability, assigns it, and defines how its evidence must be sanitised; it does
-  not start implementation.
-- **Implementation cannot begin while any load-bearing gate remains unresolved.**
+  passed** (§16.2), **Gate 5 is passed** (§16.3), and **Gate 8 is closed for the
+  first slice** (§16.4).
+- Gates **2, 5, 6 and 8 remain unresolved** for every other candidate.
+- **No other candidate is implementation-ready.**
+- **Closing Gates 2, 5 and 6 did not authorise implementation** — it selected the
+  capability, assigned it, and defined how its evidence must be sanitised.
+- **The governing rule remains that implementation must not begin while a
+  load-bearing gate is unresolved.** For the Transmittals first slice that
+  ordering was **not** followed, and the departure is recorded in §16.4 rather
+  than treated as authorisation. No waiver mechanism exists in this gate model,
+  and none is created here.
 
 A research recommendation is not gate approval. Nothing in §15 or §17 converts an
 unresolved gate into a passed one.
@@ -1223,10 +1259,66 @@ document lineage is returned.
 RFIs, Submittals, Sheets and Meetings **remain unapproved** except where existing
 conventions already cover a domain.
 
+### 16.4 Transmittals Gate 8 — closed for the first slice (2026-07-27)
+
+**Gate 8 is closed for the Transmittals first slice** under the operative §14
+criteria, with readiness established in the **approved training project**.
+
+**Criteria, each individually accounted for:**
+
+| §14 criterion | Status | Basis |
+|---|---|---|
+| Approved training project (§14 preamble) | **satisfied** | Operator attestation; the approved training project was used |
+| 1 — Transmittals module active | **satisfied** | Live reads returned data rather than a permission error |
+| 2 — Caller able to read | **satisfied** | All five read operations succeeded live |
+| 3 — One synthetic transmittal | **satisfied** | A controlled synthetic training transmittal exists |
+| 4 — One approved synthetic **or** test recipient | **satisfied** | **Approved test recipient = true** (operator attestation). Whether the underlying account is a synthetic identity is **not asserted**; the criterion is a disjunction and the test-recipient limb is met |
+| 5 — Existing training document version included | **satisfied** | The transmittal includes an exact issued document version |
+| 6 — No API write required to prepare the fixture | **satisfied** | The fixture was authored through the product interface; every evidence call was read-only |
+
+**Project scope, stated precisely.** Readiness was established in the **approved
+training project**. This does **not** assert that the Harrismith Fire Station
+example project contains a Transmittals fixture, and no Harrismith Transmittals
+data readiness is claimed. The alias-to-project binding is **not recorded in this
+repository** — it remains in the git-ignored private evidence area per
+[SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md).
+
+**Implementation-order departure, recorded rather than excused.** The governing
+sequence in the [PRD](../prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md)
+entry gate and §19 expected Gate 8 closure **before** implementation. The actual
+sequence was:
+
+1. readiness research (§7, §14);
+2. the five read-only Transmittals tools implemented and registered;
+3. the three Data Management MCP read boundaries privacy-minimised;
+4. controlled live verification in the approved training project;
+5. the remaining Gate 8 attestations resolved;
+6. formal Gate 8 closure — this section.
+
+**Implementation therefore proceeded before formal Gate 8 closure, under
+controlled read-only scope.** The substantive reason is an ordering tension in the
+gate model itself: Gate 8 criteria 1 and 2 require live interface reads, and §14
+records that Transmittals exposes **no permission-discovery endpoint**, so module
+activation and caller permission could only be established once a read client
+existed. §16.1 likewise states that "Gate 8 requires live project and interface
+verification."
+
+This is recorded as an **ordering defect in the prior gate model**, not as
+retroactive authorisation. **No tracked waiver or exception mechanism existed, and
+none is created here.** Whether the gate model should distinguish readiness that is
+verifiable without a client from readiness that is only verifiable by a live read
+is left to a later increment.
+
+**What this closure does not do.** It does not authorise any write operation; does
+not close any gate for RFIs, Submittals, Sheets or Meetings; does not make Phase 4A
+complete; does not create the Phase 4 result schema; and does not settle the
+public-evidence governance for the exact-version behavioural finding observed
+during the run — that remains outstanding, and §18.2 item 11 is unchanged.
+
 ## 17. Adopted first capability
 
 **Architecture status: adopted — Transmittals read-only slice, owned by the
-APS/Forma MCP, planned and not implemented.**
+APS/Forma MCP, implemented and live-verified 2026-07-27.**
 
 **Transmittals v1 is the adopted first Phase 4A read-only capability**, decided in
 [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)
@@ -1242,10 +1334,15 @@ What the adopted state means, precisely:
   **no write operation is in scope**;
 - **Phase 4A now spans Autodesk Forma Data Management and Autodesk Forma Build**;
 - **RFIs are the preferred second Phase 4A capability**, not rejected;
-- **implementation is still not authorised.** Adoption is a roadmap and ownership
-  decision. **Gates 5 and 8 remain unresolved**, and both are load-bearing;
-- **no MCP tool exists**, no Autodesk project API has been called, **no alias
-  family is approved**, and **live data readiness is unproven**.
+- **Gates 2, 5, 6 and 8 are closed for this slice** (§16.1–§16.4);
+- the **five read-only MCP tools exist, are registered, and are live-verified**
+  (2026-07-27, component `295c253`, pinned `6ec6411`); the **Transmittals alias
+  family is approved** by
+  [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md); and
+  **live data readiness is established in the approved training project**;
+- **Phase 4A is not complete.** The Phase 4 result schema, the public-evidence
+  governance for the exact-version behavioural finding, and the public evidence
+  artifact all remain outstanding, and no other Phase 4A module is implemented.
 
 **Historical note, retained deliberately.** Before 2026-07-25 this section carried
 the status `transmittals_read_slice_recommended_pending_decision`. The research
@@ -1278,6 +1375,15 @@ These are closed **for Transmittals only** and remain open for the other modules
 - authoritative numeric version return.
 
 ### 18.2 Still open
+
+> **Partially superseded 2026-07-27 for Transmittals.** Items **5** (module
+> activation), **6** (user permission), **10** (live response behaviour) and **15**
+> (current project data readiness) are **resolved for Transmittals** by the
+> 2026-07-27 live verification in the approved training project (§16.4); they remain
+> open for RFIs, Submittals and Sheets. Item **11** (stable document-lineage field)
+> is **unchanged and deliberately untouched** — it is reserved for a separate
+> public-evidence governance decision. All other items stand as written. The
+> historical list is preserved unchanged beneath this notice.
 
 1. **Normative Field Guide and Reference Guide retrieval for RFIs, Submittals and
    Sheets** — the remaining load-bearing documentation gap (S13). Retrieved for
@@ -1330,18 +1436,31 @@ Completed:
   recorded in
   [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md), closing
   Gate 5 (§16.3).
+- **The five MCP reads** — implemented in the component repository per
+  [ADR-0002](../decisions/0002-multi-repo-no-submodules.md), together with the
+  Data Management output-boundary hardening
+  ([COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §3.3, §3.4). **Completed
+  ahead of Gate 8 closure**, contrary to the order originally planned below — see
+  §16.4.
+- **Gate 8 verification and closure** — module activation, caller permission and
+  synthetic training data live-verified 2026-07-27 in the approved training
+  project, closing Gate 8 for the first slice (§16.4).
+- **Private live evidence capture** — held under the git-ignored `.local/`
+  boundary.
 
 Remaining, in order:
 
-1. **Verify Transmittals module activation, permissions and synthetic training
-   data** in the approved training project (**Gate 8**).
-2. **Only after Gate 8 closes**, create the Phase 4 result schema and execution
-   plan — encoding the approved sanitisation profile.
-3. **Implement the five MCP reads separately**, in the component repository, per
-   [ADR-0002](../decisions/0002-multi-repo-no-submodules.md).
-4. **Capture private live evidence** under the git-ignored `.local/` boundary.
-5. **Generate and validate the public evidence** through the approved profile, as
+1. **Public-evidence governance for the exact-version behavioural finding** — the
+   cross-surface result observed during the live run is **not** settled by this
+   document; §18.2 item 11 is unchanged.
+2. **Create the Phase 4 result schema and execution plan** — encoding the approved
+   sanitisation profile.
+3. **Generate and validate the public evidence** through the approved profile, as
    a separate artifact.
-6. **Publish the sanitised artifact separately.**
+4. **Publish the sanitised artifact separately.**
 
-Steps 2 onward are conditional on every load-bearing gate in §16 being resolved.
+**Ordering note.** The original sequence placed Gate 8 closure first and
+implementation third; it was **not followed**, and §16.4 records that departure
+plainly rather than restating the plan as though it had been. The governing
+principle in §16 — that implementation must not begin while a load-bearing gate is
+unresolved — is unchanged and still applies to every other Phase 4A module.

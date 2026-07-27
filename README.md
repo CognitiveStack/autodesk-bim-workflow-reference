@@ -75,11 +75,17 @@ operations — owned by the **APS/Forma MCP**
 ([ADR-0004](docs/decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
 RFIs are the preferred second capability.
 
-**Current state: Gates 2 (authentication), 5 (privacy and sanitisation) and 6
-(component boundary) are closed. Gate 8 (project activation, permission and
-training data) remains open, so the capability is planned and nothing is
-implemented yet** — no Transmittals MCP tool exists and no implementation is
-authorised.
+**Current state: Gates 2 (authentication), 5 (privacy and sanitisation), 6
+(component boundary) and 8 (project activation, permission and training data) are
+closed for the Transmittals first slice, and that slice is implemented and
+live-verified (2026-07-27)** — five read-only Transmittals MCP operations in the
+APS/Forma MCP. Gate 8 closed under the operative §14 criteria of the capability
+gap, with readiness established in the **approved training project**.
+
+**Phase 4A as a whole is not complete.** No other Phase 4A module is implemented,
+and the remaining work includes the Phase 4 result schema, the public-evidence
+governance decision for the cross-surface behavioural finding, and the public
+evidence artifact itself.
 
 The Transmittals public-evidence sanitisation profile is governed by
 [ADR-0005](docs/decisions/0005-approve-transmittals-sanitisation-profile.md) and

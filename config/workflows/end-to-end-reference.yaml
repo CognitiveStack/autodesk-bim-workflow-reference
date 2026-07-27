@@ -2,7 +2,7 @@ schema_version: 1
 
 # Terminology model: see docs/decisions/0003-autodesk-platform-product-and-api-terminology.md
 # and docs/guides/GLOSSARY.md. Confirmed component capability inventory:
-# see docs/architecture/COMPONENT_BOUNDARIES.md (inventory verified 2026-07-24).
+# see docs/architecture/COMPONENT_BOUNDARIES.md (inventory verified 2026-07-27).
 #
 # Each stage keeps these concerns as SEPARATE fields; they must not be conflated:
 #
@@ -20,9 +20,12 @@ schema_version: 1
 #                             beta-v1alpha | to-be-verified | not-applicable.
 #                             No GA/stable value is used unless verified against an
 #                             official source and cited in the documentation.
-#   data_readiness            Whether the Harrismith example has enough data to
-#                             demonstrate the capability: ready | blocked |
-#                             not-assessed.
+#   data_readiness            Whether the approved example or training project for
+#                             this stage holds enough data to demonstrate the
+#                             capability: ready | blocked | not-assessed. The
+#                             Harrismith example is the default; where a stage was
+#                             verified in a different approved project, name that
+#                             scope in data_readiness_reason.
 #   data_readiness_reason     Optional sanitised machine-readable explanation.
 #   automation_policy         This project's chosen automation posture.
 #
@@ -135,17 +138,25 @@ stages:
     # documented GET operations: list transmittals; get one transmittal; list
     # recipients; list folders; list included document versions. No write
     # operation is in scope.
-    # NOT IMPLEMENTED: no Transmittals MCP tool exists, so status stays planned.
-    # Gates 2 (authentication scopes), 5 (privacy/sanitisation) and 6 (component
-    # boundary/roadmap) are CLOSED for the Transmittals first slice.
+    # IMPLEMENTED and LIVE-VERIFIED 2026-07-27: the five read-only Transmittals MCP
+    # operations exist in the APS/Forma MCP (see COMPONENT_BOUNDARIES.md 3.3), so
+    # mcp_implementation_status is `confirmed` — the vocabulary's value for a tool
+    # implemented and verified in component source (COMPONENT_BOUNDARIES.md 2).
+    # Gates 2 (authentication scopes), 5 (privacy/sanitisation), 6 (component
+    # boundary/roadmap) and 8 (activation, permission, training data) are CLOSED for
+    # the Transmittals first slice.
     # SANITISATION: governed by ADR-0005 and the Transmittals public-evidence
     # profile in docs/guides/SANITISATION_CONVENTION.md. Approved aliases reuse
     # PROJECT_n, USER_n, VERSION_n and FOLDER_n, and add TRANSMITTAL_n,
     # RECIPIENT_n, EXTERNAL_MEMBER_n, COMPANY_n and ROLE_n. Behavioural
     # timestamps (receivedAt/viewedAt/downloadedAt) reduce to booleans or counts.
-    # BLOCKER: Gate 8 (project module activation, caller permission and synthetic
-    # training data) remains unresolved; implementation is NOT authorised until it
-    # closes. Hence data_readiness stays not-assessed.
+    # GATE 8: closed for the Transmittals first slice on 2026-07-27 under the
+    # operative section-14 criteria of PHASE_4_CAPABILITY_GAP.md (see 16.4).
+    # SCOPE OF data_readiness BELOW: readiness was established in the APPROVED
+    # TRAINING PROJECT for the Transmittals first slice — NOT in the Harrismith
+    # example project, which is not asserted to hold a Transmittals fixture.
+    # data_readiness_reason names that scope, per the header definition.
+    # PHASE 4A IS NOT COMPLETE: this stage covers the Transmittals first slice only.
     # RFIs are the preferred SECOND Phase 4A slice; no RFI MCP tool exists and its
     # API-family name stays unasserted here until verified (ADR-0003). Submittals
     # and Sheets are later candidates; Meetings is deferred (public API not
@@ -155,9 +166,10 @@ stages:
     api_families:
       - Autodesk Forma Transmittals API
     mcp_component: aps-forma-mcp
-    mcp_implementation_status: planned
+    mcp_implementation_status: confirmed
     api_maturity: to-be-verified
-    data_readiness: not-assessed
+    data_readiness: ready
+    data_readiness_reason: transmittals-first-slice-ready-in-approved-training-project
     automation_policy: focused_reference_examples
 
   - id: asset_handover

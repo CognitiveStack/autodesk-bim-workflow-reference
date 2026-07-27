@@ -8,9 +8,12 @@ unimplemented**, so a direct clash-to-issue link and geometric resolution remain
 **unproven**. **Phase 4A capability research is complete and its first slice is
 selected**: Autodesk Forma **Transmittals** read-only, owned by the APS/Forma MCP
 ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
-It is **planned, not implemented** — Gates 2, 5 and 6 are passed, **Gate 8
-remains open, and no implementation is authorised**.
-**Created:** 2026-07-22 · **Last reviewed:** 2026-07-25
+That first slice is **implemented and live-verified** (2026-07-27) — Gates 2, 5, 6
+and 8 are closed for it, Gate 8 under the operative §14 criteria with readiness
+established in the **approved training project**. **Phase 4A as a whole is not
+complete**: no other Phase 4A module is implemented, and the Phase 4 result schema,
+public-evidence governance and public evidence remain outstanding.
+**Created:** 2026-07-22 · **Last reviewed:** 2026-07-27
 **Terminology last verified:** 2026-07-23 (see
 [GLOSSARY.md](../guides/GLOSSARY.md) and
 [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md))
@@ -108,16 +111,20 @@ source of truth** for the responsibility matrix, the dated capability ledger, an
 the tool inventory. This PRD does not restate per-capability counts; consult the
 ledger for the authoritative figures.
 
-Current baseline recorded there, re-verified locally on 2026-07-24:
+Current baseline recorded there, re-verified locally on 2026-07-27:
 
-- **APS/Forma MCP** (`CognitiveStack/autodesk-aps-forma-mcp`) at
-  `75b36b2635de3a5707fd1ff3dbf5cd487e3f0e0a` — **30 registered MCP tools**
-  (28 read-only Autodesk, 1 guarded Autodesk write, 1 local-only preview),
-  evidenced by the offline doctor `TOOL_COUNT=30`, `RESULT=PASS`. This includes
-  **seven Reviews reads and `list_issue_relationships`** (Phase 2B) and the **five
+- **APS/Forma MCP** (`CognitiveStack/autodesk-aps-forma-mcp`) pinned at
+  `6ec64110f506ff96ac5744c5e6481c13a3f43806` — **35 registered MCP tools**
+  (33 read-only Autodesk, 1 guarded Autodesk write, 1 local-only preview),
+  evidenced by the offline doctor `TOOL_COUNT=35`, `RESULT=PASS` at the
+  implementation revision `295c2530acdd25cc5cfa8e4b361c4c2358a355f4`. This includes
+  **seven Reviews reads and `list_issue_relationships`** (Phase 2B), the **five
   Model Coordination model-set/version reads** — `list_model_sets`,
   `get_model_set`, `list_model_set_versions`, `get_latest_model_set_version`,
-  `get_model_set_version` — all implemented and live-verified (2026-07-23).
+  `get_model_set_version` — all implemented and live-verified (2026-07-23), and the
+  **five Transmittals reads** (Phase 4A first slice) — `list_transmittals`,
+  `get_transmittal`, `get_transmittal_recipients`, `get_transmittal_folders`,
+  `get_transmittal_documents` — implemented and live-verified (2026-07-27).
 - **Revit MCP** baseline remains `ae01d29` (14 tools; its pre-existing
   working-tree changes are unrelated and unresolved).
 
@@ -344,7 +351,8 @@ research was performed for RFIs, Submittals, Transmittals, Sheets and Meetings
 the roadmap and ownership question was decided in
 [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md).
 **Transmittals** is the adopted first Phase 4A read-only capability, owned by the
-APS/Forma MCP, **planned and not implemented**. Its **API family name is now
+APS/Forma MCP, **implemented and live-verified 2026-07-27** (five read-only MCP
+operations). Its **API family name is now
 authoritatively verified**; per [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md)
 the other modules' family names remain unasserted here.
 
@@ -480,12 +488,16 @@ tool implementation. That research is recorded in
 outcome was a roadmap and component-boundary decision, taken in
 [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md).
 
-**No Phase 4 capability is implemented, and no implementation is authorised yet.**
-No MCP tool exists for any Phase 4A module.
+**The Transmittals first slice is implemented and live-verified (2026-07-27); no
+other Phase 4A capability is implemented.** Five read-only Transmittals MCP
+operations exist in the APS/Forma MCP
+([COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) §3.3). No MCP
+tool exists for any other Phase 4A module, and **Phase 4A as a whole is not
+complete**.
 
 | Module | Classification | Status |
 |---|---|---|
-| **Transmittals** | **Adopted first Phase 4A read-only capability** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)). Autodesk Forma Data Management module; five documented `GET` operations; owning component **APS/Forma MCP**; sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) | **Gates 2, 5 and 6 passed**; Gate 8 unresolved. **Planned, not implemented**; implementation not yet authorised |
+| **Transmittals** | **Adopted first Phase 4A read-only capability** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)). Autodesk Forma Data Management module; five documented `GET` operations; owning component **APS/Forma MCP**; sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) | **Gates 2, 5, 6 and 8 closed for this slice** — Gate 8 under the operative §14 criteria, readiness established in the approved training project. **Implemented · live-verified 2026-07-27.** Phase 4 result schema, public-evidence governance and public evidence outstanding |
 | **RFIs** | **Preferred second Phase 4A capability.** Closest structural analogue to the Issues reads already proven in Phases 2 and 3 | Researched; **not first** (privacy exposure, larger surface, POST-based listing). Implementation not approved |
 | **Submittals** | **Later candidate** | GA capability researched; not selected first |
 | **Sheets** | **Later candidate**, requiring **domain disambiguation** — must **not** be confused with the component's Model Derivative model views (`list_model_views`) or manifests (`get_derivative_manifest`) | GA capability researched, including a genuine read surface; not selected first |
@@ -550,13 +562,25 @@ The ten items above are unchanged and all still apply. Current status for
 | 2 — authentication-scope verification | **passed**, on normative Autodesk documentation |
 | 5 — privacy and sanitisation rules | **passed** — Transmittals sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) |
 | 6 — component-boundary decision | **passed** — APS/Forma MCP owns it ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)) |
-| 8 — Harrismith scenario and data readiness | **unresolved** — module activation, caller permission and synthetic training data are unverified |
+| 8 — Harrismith scenario and data readiness | **closed for the Transmittals first slice** (2026-07-27) under the operative §14 criteria of [PHASE_4_CAPABILITY_GAP.md](../architecture/PHASE_4_CAPABILITY_GAP.md) — module activation, caller permission and synthetic training data live-verified, with readiness established in the **approved training project**. The Harrismith example project is **not** asserted to hold a Transmittals fixture (§16.4) |
 | 1, 3, 4, 7, 9, 10 | substantially supported by the recorded research |
 
-**The Phase 4A entry gate as a whole has not passed.** Gate 8 is load-bearing and
-open, so **no implementation increment is authorised**. Closing Gates 2, 5 and 6
-selects the capability, assigns it, and defines how its evidence must be
-sanitised; it does not start implementation.
+**The Phase 4A entry gate has passed for the Transmittals first slice only**, and
+that slice is implemented and live-verified. It has **not** passed for any other
+Phase 4A module, where Gates 2, 5, 6 and 8 remain unresolved and no implementation
+increment is authorised.
+
+**Ordering, recorded rather than smoothed over.** The ten-item gate above requires
+satisfaction *before* any implementation increment. For the Transmittals first
+slice that order was **not followed**: the five read tools were implemented and the
+Data Management read boundaries hardened *before* Gate 8 was formally closed, under
+controlled read-only scope. The substantive reason is an ordering tension in the
+gate model — Gate 8's module-activation and caller-permission criteria require live
+interface reads, and Transmittals exposes no permission-discovery endpoint, so
+neither could be verified until a read client existed. This is recorded as a defect
+in the prior gate model, **not** as retroactive authorisation; no waiver mechanism
+exists in this gate and none is created. See
+[PHASE_4_CAPABILITY_GAP.md](../architecture/PHASE_4_CAPABILITY_GAP.md) §16.4.
 
 **Approved privacy governance** ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md),
 detailed in [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md)):
@@ -576,12 +600,23 @@ detailed in [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md)):
 
 ##### Phase 4A implementation sequence
 
-1. **Close Gate 8** — verify module activation, caller permission and synthetic
-   training data in the approved training project.
-2. **Create the Phase 4 result schema and execution plan.**
-3. **Implement the five MCP reads** in the component repository.
-4. **Capture private live evidence** under the git-ignored `.local/` boundary.
-5. **Generate and validate the public evidence** through the approved profile.
-6. **Publish the sanitised artifact separately.**
+Completed, though **not in the planned order** — see the ordering note above and
+[PHASE_4_CAPABILITY_GAP.md](../architecture/PHASE_4_CAPABILITY_GAP.md) §16.4:
 
-Steps 2 onward are conditional on step 1 completing.
+- **Implement the five MCP reads** in the component repository — completed
+  *before* Gate 8 closure, which the original plan placed third.
+- **Close Gate 8** — module activation, caller permission and synthetic training
+  data live-verified 2026-07-27 in the approved training project. Originally
+  planned first; completed after implementation.
+- **Capture private live evidence** under the git-ignored `.local/` boundary.
+
+Remaining, in order:
+
+1. **Settle public-evidence governance** for the cross-surface behavioural finding
+   observed during the live run.
+2. **Create the Phase 4 result schema and execution plan.**
+3. **Generate and validate the public evidence** through the approved profile.
+4. **Publish the sanitised artifact separately.**
+
+For **every other Phase 4A module**, the original sequencing rule stands unchanged:
+gate closure precedes implementation.

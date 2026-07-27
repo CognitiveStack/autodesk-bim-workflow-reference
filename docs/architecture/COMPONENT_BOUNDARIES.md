@@ -1,8 +1,8 @@
 # Component Boundaries and Capability Ledger
 
 **Status:** Confirmed component capability inventory
-**Inventory verified:** 2026-07-24 (APS/Forma MCP re-verified locally at
-`75b36b2`); Revit MCP unchanged (`ae01d29`, 2026-07-22)
+**Inventory verified:** 2026-07-27 (APS/Forma MCP re-verified locally at
+`295c253`, pinned at `6ec6411`); Revit MCP unchanged (`ae01d29`, 2026-07-22)
 
 This document is the authoritative, dated ledger of the MCP capabilities this
 project depends on, and the anti-duplication contract between this orchestration
@@ -17,24 +17,43 @@ layer and the two MCP components. It is consistent with the
 
 | Component | Repository | Inspected commit | Tools |
 |---|---|---|---|
-| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `75b36b2` | 30 |
+| APS/Forma MCP | `CognitiveStack/autodesk-aps-forma-mcp` | `6ec6411` | 35 |
 | Revit MCP | `CognitiveStack/revit-mcp-triviron` | `ae01d29` | 14 |
 
 The APS/Forma MCP inventory is published at
-`75b36b2635de3a5707fd1ff3dbf5cd487e3f0e0a` and reports **30 MCP tools total**:
-28 read-only Autodesk tools, 1 guarded Autodesk write tool, and 1 local-only
+`6ec64110f506ff96ac5744c5e6481c13a3f43806` and reports **35 MCP tools total**:
+33 read-only Autodesk tools, 1 guarded Autodesk write tool, and 1 local-only
 preview tool. Component evidence: the offline MCP doctor reports
-**`TOOL_COUNT=30`, `RESULT=PASS`** at that revision, re-run locally on
-2026-07-24. The capability inventory below is **unchanged** from the previous
-pinned revision `0117022`; the intervening component commit is a
-reliability-only increment (§3.2). The five read-only Model
+**`TOOL_COUNT=35`, `RESULT=PASS`**, re-run locally on 2026-07-27 at the
+implementation revision `295c2530acdd25cc5cfa8e4b361c4c2358a355f4`.
+
+The previously pinned revision `75b36b2` carried **30 tools**. The increase is
+exactly the five read-only **Transmittals** reads (§3.3). Their component history
+keeps implementation, correction, hardening and documentation **separate**:
+
+- `7509c872e5b2f128a8f3492966bb8b7f9d27a2a9` (*feat: add read-only ACC/Forma
+  Transmittals reads*) — implemented and registered the five tools;
+- `802f52ca175ed35e264a581827fa930078d1513e` (*fix: base Transmittals error
+  detection on the client contract*) — error-contract correction;
+- `295c2530acdd25cc5cfa8e4b361c4c2358a355f4` (*feat: privacy-minimise the three
+  Data Management MCP reads*) — the Phase 4A Data Management output boundary
+  (§3.4);
+- `6ec64110f506ff96ac5744c5e6481c13a3f43806` (*docs: record Transmittals live
+  verification*) — the component inventory update, and the currently pinned
+  revision. **This commit recorded the verification; it did not implement the
+  tools.**
+
+Registration and the doctor result were verified locally at `295c253`; `6ec6411`
+is a documentation-only commit on top of it and is the revision pinned above.
+
+The five read-only Model
 Coordination model-set reads were added by component commit
 `c92ee079408500b74f7c2f7efd8b1ab0b8047fe3` (*feat: add read-only Model
 Coordination model-set reads*), logging-privacy hardened by
 `1634d8c5e65aff9af1fbb44270159772ebae20ce` (*fix: suppress identifier-bearing HTTP
 client logs*), and recorded in the component inventory at `0117022` (*docs: update
 inventory for Model Coordination reads*); they were live-verified on 2026-07-23.
-All five remain registered at `75b36b2` (verified locally, 2026-07-24).
+All five remain registered at `295c253` (verified locally, 2026-07-27).
 
 The tool identifiers below are code identifiers read from component source; they
 are not Autodesk data. No live Autodesk hub, project, folder, item, version,
@@ -63,16 +82,17 @@ separate fields (`mcp_component`, `mcp_implementation_status`, `api_maturity`,
 `data_readiness`) so MCP coverage, API maturity, and project-data readiness are
 never conflated.
 
-## 3. APS/Forma MCP — 30 tools (28 read · 1 guarded write · 1 local)
+## 3. APS/Forma MCP — 35 tools (33 read · 1 guarded write · 1 local)
 
 | Capability group | Tools | Class | Status |
 |---|---|---|---|
-| Data Management | `list_autodesk_hubs`, `list_projects`, `list_top_folders`, `list_folder_contents`, `get_item_details`, `list_item_versions` | read | confirmed |
+| Data Management | `list_autodesk_hubs`, `list_projects`, `list_top_folders`, `list_folder_contents`, `get_item_details`, `list_item_versions` | read | confirmed · the last three are privacy-minimised at the MCP boundary and were live-exercised in the Phase 4A Transmittals verification 2026-07-27 (§3.4) |
 | Model Derivative | `get_derivative_manifest`, `list_model_views`, `get_model_properties` | read | confirmed |
 | Issues | `list_issues`, `get_issue_details`, `list_issue_types` | read | confirmed |
 | Reviews | `list_review_workflows`, `list_reviews`, `get_review_details`, `get_review_workflow`, `list_review_file_versions`, `get_review_progress`, `get_file_version_approval_statuses` | read | confirmed · live-verified |
 | Issue Relationships | `list_issue_relationships` | read | confirmed · live-verified |
 | Model Coordination | `list_model_sets`, `get_model_set`, `list_model_set_versions`, `get_latest_model_set_version`, `get_model_set_version` | read | confirmed · live-verified 2026-07-23 (§3.1, §8) |
+| Transmittals | `list_transmittals`, `get_transmittal`, `get_transmittal_recipients`, `get_transmittal_folders`, `get_transmittal_documents` | read | confirmed · live-verified 2026-07-27 (§3.3) |
 | Forma Site Design (Beta `v1alpha`) | `get_forma_project`, `list_forma_proposals`, `list_forma_proposal_elements` | read | experimental |
 | Forma Site Design (Beta `v1alpha`) | `create_forma_proposal` | guarded write | experimental (sole write; requires explicit confirmation and an explicit source proposal; **not part of the Phase 2 read-only workflow**) |
 | Local-only (no Autodesk call) | `prepare_native_floor_stack_preview` | local | confirmed |
@@ -158,6 +178,63 @@ The Phase 3 evidence artifact was produced earlier, at component revision
 observation is **historical** and is not restated as current behaviour; see
 [PHASE_3_CAPABILITY_GAP.md](PHASE_3_CAPABILITY_GAP.md) §6.4.
 
+### 3.3 Transmittals reads (implemented · live-verified 2026-07-27)
+
+The five read-only **Transmittals** tools are the adopted Phase 4A first slice
+([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
+They are **implemented, registered and live-verified**:
+
+- `list_transmittals` — list the transmittals in a project.
+- `get_transmittal` — retrieve one transmittal record.
+- `get_transmittal_recipients` — recipient structure for one transmittal.
+- `get_transmittal_folders` — the folders associated with a transmittal.
+- `get_transmittal_documents` — the document versions included in a transmittal.
+
+**Read-only by construction.** Every call routes through a single GET helper in
+the component's Transmittals client; no POST, PUT, PATCH or DELETE path exists in
+that module, and no raw path or URL is accepted from the caller. Creating,
+sending, editing, re-issuing or deleting a transmittal, and adding or removing
+recipients or documents, are **not implemented**. No new OAuth scope was required
+— `data:read` already sufficed.
+
+**Recipient boundary.** `get_transmittal_recipients` returns **structural counts
+only** — project-member, external and total recipient counts plus an
+external-members boolean — and **no recipient rows**. No name, email, Autodesk
+user or company identifier, or received/viewed/downloaded telemetry is returned
+by that tool.
+
+**Live verification.** Verified 2026-07-27 against a controlled synthetic fixture
+in the **approved training project**, read-only throughout. This closed Gate 8 for
+the Transmittals first slice — see
+[PHASE_4_CAPABILITY_GAP.md](PHASE_4_CAPABILITY_GAP.md) §16.4. The exact-version
+behavioural finding observed during that run is a **separate matter awaiting
+public-evidence governance** and is deliberately not recorded here.
+
+### 3.4 Data Management output boundary (Phase 4A, component `295c253`)
+
+Component commit `295c253` (*feat: privacy-minimise the three Data Management MCP
+reads*) narrows the MCP output boundary of `list_folder_contents`,
+`get_item_details` and `list_item_versions`. The other three Data Management tools
+are unchanged. **Locally inspected in this repository's re-verification
+(2026-07-27)**, read-only:
+
+- **Constructive allowlist.** Each result is *built* from named approved fields,
+  never by deleting keys from the upstream payload, so any property the component
+  does not name — including one Autodesk may add later — is absent by
+  construction. No `raw`, `extra`, `included`, `attributes` or `relationships`
+  passthrough object exists.
+- **Omitted:** every user id and user name, every payload timestamp, storage size,
+  the storage / derivatives / thumbnails relationships, the open-ended extension
+  object, folder paths, and self/web-view links.
+- **Chaining identifiers retained byte-identically** — never parsed,
+  canonicalised, truncated, case-folded, URL-encoded or rebuilt.
+- **Two-layer split.** The raw client contract is deliberately *not* projected;
+  the allowlist is a property of the **tools**, not of the client.
+
+These three reads were live-exercised in the Phase 4A Transmittals verification.
+Identifier **aliasing** remains the job of this repository's evidence layer, not
+of the component boundary.
+
 ## 4. Revit MCP — 14 tools (10 read/inspection · 4 mutating)
 
 | Capability group | Tools | Class | Status |
@@ -184,22 +261,28 @@ observation is **historical** and is not restated as current behaviour; see
 
 | Stage | Capability | Status |
 |---|---|---|
-| construction_information | **Transmittals** (Autodesk Forma Transmittals API v1) — **adopted first Phase 4A read slice**, owning component **APS/Forma MCP** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)) | **planned** — component assignment **confirmed**, implementation **not started** |
 | construction_information | RFI — preferred second Phase 4A capability | planned |
 | asset_handover | Assets | planned |
 
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
-and live-verified (§3); they are no longer a gap. The **Transmittals** API-family
-name is asserted because it is verified from official Autodesk/APS documentation;
-API-family names for RFI and Assets are still not asserted here until they are
-verified from an official Autodesk/APS or component source.
+and live-verified (§3); they are no longer a gap. The **Transmittals** first slice
+is likewise **implemented and live-verified** (§3.3) and is no longer a gap — it
+has been removed from the table above; **Phase 4A as a whole is not complete**,
+and RFIs, Submittals, Sheets and Meetings remain unimplemented. The
+**Transmittals** API-family name is asserted because it is verified from official
+Autodesk/APS documentation; API-family names for RFI and Assets are still not
+asserted here until they are verified from an official Autodesk/APS or component
+source.
 
-### 6.1 Transmittals ownership split (adopted, not implemented)
+### 6.1 Transmittals ownership split (adopted, implemented)
 
 The component assignment below is **confirmed** by
 [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md).
-The implementation status remains **planned**: **no Transmittals MCP tool exists**,
-and none is authorised until Gates 5 and 8 close.
+The five read tools are **implemented, registered and live-verified**
+(2026-07-27, §3.3), and Gate 8 is **closed for the Transmittals first slice** under
+the operative §14 criteria of
+[PHASE_4_CAPABILITY_GAP.md](PHASE_4_CAPABILITY_GAP.md), with readiness established
+in the **approved training project**. The ownership split itself is unchanged.
 
 **APS/Forma MCP owns:**
 
@@ -209,7 +292,7 @@ and none is authorised until Gates 5 and 8 close.
 - request execution;
 - response normalisation;
 - structured error handling;
-- the five read tools, once implemented.
+- the five read tools.
 
 **This reference repository owns:**
 
@@ -297,11 +380,13 @@ repository may **invoke** or **validate** a behaviour but must never
 
 ## 11. Reverification policy
 
-- This ledger is pinned to the inspected commits (`75b36b2` APS/Forma, `ae01d29`
-  Revit) and the verification date above. The APS/Forma tool count of 30 is
-  evidenced by the offline doctor `TOOL_COUNT=30`, `RESULT=PASS` (re-run locally
-  2026-07-24), and the five Model Coordination model-set reads were live-verified
-  on 2026-07-23 and confirmed still registered at `75b36b2`.
+- This ledger is pinned to the inspected commits (`6ec6411` APS/Forma, `ae01d29`
+  Revit) and the verification date above. The APS/Forma tool count of 35 is
+  evidenced by the offline doctor `TOOL_COUNT=35`, `RESULT=PASS` (re-run locally
+  2026-07-27 at the implementation revision `295c253`, of which the pinned
+  `6ec6411` is a documentation-only descendant). The five Model Coordination
+  model-set reads were live-verified on 2026-07-23, and the five Transmittals
+  reads on 2026-07-27; all ten were confirmed still registered at `295c253`.
 - A re-pin driven by a reliability-only component change updates the revision and
   date but **must not** change any capability status; capability status changes
   only on evidence of a new or altered tool.
