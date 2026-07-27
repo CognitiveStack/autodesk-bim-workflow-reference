@@ -20,7 +20,8 @@ Two distinct things were being conflated:
 
 1. **Product and platform branding** — how Autodesk names the platform and its
    offerings.
-2. **API maturity** — whether a given developer API is stable or beta.
+2. **API maturity** — the lifecycle/maturity classification of a given developer
+   API.
 
 These are independent concerns. A product can be well established while a related
 API is beta, and vice versa.
@@ -64,8 +65,8 @@ Additional rules:
 - **API maturity is a separate concern from product branding.** Naming an API
   family is not a claim about its maturity.
 - Do not infer API maturity from product maturity.
-- Assert a specific maturity level (stable vs beta) only when it is verified and
-  cited; otherwise mark it "to be verified".
+- Assert a specific maturity level only when it is verified and cited; otherwise
+  mark it "to be verified".
 - Record "Terminology last verified: 2026-07-22" where terminology claims are
   made, and re-verify against official Autodesk / APS sources over time.
 

@@ -87,7 +87,7 @@ git-ignored):
   keeps separate, non-conflated fields: `api_families` (a list of relevant
   developer APIs), `mcp_component` (owning integration component),
   `mcp_implementation_status` (`confirmed` / `partial` / `planned` /
-  `not-applicable`), `api_maturity` (`beta-v1alpha` / `to-be-verified` /
+  `not-applicable`), `api_maturity` (`beta-v1alpha` / `ga` / `to-be-verified` /
   `not-applicable`), `data_readiness` (`ready` / `blocked` / `not-assessed`),
   and `data_readiness_reason` (an optional sanitised machine-readable
   explanation of that value, used for example to identify a non-default

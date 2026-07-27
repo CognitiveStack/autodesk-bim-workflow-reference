@@ -16,10 +16,13 @@ schema_version: 1
 #                             revit-mcp | none.
 #   mcp_implementation_status Whether THIS project's MCP tooling exists for the
 #                             stage: confirmed | partial | planned | not-applicable.
-#   api_maturity              Separately verified maturity of the underlying API:
-#                             beta-v1alpha | to-be-verified | not-applicable.
-#                             No GA/stable value is used unless verified against an
-#                             official source and cited in the documentation.
+#   api_maturity              Separately verified lifecycle classification of the
+#                             underlying Autodesk developer API:
+#                             beta-v1alpha | ga | to-be-verified | not-applicable.
+#                             ga = General Availability. A concrete lifecycle
+#                             classification is asserted only where verified
+#                             against an official Autodesk/APS source and cited
+#                             in the documentation; otherwise use to-be-verified.
 #   data_readiness            Whether the approved example or training project for
 #                             this stage holds enough data to demonstrate the
 #                             capability: ready | blocked | not-assessed. The

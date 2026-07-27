@@ -6,8 +6,8 @@ The terminology model behind this glossary is defined in
 
 Entries distinguish four tiers: **platform**, **product / offering**, **API
 family**, and **historical name**. Naming an API family is not a claim about API
-maturity; maturity (stable vs beta) is a separate concern and is only asserted
-where verified and cited.
+maturity; maturity is a separate concern and is only asserted where verified and
+cited.
 
 **Terminology last verified: 2026-07-22** against official Autodesk and APS
 sources (see [References](#references)). Items awaiting official confirmation are
