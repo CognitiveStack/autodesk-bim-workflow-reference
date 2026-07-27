@@ -170,7 +170,7 @@ stages:
       - Autodesk Forma Transmittals API
     mcp_component: aps-forma-mcp
     mcp_implementation_status: confirmed
-    api_maturity: to-be-verified
+    api_maturity: ga
     data_readiness: ready
     data_readiness_reason: transmittals-first-slice-ready-in-approved-training-project
     automation_policy: focused_reference_examples
