@@ -110,8 +110,14 @@ cited source
 > `api_version`, `api_maturity`, `mcp_component`, `mcp_implementation_status`,
 > `data_readiness`, `data_readiness_reason`) move into per-capability records
 > inside each stage, leaving the stage itself as workflow taxonomy and
-> pedagogical posture. **No migration has been made**, and none may proceed until
-> the Site Design lifecycle/version reconciliation named in that ADR lands.
+> pedagogical posture. **Not every capability field is mandatory:**
+> [reference-repo ADR-0009](../decisions/0009-define-capability-record-cardinality-for-schema-v2.md)
+> defines which fields are required, conditional or optional, and clarifies that
+> `capabilities: []` means a stage has **no governed capability** — not merely no
+> implementation, no asserted API family, or no ready data. **No migration has
+> been made.** The Site Design lifecycle/version reconciliation prerequisite named
+> in ADR-0008 is now satisfied; the migration itself remains pending its own
+> separately reviewed increment.
 
 ## 5. Trust and security boundaries
 
