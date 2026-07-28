@@ -10,9 +10,12 @@ sufficiently verified** (§16.1) and **Gate 6 is passed** — Transmittals is th
 ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md),
 §16.3). **Gate 8 is closed for the Transmittals first slice** under the operative
 §14 criteria, with readiness established in the **approved training project**
-(§16.4). The **Transmittals first slice is implemented and live-verified**
-(2026-07-27); **no other Phase 4A module is implemented**, and **Phase 4A as a
-whole is not complete**.
+(§16.4). **Gate 8 is also closed for the RFI first read-only slice** (§16.7),
+with readiness established in the same approved training project against a
+controlled synthetic fixture. The **Transmittals first slice is implemented and
+live-verified** (2026-07-27) and the **RFI first read-only slice is implemented,
+published and live-verified** (2026-07-28); **no other Phase 4A module is
+implemented**, and **Phase 4A as a whole is not complete**.
 **Research date:** 2026-07-24 · **Transmittals normative spike:** 2026-07-25 ·
 **Architecture and privacy decisions:** 2026-07-25 · **Transmittals
 implementation and live verification:** 2026-07-27
@@ -48,15 +51,19 @@ source is recorded as **unresolved**, never as a negative finding.
 | Reference-repository baseline (initial pass) | `cc4321a0f585662367d940ae1c9b109d4b0f3753` (`main`, clean) |
 | Reference-repository baseline (normative spike) | `08eb2a24ac33c6519d15be3a238f09efa708baef` (`main`, clean) |
 | APS/Forma MCP baseline | `6ec64110f506ff96ac5744c5e6481c13a3f43806` (implementation revision `295c2530acdd25cc5cfa8e4b361c4c2358a355f4`) |
-| Registered MCP tool count | 35 (33 read-only Autodesk, 1 guarded Autodesk write, 1 local-only); offline doctor `TOOL_COUNT=35`, `RESULT=PASS`, 2026-07-27 |
+| Registered MCP tool count | **38** (36 read-only Autodesk, 1 guarded Autodesk write, 1 local-only) at component revision `5dca229`; offline doctor `TOOL_COUNT=38`, `RESULT=PASS`, 2026-07-28. The previous count of 35 (2026-07-27) differs by exactly the three RFI read-only tools |
 | Transmittals normative research | **`normative_transmittals_research_complete`** |
 | Transmittals Gate 2 | **sufficiently verified** (§16.1) |
 | Transmittals Gate 6 | **passed** — adopted, owned by APS/Forma MCP ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md), §16.2) |
 | Transmittals Gate 5 | **passed** — sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md), §16.3) |
 | Transmittals Gate 8 | **closed for the Transmittals first slice** under the operative §14 criteria, readiness established in the approved training project (§16.4) |
 | Transmittals first slice | **implemented · live-verified 2026-07-27** — five read-only MCP operations |
-| Phase 4 overall | **not complete** — the Transmittals first slice only; RFIs, Submittals, Sheets and Meetings are unimplemented, and the Phase 4 result schema, public-evidence governance and public evidence remain outstanding |
-| Phase 4 MCP capability implemented | **Transmittals first slice only** (5 read-only operations) |
+| RFIs Gate 6 | **passed** — contract and component boundary adopted ([ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)), search refined by ([ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)), §16.6 |
+| RFIs Gate 5 | **passed** — public-evidence sanitisation profile approved ([ADR-0010](../decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)), §16.5 |
+| RFIs Gate 8 | **closed for the RFI first read-only slice** under the operative §14 criteria, readiness established in the approved training project (§16.7) |
+| RFI first slice | **implemented · published · live-verified 2026-07-28** — three read-only MCP operations at component revision `5dca229`; **no RFI write is supported or authorised** |
+| Phase 4 overall | **not complete** — the Transmittals and RFI first slices only; Submittals, Sheets and Meetings are unimplemented |
+| Phase 4 MCP capability implemented | **Transmittals first slice** (5 read-only operations) and **RFI first slice** (3 read-only operations) |
 | Implementation authorised by this document | **None** — this document authorises nothing; it records state |
 
 The initial pass concluded `additional_authoritative_research_required`. The
@@ -245,7 +252,7 @@ another module. Verdicts are recorded in §16.
 
 | Module | Official API / module name | Version | Maturity | Module ownership | Read surface | Write surface | Authentication | Repository classification |
 |---|---|---|---|---|---|---|---|---|
-| **RFIs** | Autodesk Forma Build RFI API (S1) | v3 | General availability, announced 2025-07-23 (S1) | Forma Build | Verified present; includes a read-semantic POST search (S1, S9) | Verified present (S1, S9) | 3-legged or SSA evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
+| **RFIs** | Autodesk Forma Build RFI API (S1) | v3 | General availability, announced 2025-07-23 (S1) | Forma Build | Verified present; includes a read-semantic POST search (S1, S9) | Verified present (S1, S9) | 3-legged or SSA evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; **adopted second Phase 4A read-only capability**; **Gates 5, 6 and 8 closed** for the first slice (§16.5–§16.7); **implemented · published · live-verified 2026-07-28** |
 | **Submittals** | Autodesk Forma Build Submittals API (S3) | v2 | General availability, read phase 2024-02-22, write phase 2024-08-05 (S3, S4) | Forma Build | Verified present and broad (S3, S4, S9) | Verified present, sharing the same base path (S4, S9) | 3-legged evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
 | **Transmittals** | Autodesk Forma Transmittals API (N1, S2) | v1 | General availability, announced 2025-12-10 (S2) | **Autodesk Forma Data Management** (S2) | **Normatively verified** — five read-only operations (N1, N3–N7) | **Normatively excluded** — the Field Guide lists creating, updating settings, adding recipients and exporting as unsupported (N1) | **Normatively verified** — `data:read`, user context optional, 2-legged **or** 3-legged (N3–N7). Module activation and entitlement **live-verified 2026-07-27** in the approved training project | verified GA capability; **Gates 2, 5, 6 and 8 closed** for this slice (§16.1–§16.4); **adopted first Phase 4A read-only capability**, owned by the **APS/Forma MCP**; **implemented · live-verified 2026-07-27** |
 | **Sheets** | Autodesk Forma Build Sheets API (S5) | v1 | General availability (S5, S6, S7) | Forma Build | **Genuine read surface verified present** — sheets, version sets, collections (S5, S6, S10) | Verified present, including asynchronous export creation (S5, S7, S10) | 2-legged **and** 3-legged evidenced (S5, S6) | verified GA capability with a genuine read surface; **later candidate**; **not implementation-ready** |
@@ -1127,7 +1134,7 @@ and proven across three phases.
 | 5 | Privacy and sanitisation planning | **passed** (§16.5) | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **passed** (§16.6) | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
-| 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
+| 8 | Harrismith scenario and data readiness | **closed for the first slice** (§16.7) | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
 | 10 | No monolithic Forma Build API assumption | pass | pass | **pass** | pass | pass |
 
@@ -1454,6 +1461,76 @@ no Gate-5-safe evidence artifact exists. **Gate 8 remains unresolved**,
 `mcp_implementation_status` remains `planned`, and `data_readiness` remains
 `not-assessed`.
 
+### 16.7 RFIs Gate 8 — closed for the first slice (2026-07-28)
+
+**Gate 8 is closed for the RFI first read-only slice** under the operative §14
+criteria, with readiness established in the **approved training project** against
+one **controlled synthetic Draft**, verified through the **published MCP
+contract**.
+
+**Criteria, each individually accounted for:**
+
+| §14 criterion | Status | Basis |
+|---|---|---|
+| Approved training project (§14 preamble) | **satisfied** | The approved training project was used; the binding is private |
+| Project entitlement / accessible | **satisfied** | Every governed RFI operation returned data rather than a permission error |
+| RFI module active | **satisfied** | `GET users/me` returned a caller context rather than a permission error |
+| RFI workflow configured | **satisfied** | A workflow type was returned and observed; it is recorded as observed, not assumed |
+| Caller permission to read RFIs | **satisfied** | All three governed read operations succeeded |
+| One synthetic RFI | **satisfied** | One controlled synthetic Draft exists and was returned |
+| Fixture discoverable | **satisfied** | Returned by `search_rfis` and matched on the controlled synthetic title |
+| Fixture retrievable by id | **satisfied** | Returned by `get_rfi`, with search-to-detail identity equality proven byte-for-byte |
+| No API write required to prepare the fixture | **satisfied** | The fixture was authored through the product interface; every verification call was a read |
+
+**Verified against a fresh published component.** The run used a **server started
+fresh for the verification**, loaded from published APS/Forma MCP revision
+`5dca2297e610d5125ea123cd4203de63e96e943b`, and exercised over the **MCP
+JSON-RPC protocol surface** (`initialize` → `notifications/initialized` →
+`tools/list` → `tools/call`) rather than by in-process import. The registry
+reported **38 tools** with all three RFI tools present.
+
+**The three governed operations**, and only these three:
+
+1. `get_rfi_user_context` — `GET users/me`; exactly the eight approved caller keys,
+   with **no caller identity** returned;
+2. `search_rfis` — **`POST search:rfis`, read-semantic under
+   [ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md)**;
+   every item carried exactly the four approved keys and the client allowlist held;
+3. `get_rfi` — `GET rfis/:rfiId`; exactly the 27 approved keys.
+
+**Proofs.** Search-to-detail identity equality **true** (byte-for-byte, on
+independently retained operands); controlled-fixture title, question and status all
+matched; `custom_identifier` absent for the unnumbered Draft, preserved as absence
+rather than a placeholder; `answered` and `closed` returned **null**, and the
+client preserves that upstream absence rather than rewriting it to `false`.
+
+**Privacy negative space.** Embedded response narrative **not exposed**;
+participant identity **not exposed**; sensitive logging **not observed** — logs
+carried only operation, status and bounded counts.
+
+**No writes.** RFI write request count **0**, and the controlled Draft is
+**unchanged**. The client defines no write verb, so no write route exists to call.
+
+**Evidence.** Raw identifiers remain in the git-ignored private evidence area,
+bound as `PROJECT_1` and `RFI_1` with provenance classes; the Gate-5-safe public
+artifact is
+[`rfis-first-slice-read-verification.result.json`](../../examples/harrismith-fire-station/expected-results/rfis-first-slice-read-verification.result.json),
+outcome **`rfi_read_slice_verified`**, scoped to the controlled fixture.
+
+**Ordering, recorded as a contrast rather than a defect.** §16.4 had to record an
+ordering defect: Transmittals exposes no permission-discovery endpoint, so module
+activation and caller permission were only knowable once a client existed. RFIs
+closed Gate 8 **without** that tension — the two criteria provable only by a live
+read were proven here **through the published, reviewed MCP contract**, after
+implementation and publication rather than around them.
+
+**What this closure does not do.** It does **not** authorise any RFI write
+operation; does **not** claim readiness for any other Autodesk project; does
+**not** claim behaviour for any other RFI workflow type; does **not** assert that
+the Harrismith Fire Station example project contains this or any RFI fixture;
+does **not** close any gate for Submittals, Sheets or Meetings; and does **not**
+make Phase 4A complete.
+
 ## 17. Adopted first capability
 
 **Architecture status: adopted — Transmittals read-only slice, owned by the
@@ -1496,15 +1573,17 @@ are now **adopted as the second governed Phase 4A capability** in the schema-v2
 workflow contract: `api_family: Autodesk Forma Build RFI API`, `api_version: v3`,
 `api_maturity: ga`.
 
-**ADOPTION IS NOT IMPLEMENTATION.** The capability is governed by the workflow
-contract; its implementation preconditions are unchanged. `mcp_implementation_status`
-is **`planned`** — no RFI MCP tool exists. `data_readiness` is **`not-assessed`** —
-no readiness determination has yet been made under the approved evidence process,
-and no controlled RFI training fixture has been established. **No RFI gate in §16
-is closed** (Gate 5, Gate 6 and Gate 8 all remain open), and **no RFI live
-verification has occurred**. The POST-as-read policy decision recorded in §5 is
-**taken (reference-repo ADR-0007)**; a correspondingly stricter free-text evidence
-policy (§13) remains outstanding. Submittals and Sheets remain later candidates;
+**ADOPTED, IMPLEMENTED AND LIVE-VERIFIED.** `mcp_implementation_status` is
+**`confirmed`** — the three governed read-only tools exist in the APS/Forma MCP at
+published revision `5dca2297e610d5125ea123cd4203de63e96e943b`. `data_readiness` is
+**`ready`**, scoped to the **approved training project** and this read-only slice
+against one controlled synthetic Draft; it asserts nothing about other projects,
+other RFI workflow types, or any write capability. **Gates 5, 6 and 8 are closed
+for this first slice** (§16.5, §16.6, §16.7), and **RFI live verification occurred
+on 2026-07-28** through a freshly launched server over the MCP protocol surface.
+The POST-as-read policy decision recorded in §5 is **taken (reference-repo
+ADR-0007)**; a correspondingly stricter free-text evidence policy (§13) remains
+outstanding. Submittals and Sheets remain later candidates;
 Meetings remains deferred (§9).
 
 ## 18. Missing evidence and open questions

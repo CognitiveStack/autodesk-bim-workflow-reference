@@ -46,6 +46,15 @@ keeps implementation, correction, hardening and documentation **separate**:
 Registration and the doctor result were verified locally at `295c253`; `6ec6411`
 is a documentation-only commit on top of it and is the revision pinned above.
 
+**Delta since this inventory date (2026-07-28).** The component has since published
+the **RFI first read-only slice** (§6.2) at
+`5dca2297e610d5125ea123cd4203de63e96e943b`, taking the component to **38 MCP
+tools** — the three RFI reads added to the 35 above — with the offline doctor
+reporting **`TOOL_COUNT=38`, `RESULT=PASS`** at that revision. The dated ledger
+rows above are deliberately **not** rewritten: they record the 2026-07-27
+inventory verification, and no full component re-inventory has been performed
+since. Only the RFI capability rows in this document reflect the newer revision.
+
 The five read-only Model
 Coordination model-set reads were added by component commit
 `c92ee079408500b74f7c2f7efd8b1ab0b8047fe3` (*feat: add read-only Model
@@ -119,8 +128,9 @@ request helpers remain prohibited in every case (§3.1).
 | Forma Site Design (Beta `v1alpha`) | `create_forma_proposal` | guarded write | experimental (sole write; requires explicit confirmation and an explicit source proposal; **not part of the Phase 2 read-only workflow**) |
 | Local-only (no Autodesk call) | `prepare_native_floor_stack_preview` | local | confirmed |
 
-Issues, Reviews, and Relationships reads are confirmed; RFI and Assets
-capabilities remain planned (§6). Direct Review-to-Issue relationship support is
+Issues, Reviews, and Relationships reads are confirmed; the **RFI** first
+read-only slice is confirmed and live-verified (§6.2), and Assets remains planned
+(§6). Direct Review-to-Issue relationship support is
 **not** established; the relationship read (`list_issue_relationships`) supports
 **shared-document comparison** only.
 
@@ -283,7 +293,7 @@ of the component boundary.
 
 | Stage | Capability | Status |
 |---|---|---|
-| construction_information | RFI — adopted second Phase 4A capability | planned |
+| construction_information | RFI — adopted second Phase 4A capability; first read-only slice implemented and live-verified 2026-07-28 (§6.2) | confirmed |
 | asset_handover | Assets | planned |
 
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
@@ -352,17 +362,23 @@ The first slice is fixed at the five documented read operations: list
 transmittals; get one transmittal; list recipients; list folders; list included
 document versions.
 
-### 6.2 RFI first-slice contract (adopted, planned)
+### 6.2 RFI first-slice contract (adopted, implemented, live-verified)
 
 **Approved by
 [reference-repo ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)
 (2026-07-28), with the `search_rfis` contract refined 2026-07-28 by
 [ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)
 from runtime verification.** The contract below is the **current effective**
-contract for the **RFI v1 first slice**; **no RFI code exists**, and
-`mcp_implementation_status` remains `planned` with `data_readiness`
-`not-assessed`. ADR-0011 is not amended and remains authoritative for every
-decision ADR-0012 does not refine.
+contract for the **RFI v1 first slice**. The slice is **implemented, published and
+live-verified (2026-07-28)** at APS/Forma MCP revision
+`5dca2297e610d5125ea123cd4203de63e96e943b`, exercised through a **freshly launched
+server over the MCP protocol surface** against a controlled synthetic fixture in
+the **approved training project**;
+[`PHASE_4_CAPABILITY_GAP.md`](PHASE_4_CAPABILITY_GAP.md) §16.7 records the Gate 8
+closure. `mcp_implementation_status` is `confirmed` and `data_readiness` is
+`ready`, both scoped to that project and that read-only slice — no other project,
+no other RFI workflow type, and **no write capability**. ADR-0011 is not amended
+and remains authoritative for every decision ADR-0012 does not refine.
 
 **APS/Forma MCP owns RFI**, in a **dedicated `rfis_client`**. RFI semantics belong
 in no existing client and in no generic request infrastructure.
@@ -462,7 +478,8 @@ names, element IDs, model-set IDs, URNs, GUIDs, or timestamps are recorded here.
 | Autodesk authentication (APS) | — | Owns | Never implements |
 | Forma Data Management (CDE) | — | Owns | Documents, invokes, validates |
 | Model Derivative / properties | — | Owns | Documents, invokes, validates |
-| Issues, Reviews & Relationships (RFI/assets planned) | — | Owns | Documents, invokes, validates |
+| Issues, Reviews & Relationships (assets planned) | — | Owns | Documents, invokes, validates |
+| RFI first-slice reads (adopted, implemented — §6.2) | — | Owns | Documents, invokes, validates |
 | Transmittals reads (adopted, planned — §6.1) | — | Owns | Documents, invokes, validates |
 | Model Coordination model-set/version reads | — | Owns | Documents, invokes, validates |
 | Model Coordination clash engine (native) | — | Consumes / surfaces | Documents only |

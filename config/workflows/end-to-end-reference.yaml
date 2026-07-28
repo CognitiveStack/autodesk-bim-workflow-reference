@@ -259,24 +259,24 @@ stages:
 
       - id: rfis
         primary_system: Forma Build
-        # ADOPTED as the second governed Phase 4A capability. ADOPTION IS NOT
-        # IMPLEMENTATION.
+        # ADOPTED as the second governed Phase 4A capability, and now IMPLEMENTED,
+        # PUBLISHED and LIVE-VERIFIED (2026-07-28).
         # API IDENTITY: asserted because it is verified from official Autodesk/APS
         # documentation (see PHASE_4_CAPABILITY_GAP.md 4 and 5) — Autodesk Forma
         # Build RFI API, contract/request-route version v3 under
         # /construction/rfis/v3/projects/:projectId, general availability announced
         # 2025-07-23. api_version is REQUIRED here because api_maturity: ga is a
         # concrete lifecycle assertion (ADR-0009).
-        # IMPLEMENTATION: no RFI MCP tool currently exists in the APS/Forma MCP, so
-        # mcp_implementation_status is `planned`. Shared authentication and HTTP
-        # infrastructure does not count as RFI implementation.
-        # DATA READINESS: `not-assessed` — readiness has not yet been established
-        # under the repository's approved evidence process, and no controlled RFI
-        # training fixture has yet been established. Readiness is never inferred
-        # from module availability, API documentation or authentication capability.
-        # GATES / VERIFICATION: no RFI gate is closed, and no RFI live verification
-        # has occurred.
-        # FUTURE FIRST READ-ONLY SLICE — ROADMAP ONLY, NOT IMPLEMENTED:
+        # IMPLEMENTATION: the governed first read-only slice exists in the APS/Forma
+        # MCP at published revision 5dca2297e610d5125ea123cd4203de63e96e943b — three
+        # read-only tools, contract-tested offline and live-verified through a
+        # freshly launched MCP server over the MCP protocol surface. Shared
+        # authentication and HTTP infrastructure still does not count as RFI
+        # implementation; the three RFI tools do.
+        # GATES / VERIFICATION: Gates 5, 6 and 8 are closed for this first slice
+        # (PHASE_4_CAPABILITY_GAP.md 16.5, 16.6 and 16.7). RFI writes remain
+        # unsupported and unauthorised.
+        # ADOPTED FIRST READ-ONLY SLICE — IMPLEMENTED AND LIVE-VERIFIED:
         # 1. GET users/me; 2. POST search:rfis (approved as read-semantic at
         # endpoint level by ADR-0007); 3. GET rfis/:rfiId. Comments, attachments,
         # responses and all writes are excluded from that initial slice.
@@ -284,8 +284,16 @@ stages:
         api_version: v3
         api_maturity: ga
         mcp_component: aps-forma-mcp
-        mcp_implementation_status: planned
-        data_readiness: not-assessed
+        mcp_implementation_status: confirmed
+        # SCOPE OF data_readiness BELOW: readiness was established in the APPROVED
+        # TRAINING PROJECT for the RFI first read-only slice, against ONE controlled
+        # synthetic Draft, through the published MCP contract — NOT in the Harrismith
+        # example project, which is not asserted to hold an RFI fixture. It asserts
+        # nothing about other Autodesk projects, other RFI workflow types, any write
+        # capability, or production readiness. data_readiness_reason names that
+        # scope, per the header definition.
+        data_readiness: ready
+        data_readiness_reason: rfi-first-slice-ready-in-approved-training-project
 
   - id: asset_handover
     platform: Autodesk Forma

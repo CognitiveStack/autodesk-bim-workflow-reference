@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "phase": "4A",
+    "slice": "rfis-first-slice-read-verification",
+    "execution_date": "2026-07-28",
+    "read_only": true,
+    "status": "complete"
+  },
+  "scenario": {
+    "scenario_key": "harrismith-fire-station",
+    "capture_context": "approved_training_project",
+    "scenario_project_contains_fixture": false
+  },
+  "capability": {
+    "modules": [
+      "rfis"
+    ],
+    "read_only": true,
+    "operations_verified": [
+      "get_rfi_user_context",
+      "search_rfis",
+      "get_rfi"
+    ]
+  },
+  "component_provenance": {
+    "aps_forma_mcp": {
+      "repository_slug": "CognitiveStack/autodesk-aps-forma-mcp",
+      "inspected_revision": "5dca2297e610d5125ea123cd4203de63e96e943b",
+      "runtime_worktree_state": "clean",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": [
+        "get_rfi_user_context",
+        "search_rfis",
+        "get_rfi"
+      ],
+      "fresh_process": true,
+      "mcp_protocol_verified": true,
+      "registered_tool_count": 38,
+      "capability_tools_registered": 3
+    }
+  },
+  "rfi_observation": {
+    "available": true,
+    "project_alias": "PROJECT_1",
+    "record_alias": "RFI_1",
+    "controlled_fixture_matched": true,
+    "status": "draft",
+    "workflow_type": "US",
+    "custom_identifier_present": false,
+    "question_present": true,
+    "official_response_present": false,
+    "official_response_status_present": false,
+    "suggested_answer_present": false,
+    "previous_status_present": false,
+    "priority": "Normal",
+    "cost_impact": null,
+    "schedule_impact": null,
+    "has_due_date": false,
+    "answered_at_present": false,
+    "closed_at_present": false,
+    "answered": null,
+    "closed": null,
+    "response_count": 0,
+    "response_state_count": 0,
+    "response_status_count": 0,
+    "comment_count": 0,
+    "assignee_count": 1,
+    "reviewer_count": 0,
+    "watcher_count": 0,
+    "narrative_content_published": false
+  },
+  "caller_context_observation": {
+    "available": true,
+    "key_count": 8,
+    "project_role": "project_admin",
+    "workflow_type": "US",
+    "can_create_rfi": true,
+    "permitted_status_count": 0,
+    "required_attribute_name_count": 0,
+    "permitted_attribute_name_count": 0,
+    "allowed_value_count": 0,
+    "max_assignees": null,
+    "identity_published": false,
+    "note": "Observed normalisation result for this approved project, this caller and this API response. can_create_rfi was true while the permission-derived collections were empty and max_assignees was null. This is an observation for this live context only. It does not assert that the API lacks permitted statuses generally, that the documentation is wrong, that the workflow has no permitted statuses, or that the caller lacks permissions."
+  },
+  "contract_observation": {
+    "search_item_key_count": 4,
+    "search_allowlist_enforced": true,
+    "detail_key_count": 27,
+    "detail_contract_exact": true,
+    "pagination_limit": 10,
+    "pagination_offset": 0,
+    "pagination_total_results": 1,
+    "projection_used": true,
+    "read_semantic_post": true,
+    "search_route_fix_live_proven": true,
+    "write_request_count": 0,
+    "fixture_unchanged": true,
+    "sensitive_logging_observed": false,
+    "private_provenance_sufficient": true
+  },
+  "surface_claims": [
+    {
+      "surface": "rfis",
+      "claim": "caller_context_boundary",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "The governed user-context tool returned exactly the eight approved keys. No caller identity was returned, and permitted attribute values reduced to a count."
+    },
+    {
+      "surface": "rfis",
+      "claim": "search_allowlist_enforced",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "Every returned search item carried exactly the four approved caller keys. The upstream field-selection request is a bounded selection request and not an enforcement boundary (ADR-0012); the client allowlist is the authoritative caller boundary."
+    },
+    {
+      "surface": "rfis",
+      "claim": "detail_contract_exact",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "The governed detail tool returned exactly the 27 approved keys."
+    },
+    {
+      "surface": "rfis",
+      "claim": "response_narrative_excluded",
+      "status": "proven",
+      "basis": "absence_verified_in_returned_projection",
+      "note": "No response text, author, on-behalf actor, response identifier or raw response record appeared in caller output. Only structural response counts are exposed."
+    },
+    {
+      "surface": "rfis",
+      "claim": "participant_identity_excluded",
+      "status": "proven",
+      "basis": "absence_verified_in_returned_projection",
+      "note": "No participant identifier, name or email appeared in caller output. Participants reduce to counts."
+    },
+    {
+      "surface": "rfis",
+      "claim": "write_surface_exercised",
+      "status": "not_proven",
+      "basis": "not_established",
+      "note": "No RFI write operation was attempted, authorised or verified. The adopted slice is read-only and this artifact makes no write claim."
+    }
+  ],
+  "proofs": [
+    {
+      "code": "P1_SEARCH_DETAIL_IDENTITY_EQUAL",
+      "statement": "The RFI identity returned by the search operation is the same exact identity returned by the detail operation.",
+      "left_alias": "RFI_1",
+      "left_surface": "rfis_search",
+      "right_alias": "RFI_1",
+      "right_surface": "rfis_detail",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": true,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "Both operands were independently retained in the private capture during the same live session, so this equality can be independently re-checked there."
+    },
+    {
+      "code": "P2_CONTROLLED_FIXTURE_CONTENT_MATCHED",
+      "statement": "The retrieved record matched the controlled synthetic fixture on title, question and status.",
+      "left_alias": "RFI_1",
+      "left_surface": "rfis_detail",
+      "right_alias": "RFI_1",
+      "right_surface": "controlled_fixture",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": false,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "The compared operands are controlled synthetic narrative and are deliberately not published in either the public or the private artifact. Only the match outcome is recorded."
+    }
+  ],
+  "evidence_integrity": {
+    "freeze_policy": "VERIFIED_SURVIVING_VALUE",
+    "strict_originating_result_preflight_passed": true,
+    "recovery_reads_performed": false,
+    "note": "RFI_1 was retained directly from the originating search result, and the detail operand was retained alongside it within the same live session. Provenance classes describe evidence provenance only, never Autodesk resource semantics, and permit no reconstruction, inference or derivation of an identifier."
+  },
+  "aliases": [
+    {
+      "alias": "PROJECT_1",
+      "domain": "project",
+      "provenance_class": "VALIDATED_RETAINED_INVOCATION",
+      "note": "The project identity was already bound privately by an earlier controlled run and was reused as the parameter of every successful RFI operation here."
+    },
+    {
+      "alias": "RFI_1",
+      "domain": "rfi",
+      "provenance_class": "ORIGINATING_RESULT"
+    }
+  ],
+  "outcome": "rfi_read_slice_verified",
+  "outcome_scope": "controlled_fixture",
+  "governance_checks": [
+    {
+      "code": "NO_RAW_IDENTIFIER_PUBLISHED",
+      "outcome": "pass",
+      "statement": "No raw project, RFI, user or customIdentifier value appears; identity is carried by aliases and presence booleans only."
+    },
+    {
+      "code": "NO_NARRATIVE_PUBLISHED",
+      "outcome": "pass",
+      "statement": "No title, question, official response, suggested answer or response text appears; narrative is represented by presence booleans."
+    },
+    {
+      "code": "NO_PARTICIPANT_IDENTITY",
+      "outcome": "pass",
+      "statement": "Participants appear only as counts."
+    },
+    {
+      "code": "NO_PERSON_LINKED_TIMESTAMP",
+      "outcome": "pass",
+      "statement": "Person-linked workflow timestamps are reduced to booleans, and createdAt and updatedAt values are omitted, per ADR-0010."
+    },
+    {
+      "code": "NULL_PRESERVED_NOT_NORMALISED",
+      "outcome": "pass",
+      "statement": "answered and closed are published as null because the record supplied neither flag. The client preserves upstream absence and does not rewrite it to false."
+    },
+    {
+      "code": "PROJECTION_NOT_ENFORCEMENT",
+      "outcome": "pass",
+      "statement": "The upstream field-selection request is recorded as a bounded selection request, not as proof of response shaping. The client allowlist is recorded as the authoritative caller boundary (ADR-0012)."
+    },
+    {
+      "code": "READ_SEMANTIC_POST_DECLARED",
+      "outcome": "pass",
+      "statement": "The search operation is a POST classified read by observable state semantics under ADR-0007, and is declared as such rather than presented as a GET."
+    },
+    {
+      "code": "NO_WRITE_CLAIM",
+      "outcome": "pass",
+      "statement": "No write support, write verification or write capability is claimed, and no write request was issued."
+    },
+    {
+      "code": "VERDICT_SCOPED_TO_FIXTURE",
+      "outcome": "pass",
+      "statement": "The verdict is scoped to one controlled fixture in the approved training project. It makes no tenant-wide, project-wide, workflow-type-wide, production-readiness or phase-completion claim."
+    },
+    {
+      "code": "SCENARIO_NOT_CAPTURE_CONTEXT",
+      "outcome": "pass",
+      "statement": "Teaching-scenario placement is recorded separately from capture provenance; the Harrismith scenario project is not asserted to contain the RFI fixture."
+    },
+    {
+      "code": "FRESH_PUBLISHED_COMPONENT_VERIFIED",
+      "outcome": "pass",
+      "statement": "Verification ran against a server started fresh for the run, loaded from the published component revision, exercised over the MCP protocol surface with no direct in-process import fallback."
+    },
+    {
+      "code": "TWO_ARTIFACT_WORKFLOW",
+      "outcome": "pass",
+      "statement": "This artifact was generated separately from the private capture; the private file was not sanitised in place."
+    }
+  ],
+  "sanitisation": {
+    "convention_version": 1,
+    "profile_version": 1,
+    "tokens_used": [
+      "PROJECT_1",
+      "RFI_1"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "PUBLIC_ARTIFACT_NOT_SELF_REDERIVABLE",
+      "stage": "proof",
+      "message": "This alias-only artifact records historically established proof outcomes. Raw operands are deliberately excluded, so no proof is recomputable from the public artifact. That is intentional and is not an evidence defect."
+    },
+    {
+      "code": "CALLER_CONTEXT_COLLECTIONS_EMPTY",
+      "stage": "rfis",
+      "message": "can_create_rfi was true while the permission-derived collections were empty and max_assignees was null. This reproduced across two live runs and is recorded as an observed normalisation result for this project, caller and API response. No general claim about the API, its documentation, the workflow or the caller's permissions is made."
+    },
+    {
+      "code": "SINGLE_WORKFLOW_TYPE_OBSERVED",
+      "stage": "rfis",
+      "message": "Only one RFI workflow type was present in the verified context. No behaviour is asserted for any other workflow type."
+    }
+  ]
+}

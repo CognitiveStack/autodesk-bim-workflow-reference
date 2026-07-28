@@ -11,8 +11,6 @@
     "scenario",
     "capability",
     "component_provenance",
-    "transmittal_observation",
-    "item_observation",
     "surface_claims",
     "proofs",
     "evidence_integrity",
@@ -24,30 +22,59 @@
     "warnings"
   ],
   "properties": {
-    "schema_version": { "type": "integer", "const": 1 },
-
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["phase", "slice", "execution_date", "read_only", "status"],
+      "required": [
+        "phase",
+        "slice",
+        "execution_date",
+        "read_only",
+        "status"
+      ],
       "properties": {
-        "phase": { "type": "string", "const": "4A" },
+        "phase": {
+          "type": "string",
+          "const": "4A"
+        },
         "slice": {
           "description": "The governed Phase 4A slice this artifact evidences. A deliberate extension point: additional Phase 4A modules are admitted by adding an enum value, not by leaving the field an open string.",
           "type": "string",
-          "enum": ["transmittals-exact-version-snapshot"]
+          "enum": [
+            "transmittals-exact-version-snapshot",
+            "rfis-first-slice-read-verification"
+          ]
         },
-        "execution_date": { "$ref": "#/definitions/date_only_required" },
-        "read_only": { "type": "boolean", "const": true },
-        "status": { "type": "string", "enum": ["complete", "partial", "failed"] }
+        "execution_date": {
+          "$ref": "#/definitions/date_only_required"
+        },
+        "read_only": {
+          "type": "boolean",
+          "const": true
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "partial",
+            "failed"
+          ]
+        }
       }
     },
-
     "scenario": {
       "type": "object",
       "description": "Teaching-scenario identity kept SEPARATE from capture provenance. The scenario namespace an artifact is published under is NOT an assertion that the scenario's Autodesk project holds the fixture. No real Autodesk project title, raw project id, or alias-to-real-project binding is ever recorded here.",
       "additionalProperties": false,
-      "required": ["scenario_key", "capture_context", "scenario_project_contains_fixture"],
+      "required": [
+        "scenario_key",
+        "capture_context",
+        "scenario_project_contains_fixture"
+      ],
       "properties": {
         "scenario_key": {
           "description": "Slug of the learning/reference scenario this artifact belongs to, matching the project_key convention in config/projects/ (for example harrismith-bim-learning-project). A scenario slug, never an Autodesk project identifier or title.",
@@ -57,7 +84,11 @@
         "capture_context": {
           "description": "Where the controlled fixture was actually captured. approved_training_project: an explicitly approved training project, distinct from the scenario's own project. scenario_project: the scenario's own project held the fixture. unspecified: not recorded.",
           "type": "string",
-          "enum": ["approved_training_project", "scenario_project", "unspecified"]
+          "enum": [
+            "approved_training_project",
+            "scenario_project",
+            "unspecified"
+          ]
         },
         "scenario_project_contains_fixture": {
           "description": "Whether the scenario's own Autodesk project is asserted to contain the fixture. MUST be false when capture_context is approved_training_project, so that publishing under a scenario namespace never implies scenario-project data readiness.",
@@ -65,81 +96,164 @@
         }
       }
     },
-
     "capability": {
       "type": "object",
       "description": "The Autodesk capability being evidenced. Kept generic so future Phase 4A modules reuse this envelope rather than forking it.",
       "additionalProperties": false,
-      "required": ["modules", "read_only", "operations_verified"],
+      "required": [
+        "modules",
+        "read_only",
+        "operations_verified"
+      ],
       "properties": {
         "modules": {
           "description": "Autodesk modules whose reads contributed evidence. A deliberate extension point for later Phase 4A modules.",
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "enum": ["transmittals", "data_management"] }
+          "items": {
+            "type": "string",
+            "enum": [
+              "transmittals",
+              "data_management",
+              "rfis"
+            ]
+          }
         },
-        "read_only": { "type": "boolean", "const": true },
+        "read_only": {
+          "type": "boolean",
+          "const": true
+        },
         "operations_verified": {
           "description": "MCP tool identifiers invoked. These are code identifiers read from component source and are NOT Autodesk data (see COMPONENT_BOUNDARIES.md). No endpoint URL, request header, or payload is recorded.",
           "type": "array",
-          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
         }
       }
     },
-
     "component_provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["aps_forma_mcp"],
+      "required": [
+        "aps_forma_mcp"
+      ],
       "properties": {
-        "aps_forma_mcp": { "$ref": "#/definitions/provenance" }
+        "aps_forma_mcp": {
+          "$ref": "#/definitions/provenance"
+        }
       }
     },
-
     "transmittal_observation": {
       "type": "object",
       "description": "Transmittals-surface evidence. The issued document version is the terminal identity on this surface: no document-lineage node sits between the transmittal and its version. Recipient evidence is structural counts only.",
       "additionalProperties": false,
-      "required": ["available", "transmittal_alias", "issued_version_alias", "exact_version_returned"],
+      "required": [
+        "available",
+        "transmittal_alias",
+        "issued_version_alias",
+        "exact_version_returned"
+      ],
       "properties": {
-        "available": { "type": "boolean" },
-        "transmittal_alias": { "$ref": "#/definitions/alias" },
-        "status": { "type": ["string", "null"], "enum": ["SENDING", "COMPLETED", "FAILED", null] },
-        "display_recipients": { "type": ["string", "null"], "enum": ["ALL", "LIMITED", null] },
-        "folder_alias": { "$ref": "#/definitions/alias" },
+        "available": {
+          "type": "boolean"
+        },
+        "transmittal_alias": {
+          "$ref": "#/definitions/alias"
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "SENDING",
+            "COMPLETED",
+            "FAILED",
+            null
+          ]
+        },
+        "display_recipients": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "ALL",
+            "LIMITED",
+            null
+          ]
+        },
+        "folder_alias": {
+          "$ref": "#/definitions/alias"
+        },
         "issued_version_alias": {
           "description": "Alias of the EXACT immutable document version as issued by the transmittal (for example VERSION_1). Never a raw URN, and never a numeric Autodesk version.",
           "$ref": "#/definitions/alias"
         },
-        "exact_version_returned": { "type": "boolean" },
+        "exact_version_returned": {
+          "type": "boolean"
+        },
         "recipient_summary": {
           "type": "object",
           "description": "Structural recipient counts only. No name, email, user or company identity, and no received/viewed/downloaded telemetry.",
           "additionalProperties": false,
           "properties": {
-            "project_member_recipient_count": { "type": "integer", "minimum": 0 },
-            "external_member_count": { "type": "integer", "minimum": 0 },
-            "total_recipient_count": { "type": "integer", "minimum": 0 },
-            "has_external_members": { "type": "boolean" },
+            "project_member_recipient_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "external_member_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total_recipient_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "has_external_members": {
+              "type": "boolean"
+            },
             "approved_test_recipients": {
               "description": "Whether every recipient was an approved test or synthetic recipient for the controlled fixture. Asserting an approved test recipient does NOT assert that the underlying account is a synthetic identity.",
               "type": "boolean"
             }
           }
         },
-        "folder_count": { "type": ["integer", "null"], "minimum": 0 },
-        "document_version_count": { "type": ["integer", "null"], "minimum": 0 }
+        "folder_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "document_version_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
       }
     },
-
     "item_observation": {
       "type": "object",
       "description": "Data Management-surface evidence. The item resource IS the stable item/lineage identity for this surface, aliased as ITEM_n, and may be recorded as proven only when it was returned directly as a field by the first-party Data Management resource. No raw numeric Autodesk version property is recorded anywhere in this object.",
       "additionalProperties": false,
-      "required": ["available", "item_alias", "item_alias_directly_returned", "version_set"],
+      "required": [
+        "available",
+        "item_alias",
+        "item_alias_directly_returned",
+        "version_set"
+      ],
       "properties": {
-        "available": { "type": "boolean" },
-        "item_alias": { "$ref": "#/definitions/alias" },
+        "available": {
+          "type": "boolean"
+        },
+        "item_alias": {
+          "$ref": "#/definitions/alias"
+        },
         "item_alias_directly_returned": {
           "description": "Whether the item identity was returned directly as a field by the Data Management resource. False forbids recording item lineage as proven.",
           "type": "boolean"
@@ -148,15 +262,28 @@
           "type": "object",
           "description": "The returned version set for the item lineage, expressed as aliases plus safe structural completeness metadata. Autodesk's numeric version property is deliberately NOT representable here.",
           "additionalProperties": false,
-          "required": ["version_aliases", "count", "has_more", "complete"],
+          "required": [
+            "version_aliases",
+            "count",
+            "has_more",
+            "complete"
+          ],
           "properties": {
             "version_aliases": {
               "type": "array",
               "minItems": 1,
-              "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              }
             },
-            "count": { "type": "integer", "minimum": 0 },
-            "has_more": { "type": "boolean" },
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "has_more": {
+              "type": "boolean"
+            },
             "complete": {
               "description": "Whether the returned set is established as complete. Requires has_more false: a count alone never establishes completeness.",
               "type": "boolean"
@@ -169,11 +296,13 @@
         },
         "current_tip_directly_returned": {
           "description": "Whether the tip relation was returned directly by the Data Management resource, rather than inferred or ordered client-side.",
-          "type": ["boolean", "null"]
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       }
     },
-
     "surface_claims": {
       "type": "array",
       "description": "Lineage and version claims recorded PER SURFACE. This array exists so the ADR-0006 asymmetry survives sanitisation: a single blended 'lineage_proven' flag is deliberately not representable anywhere in this schema.",
@@ -181,11 +310,21 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["surface", "claim", "status", "basis"],
+        "required": [
+          "surface",
+          "claim",
+          "status",
+          "basis"
+        ],
         "properties": {
           "surface": {
             "type": "string",
-            "enum": ["transmittals", "data_management", "cross_surface"]
+            "enum": [
+              "transmittals",
+              "data_management",
+              "cross_surface",
+              "rfis"
+            ]
           },
           "claim": {
             "description": "stable_lineage: a stable source-document/item lineage identity on that surface. item_lineage_identity: the Data Management item resource as the lineage-bearing identity. exact_version_returned: an exact immutable version identity was returned. exact_version_relation: two returned version identities stand in a proven relation across surfaces. current_tip_relation: a lineage's current tip version.",
@@ -195,10 +334,23 @@
               "item_lineage_identity",
               "exact_version_returned",
               "exact_version_relation",
-              "current_tip_relation"
+              "current_tip_relation",
+              "caller_context_boundary",
+              "search_allowlist_enforced",
+              "detail_contract_exact",
+              "response_narrative_excluded",
+              "participant_identity_excluded",
+              "write_surface_exercised"
             ]
           },
-          "status": { "type": "string", "enum": ["proven", "not_proven", "not_applicable"] },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proven",
+              "not_proven",
+              "not_applicable"
+            ]
+          },
           "basis": {
             "description": "How the claim was established. directly_returned_field: the identity arrived as a returned field. byte_for_byte_exact_equality: established by exact string comparison. structural_completeness_metadata: established from permitted counts. not_established: no basis; only valid with status not_proven or not_applicable. Client-side URN splitting, suffix removal, reconstruction, canonicalisation and pattern inference are NOT bases and have no representation here.",
             "type": "string",
@@ -206,14 +358,16 @@
               "directly_returned_field",
               "byte_for_byte_exact_equality",
               "structural_completeness_metadata",
-              "not_established"
+              "not_established",
+              "absence_verified_in_returned_projection"
             ]
           },
-          "note": { "type": "string" }
+          "note": {
+            "type": "string"
+          }
         }
       }
     },
-
     "proofs": {
       "type": "array",
       "description": "Explicit comparisons between sanitised aliases. WHAT was compared (left_alias/right_alias and their surfaces), HOW it was compared (comparison_method), the relation asserted (expected_relation) and WHAT the comparison returned (outcome) are kept as separate fields; outcome is never overloaded with the method. Raw operands are never recorded: alias operands are constrained to the alias token pattern, which no Autodesk URN can satisfy.",
@@ -233,44 +387,105 @@
           "reproducibility"
         ],
         "properties": {
-          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
-          "statement": { "type": "string" },
-          "left_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
-          "left_surface": { "type": "string", "enum": ["transmittals", "data_management"] },
-          "right_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
-          "right_surface": { "type": "string", "enum": ["transmittals", "data_management"] },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "left_alias": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "left_surface": {
+            "type": "string",
+            "enum": [
+              "transmittals",
+              "data_management",
+              "rfis_search",
+              "rfis_detail",
+              "controlled_fixture"
+            ]
+          },
+          "right_alias": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "right_surface": {
+            "type": "string",
+            "enum": [
+              "transmittals",
+              "data_management",
+              "rfis_search",
+              "rfis_detail",
+              "controlled_fixture"
+            ]
+          },
           "comparison_method": {
             "type": "string",
-            "enum": ["byte_for_byte_exact_string_comparison"]
+            "enum": [
+              "byte_for_byte_exact_string_comparison"
+            ]
           },
-          "expected_relation": { "type": "string", "enum": ["equal", "not_equal"] },
-          "outcome": { "type": "string", "enum": ["pass", "fail", "unproven", "not_applicable"] },
-          "reproducibility": { "$ref": "#/definitions/reproducibility" },
-          "note": { "type": "string" }
+          "expected_relation": {
+            "type": "string",
+            "enum": [
+              "equal",
+              "not_equal"
+            ]
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "unproven",
+              "not_applicable"
+            ]
+          },
+          "reproducibility": {
+            "$ref": "#/definitions/reproducibility"
+          },
+          "note": {
+            "type": "string"
+          }
         }
       }
     },
-
     "evidence_integrity": {
       "type": "object",
       "description": "How the retained aliases are trusted. This describes EVIDENCE PROVENANCE, not Autodesk resource type, and confers no identity on anything. No class permits reconstruction, inference, derivation, string transformation, or substituting one identifier for another.",
       "additionalProperties": false,
-      "required": ["freeze_policy"],
+      "required": [
+        "freeze_policy"
+      ],
       "properties": {
         "freeze_policy": {
           "description": "VERIFIED_SURVIVING_VALUE permits the explicitly classified surviving sources below, rather than requiring every value to remain in its first-ever originating response.",
           "type": "string",
-          "enum": ["VERIFIED_SURVIVING_VALUE"]
+          "enum": [
+            "VERIFIED_SURVIVING_VALUE"
+          ]
         },
-        "strict_originating_result_preflight_passed": { "type": ["boolean", "null"] },
+        "strict_originating_result_preflight_passed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "recovery_reads_performed": {
           "description": "Whether any additional read was made to recover an aged-out value. Recorded so a reader can tell a freeze from a re-fetch.",
-          "type": ["boolean", "null"]
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
-        "note": { "type": "string" }
+        "note": {
+          "type": "string"
+        }
       }
     },
-
     "aliases": {
       "type": "array",
       "description": "Registry of every alias used, with its identifier domain and evidence-provenance class. Domains are per-surface resource kinds and are never interchangeable; matching numeric suffixes prove nothing. No lineage domain exists: the Data Management item resource is already the lineage-bearing resource, so LINEAGE_n is neither approved nor necessary and is explicitly unusable as a token here.",
@@ -278,12 +493,18 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["alias", "domain", "provenance_class"],
+        "required": [
+          "alias",
+          "domain",
+          "provenance_class"
+        ],
         "properties": {
           "alias": {
             "type": "string",
             "pattern": "^[A-Z][A-Z0-9_]*$",
-            "not": { "pattern": "^LINEAGE_" }
+            "not": {
+              "pattern": "^LINEAGE_"
+            }
           },
           "domain": {
             "description": "The approved alias domains for this profile: project, transmittal, folder, item, version, user, recipient, external_member, company, role. DOCUMENT_n is deliberately absent from this profile — VERSION_n is the terminal identity on the Transmittals surface and ITEM_n carries lineage on the Data Management surface.",
@@ -298,7 +519,8 @@
               "recipient",
               "external_member",
               "company",
-              "role"
+              "role",
+              "rfi"
             ]
           },
           "provenance_class": {
@@ -310,11 +532,12 @@
               "EQUALITY_VERIFIED_LATER_RESULT"
             ]
           },
-          "note": { "type": "string" }
+          "note": {
+            "type": "string"
+          }
         }
       }
     },
-
     "outcome": {
       "type": "string",
       "description": "Small Phase 4A outcome vocabulary, scoped by outcome_scope. exact_version_snapshot_proven: for the controlled fixture, the completed transmittal preserved its issued exact version while the source Data Management lineage later carried a different current tip. exact_version_relation_not_proven: the cross-surface comparison was not established. transmittals_read_slice_verified: the read operations returned evidence but no cross-surface version proposition is claimed. phase_4_evidence_incomplete: a required observation is missing. This vocabulary describes ONE evidence claim about a tested fixture; it never describes an entry-gate status and never asserts that Phase 4A as a whole is complete.",
@@ -322,56 +545,92 @@
         "exact_version_snapshot_proven",
         "exact_version_relation_not_proven",
         "transmittals_read_slice_verified",
-        "phase_4_evidence_incomplete"
+        "phase_4_evidence_incomplete",
+        "rfi_read_slice_verified"
       ]
     },
-
     "outcome_scope": {
       "description": "The reach of the outcome. controlled_fixture is the only permitted value: every Phase 4A outcome is scoped to the tested fixture and observed API behaviour. Universal, tenant-wide, region-wide, gate-wide and phase-completion claims are deliberately unrepresentable.",
       "type": "string",
-      "enum": ["controlled_fixture"]
+      "enum": [
+        "controlled_fixture"
+      ]
     },
-
     "governance_checks": {
       "type": "array",
       "description": "Explicit governance checks. Outcomes are pass/fail/unproven/not_applicable (distinct from a proof's expected_relation).",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "outcome"],
+        "required": [
+          "code",
+          "outcome"
+        ],
         "properties": {
-          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
-          "statement": { "type": "string" },
-          "outcome": { "type": "string", "enum": ["pass", "fail", "unproven", "not_applicable"] },
-          "note": { "type": "string" }
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "unproven",
+              "not_applicable"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
         }
       }
     },
-
     "sanitisation": {
       "type": "object",
-      "description": "Sanitisation governance declared by the artifact. convention_version is the SANITISATION_CONVENTION.md document version; profile_version is the Transmittals public-evidence profile version, which ADR-0006 advanced to 2. The convention's policy guidance names this concept sanitisation_profile_version; it is nested here for consistency with convention_version.",
+      "description": "Sanitisation governance declared by the artifact. convention_version is the SANITISATION_CONVENTION.md document version; profile_version is the version of the capability's own public-evidence profile, and is pinned per slice below. The convention's policy guidance names this concept sanitisation_profile_version; it is nested here for consistency with convention_version.",
       "additionalProperties": false,
-      "required": ["convention_version", "profile_version", "tokens_used"],
+      "required": [
+        "convention_version",
+        "profile_version",
+        "tokens_used"
+      ],
       "properties": {
-        "convention_version": { "type": "integer", "minimum": 1 },
-        "profile_version": {
-          "description": "Transmittals public-evidence profile version. Fixed at 2: this schema describes the currently governed Phase 4A contract. No Phase 4A artifact was ever produced under profile v1, so permitting 1 would describe a contract that never existed.",
+        "convention_version": {
           "type": "integer",
-          "const": 2
+          "minimum": 1
         },
-        "tokens_used": { "type": "array", "items": { "$ref": "#/definitions/alias" } }
+        "profile_version": {
+          "description": "Version of the capability public-evidence profile this artifact was produced under. The exact permitted value is pinned per slice by the allOf branches, so no artifact may declare a profile version its capability never had.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "tokens_used": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/alias"
+          }
+        }
       }
     },
-
     "warnings": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "stage", "message"],
+        "required": [
+          "code",
+          "stage",
+          "message"
+        ],
         "properties": {
-          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
           "stage": {
             "type": "string",
             "enum": [
@@ -384,15 +643,310 @@
               "evidence_integrity",
               "governance",
               "provenance",
-              "sanitisation"
+              "sanitisation",
+              "rfis"
             ]
           },
-          "message": { "type": "string" }
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rfi_observation": {
+      "type": "object",
+      "description": "RFI-surface evidence for the governed read-only first slice. Alias-only. Narrative is represented by presence booleans, never by content: title, question, official response, suggested answer and every response body are excluded by ADR-0010, as is the customIdentifier VALUE — only its presence is published. Participants reduce to counts. Person-linked workflow timestamps reduce to booleans; createdAt and updatedAt values are omitted.",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "project_alias",
+        "record_alias",
+        "controlled_fixture_matched",
+        "status",
+        "custom_identifier_present",
+        "narrative_content_published"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "project_alias": {
+          "$ref": "#/definitions/alias"
+        },
+        "record_alias": {
+          "description": "Alias of the controlled RFI record (for example RFI_1). Never a raw Autodesk RFI identifier.",
+          "$ref": "#/definitions/alias"
+        },
+        "controlled_fixture_matched": {
+          "type": "boolean",
+          "description": "Whether the retrieved record matched the controlled synthetic fixture on title, question and status. The compared values are controlled synthetic narrative and are deliberately not published."
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "RFI workflow status enum as returned (for example draft). A workflow enum, not narrative and not identity."
+        },
+        "workflow_type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "RFI workflow type enum as returned (for example US). Observed for this project only; no claim is made about other projects or workflow types."
+        },
+        "custom_identifier_present": {
+          "type": "boolean",
+          "description": "Whether the record carried a human RFI number. The VALUE is excluded from public evidence by ADR-0010; only presence is published."
+        },
+        "question_present": {
+          "type": "boolean",
+          "description": "Whether question narrative was present. Content is never published."
+        },
+        "official_response_present": {
+          "type": "boolean",
+          "description": "Whether an official response was present. Content is never published."
+        },
+        "official_response_status_present": {
+          "type": "boolean",
+          "description": "Whether an official-response status was present."
+        },
+        "suggested_answer_present": {
+          "type": "boolean",
+          "description": "Whether a suggested answer was present. Content is never published."
+        },
+        "previous_status_present": {
+          "type": "boolean",
+          "description": "Whether a previous status was present."
+        },
+        "priority": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Priority enum as returned."
+        },
+        "cost_impact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schedule_impact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "has_due_date": {
+          "type": "boolean",
+          "description": "Due-date presence only; no date value is published."
+        },
+        "answered_at_present": {
+          "type": "boolean",
+          "description": "Person-linked workflow timestamp reduced to a boolean per ADR-0010. No value, interval or ordering."
+        },
+        "closed_at_present": {
+          "type": "boolean",
+          "description": "Person-linked workflow timestamp reduced to a boolean per ADR-0010. No value, interval or ordering."
+        },
+        "answered": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Upstream answered flag. null means the record supplied no flag; the client preserves upstream absence and never rewrites it to false."
+        },
+        "closed": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Upstream closed flag. null means the record supplied no flag; the client preserves upstream absence and never rewrites it to false."
+        },
+        "response_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "response_state_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "response_status_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "comment_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assignee_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reviewer_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "watcher_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "narrative_content_published": {
+          "type": "boolean",
+          "description": "Must be false. Records explicitly that no RFI narrative content was published in this artifact.",
+          "const": false
+        }
+      }
+    },
+    "caller_context_observation": {
+      "type": "object",
+      "description": "Caller RFI permission context as returned by the governed user-context tool. Structural only: no user id, name, email or workflow role identity, and permitted attribute VALUES (which are user identifiers) reduce to a count.",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "key_count",
+        "identity_published"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "key_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of keys in the governed caller-context contract."
+        },
+        "project_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "workflow_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "can_create_rfi": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "permitted_status_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "required_attribute_name_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "permitted_attribute_name_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "allowed_value_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_assignees": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "null when the service supplied no value. Never fabricated."
+        },
+        "identity_published": {
+          "type": "boolean",
+          "const": false,
+          "description": "Must be false. No caller identity is published."
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "contract_observation": {
+      "type": "object",
+      "description": "Whether the governed caller-facing contract held during the live run. Counts and booleans only.",
+      "additionalProperties": false,
+      "required": [
+        "search_item_key_count",
+        "search_allowlist_enforced",
+        "detail_key_count",
+        "detail_contract_exact",
+        "write_request_count",
+        "fixture_unchanged",
+        "sensitive_logging_observed"
+      ],
+      "properties": {
+        "search_item_key_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "search_allowlist_enforced": {
+          "type": "boolean"
+        },
+        "detail_key_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "detail_contract_exact": {
+          "type": "boolean"
+        },
+        "pagination_limit": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "pagination_offset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "pagination_total_results": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "projection_used": {
+          "type": "boolean",
+          "description": "Whether an upstream field-selection request was sent. It is a bounded selection request, not a response-shaping guarantee (ADR-0012)."
+        },
+        "read_semantic_post": {
+          "type": "boolean",
+          "description": "Whether the slice included a POST classified read by state semantics under ADR-0007."
+        },
+        "search_route_fix_live_proven": {
+          "type": "boolean"
+        },
+        "write_request_count": {
+          "type": "integer",
+          "const": 0,
+          "description": "Must be 0. The adopted slice is read-only and no write route exists."
+        },
+        "fixture_unchanged": {
+          "type": "boolean",
+          "const": true
+        },
+        "sensitive_logging_observed": {
+          "type": "boolean",
+          "const": false
+        },
+        "private_provenance_sufficient": {
+          "type": "boolean"
         }
       }
     }
   },
-
   "allOf": [
     {
       "description": "SURFACE ASYMMETRY, ADR-0006. A stable_lineage claim on the transmittals surface may only ever be not_proven with no established basis. The Transmittals response alone does not provide a stable source-document lineage identity, and no comparison, count or aliasing changes that.",
@@ -400,31 +954,51 @@
         "properties": {
           "surface_claims": {
             "contains": {
-              "required": ["surface", "claim"],
+              "required": [
+                "surface",
+                "claim"
+              ],
               "properties": {
-                "surface": { "const": "transmittals" },
-                "claim": { "const": "stable_lineage" }
+                "surface": {
+                  "const": "transmittals"
+                },
+                "claim": {
+                  "const": "stable_lineage"
+                }
               }
             }
           }
         },
-        "required": ["surface_claims"]
+        "required": [
+          "surface_claims"
+        ]
       },
       "then": {
         "properties": {
           "surface_claims": {
             "items": {
               "if": {
-                "required": ["surface", "claim"],
+                "required": [
+                  "surface",
+                  "claim"
+                ],
                 "properties": {
-                  "surface": { "const": "transmittals" },
-                  "claim": { "const": "stable_lineage" }
+                  "surface": {
+                    "const": "transmittals"
+                  },
+                  "claim": {
+                    "const": "stable_lineage"
+                  }
                 }
               },
               "then": {
                 "properties": {
-                  "status": { "const": "not_proven" },
-                  "basis": { "const": "not_established" }
+                  "status": {
+                    "const": "not_proven"
+                  },
+                  "basis": {
+                    "const": "not_established"
+                  }
                 }
               }
             }
@@ -438,37 +1012,73 @@
         "properties": {
           "surface_claims": {
             "contains": {
-              "required": ["surface", "claim", "status"],
+              "required": [
+                "surface",
+                "claim",
+                "status"
+              ],
               "properties": {
-                "surface": { "const": "data_management" },
-                "claim": { "const": "item_lineage_identity" },
-                "status": { "const": "proven" }
+                "surface": {
+                  "const": "data_management"
+                },
+                "claim": {
+                  "const": "item_lineage_identity"
+                },
+                "status": {
+                  "const": "proven"
+                }
               }
             }
           }
         },
-        "required": ["surface_claims"]
+        "required": [
+          "surface_claims"
+        ]
       },
       "then": {
         "properties": {
           "item_observation": {
-            "required": ["item_alias", "item_alias_directly_returned"],
+            "required": [
+              "item_alias",
+              "item_alias_directly_returned"
+            ],
             "properties": {
-              "item_alias_directly_returned": { "const": true },
-              "item_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+              "item_alias_directly_returned": {
+                "const": true
+              },
+              "item_alias": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              }
             }
           },
           "surface_claims": {
             "items": {
               "if": {
-                "required": ["surface", "claim", "status"],
+                "required": [
+                  "surface",
+                  "claim",
+                  "status"
+                ],
                 "properties": {
-                  "surface": { "const": "data_management" },
-                  "claim": { "const": "item_lineage_identity" },
-                  "status": { "const": "proven" }
+                  "surface": {
+                    "const": "data_management"
+                  },
+                  "claim": {
+                    "const": "item_lineage_identity"
+                  },
+                  "status": {
+                    "const": "proven"
+                  }
                 }
               },
-              "then": { "properties": { "basis": { "const": "directly_returned_field" } } }
+              "then": {
+                "properties": {
+                  "basis": {
+                    "const": "directly_returned_field"
+                  }
+                }
+              }
             }
           }
         }
@@ -480,30 +1090,58 @@
         "properties": {
           "surface_claims": {
             "contains": {
-              "required": ["surface", "claim", "status"],
+              "required": [
+                "surface",
+                "claim",
+                "status"
+              ],
               "properties": {
-                "surface": { "const": "cross_surface" },
-                "claim": { "const": "exact_version_relation" },
-                "status": { "const": "proven" }
+                "surface": {
+                  "const": "cross_surface"
+                },
+                "claim": {
+                  "const": "exact_version_relation"
+                },
+                "status": {
+                  "const": "proven"
+                }
               }
             }
           }
         },
-        "required": ["surface_claims"]
+        "required": [
+          "surface_claims"
+        ]
       },
       "then": {
         "properties": {
           "surface_claims": {
             "items": {
               "if": {
-                "required": ["surface", "claim", "status"],
+                "required": [
+                  "surface",
+                  "claim",
+                  "status"
+                ],
                 "properties": {
-                  "surface": { "const": "cross_surface" },
-                  "claim": { "const": "exact_version_relation" },
-                  "status": { "const": "proven" }
+                  "surface": {
+                    "const": "cross_surface"
+                  },
+                  "claim": {
+                    "const": "exact_version_relation"
+                  },
+                  "status": {
+                    "const": "proven"
+                  }
                 }
               },
-              "then": { "properties": { "basis": { "const": "byte_for_byte_exact_equality" } } }
+              "then": {
+                "properties": {
+                  "basis": {
+                    "const": "byte_for_byte_exact_equality"
+                  }
+                }
+              }
             }
           }
         }
@@ -515,23 +1153,40 @@
         "properties": {
           "surface_claims": {
             "contains": {
-              "required": ["claim", "status"],
+              "required": [
+                "claim",
+                "status"
+              ],
               "properties": {
-                "claim": { "const": "current_tip_relation" },
-                "status": { "const": "proven" }
+                "claim": {
+                  "const": "current_tip_relation"
+                },
+                "status": {
+                  "const": "proven"
+                }
               }
             }
           }
         },
-        "required": ["surface_claims"]
+        "required": [
+          "surface_claims"
+        ]
       },
       "then": {
         "properties": {
           "item_observation": {
-            "required": ["current_tip_version_alias", "current_tip_directly_returned"],
+            "required": [
+              "current_tip_version_alias",
+              "current_tip_directly_returned"
+            ],
             "properties": {
-              "current_tip_directly_returned": { "const": true },
-              "current_tip_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+              "current_tip_directly_returned": {
+                "const": true
+              },
+              "current_tip_version_alias": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              }
             }
           }
         }
@@ -542,7 +1197,15 @@
       "if": {
         "properties": {
           "item_observation": {
-            "properties": { "version_set": { "properties": { "complete": { "const": true } } } }
+            "properties": {
+              "version_set": {
+                "properties": {
+                  "complete": {
+                    "const": true
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -551,8 +1214,15 @@
           "item_observation": {
             "properties": {
               "version_set": {
-                "required": ["count", "has_more"],
-                "properties": { "has_more": { "const": false } }
+                "required": [
+                  "count",
+                  "has_more"
+                ],
+                "properties": {
+                  "has_more": {
+                    "const": false
+                  }
+                }
               }
             }
           }
@@ -563,15 +1233,29 @@
       "description": "PUBLICATION PROVENANCE. When the fixture was captured in an approved training project, the scenario's own Autodesk project must NOT be asserted to contain it. Publishing under a teaching-scenario namespace never implies scenario-project data readiness.",
       "if": {
         "properties": {
-          "scenario": { "properties": { "capture_context": { "const": "approved_training_project" } } }
+          "scenario": {
+            "properties": {
+              "capture_context": {
+                "const": "approved_training_project"
+              }
+            }
+          }
         },
-        "required": ["scenario"]
+        "required": [
+          "scenario"
+        ]
       },
       "then": {
         "properties": {
           "scenario": {
-            "required": ["scenario_project_contains_fixture"],
-            "properties": { "scenario_project_contains_fixture": { "const": false } }
+            "required": [
+              "scenario_project_contains_fixture"
+            ],
+            "properties": {
+              "scenario_project_contains_fixture": {
+                "const": false
+              }
+            }
           }
         }
       }
@@ -579,34 +1263,85 @@
     {
       "description": "exact_version_snapshot_proven requires the full cross-surface proof: an available transmittal with an issued exact version and exact_version_returned true; an available item lineage whose identity was directly returned, with a complete version set of at least two aliases and a directly returned current tip; surface claims recording transmittals stable_lineage as not_proven, data_management item_lineage_identity as proven, and cross_surface exact_version_relation as proven; and at least one passing byte-for-byte proof asserting equality across the two surfaces plus at least one passing proof asserting inequality between two versions. Draft-7 cannot express that the two version aliases are semantically DISTINCT, nor that a proof's operands correspond to the observed aliases; both remain runtime governance checks.",
       "if": {
-        "properties": { "outcome": { "const": "exact_version_snapshot_proven" } },
-        "required": ["outcome"]
+        "properties": {
+          "outcome": {
+            "const": "exact_version_snapshot_proven"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
       },
       "then": {
         "properties": {
           "transmittal_observation": {
-            "required": ["available", "transmittal_alias", "issued_version_alias", "exact_version_returned"],
+            "required": [
+              "available",
+              "transmittal_alias",
+              "issued_version_alias",
+              "exact_version_returned"
+            ],
             "properties": {
-              "available": { "const": true },
-              "exact_version_returned": { "const": true },
-              "transmittal_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
-              "issued_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+              "available": {
+                "const": true
+              },
+              "exact_version_returned": {
+                "const": true
+              },
+              "transmittal_alias": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              },
+              "issued_version_alias": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              }
             }
           },
           "item_observation": {
-            "required": ["available", "item_alias", "item_alias_directly_returned", "version_set", "current_tip_version_alias", "current_tip_directly_returned"],
+            "required": [
+              "available",
+              "item_alias",
+              "item_alias_directly_returned",
+              "version_set",
+              "current_tip_version_alias",
+              "current_tip_directly_returned"
+            ],
             "properties": {
-              "available": { "const": true },
-              "item_alias_directly_returned": { "const": true },
-              "current_tip_directly_returned": { "const": true },
-              "item_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
-              "current_tip_version_alias": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "available": {
+                "const": true
+              },
+              "item_alias_directly_returned": {
+                "const": true
+              },
+              "current_tip_directly_returned": {
+                "const": true
+              },
+              "item_alias": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              },
+              "current_tip_version_alias": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              },
               "version_set": {
-                "required": ["version_aliases", "count", "has_more", "complete"],
+                "required": [
+                  "version_aliases",
+                  "count",
+                  "has_more",
+                  "complete"
+                ],
                 "properties": {
-                  "version_aliases": { "minItems": 2 },
-                  "has_more": { "const": false },
-                  "complete": { "const": true }
+                  "version_aliases": {
+                    "minItems": 2
+                  },
+                  "has_more": {
+                    "const": false
+                  },
+                  "complete": {
+                    "const": true
+                  }
                 }
               }
             }
@@ -615,31 +1350,61 @@
             "allOf": [
               {
                 "contains": {
-                  "required": ["surface", "claim", "status"],
+                  "required": [
+                    "surface",
+                    "claim",
+                    "status"
+                  ],
                   "properties": {
-                    "surface": { "const": "transmittals" },
-                    "claim": { "const": "stable_lineage" },
-                    "status": { "const": "not_proven" }
+                    "surface": {
+                      "const": "transmittals"
+                    },
+                    "claim": {
+                      "const": "stable_lineage"
+                    },
+                    "status": {
+                      "const": "not_proven"
+                    }
                   }
                 }
               },
               {
                 "contains": {
-                  "required": ["surface", "claim", "status"],
+                  "required": [
+                    "surface",
+                    "claim",
+                    "status"
+                  ],
                   "properties": {
-                    "surface": { "const": "data_management" },
-                    "claim": { "const": "item_lineage_identity" },
-                    "status": { "const": "proven" }
+                    "surface": {
+                      "const": "data_management"
+                    },
+                    "claim": {
+                      "const": "item_lineage_identity"
+                    },
+                    "status": {
+                      "const": "proven"
+                    }
                   }
                 }
               },
               {
                 "contains": {
-                  "required": ["surface", "claim", "status"],
+                  "required": [
+                    "surface",
+                    "claim",
+                    "status"
+                  ],
                   "properties": {
-                    "surface": { "const": "cross_surface" },
-                    "claim": { "const": "exact_version_relation" },
-                    "status": { "const": "proven" }
+                    "surface": {
+                      "const": "cross_surface"
+                    },
+                    "claim": {
+                      "const": "exact_version_relation"
+                    },
+                    "status": {
+                      "const": "proven"
+                    }
                   }
                 }
               }
@@ -649,23 +1414,49 @@
             "allOf": [
               {
                 "contains": {
-                  "required": ["left_surface", "right_surface", "comparison_method", "expected_relation", "outcome"],
+                  "required": [
+                    "left_surface",
+                    "right_surface",
+                    "comparison_method",
+                    "expected_relation",
+                    "outcome"
+                  ],
                   "properties": {
-                    "left_surface": { "const": "transmittals" },
-                    "right_surface": { "const": "data_management" },
-                    "comparison_method": { "const": "byte_for_byte_exact_string_comparison" },
-                    "expected_relation": { "const": "equal" },
-                    "outcome": { "const": "pass" }
+                    "left_surface": {
+                      "const": "transmittals"
+                    },
+                    "right_surface": {
+                      "const": "data_management"
+                    },
+                    "comparison_method": {
+                      "const": "byte_for_byte_exact_string_comparison"
+                    },
+                    "expected_relation": {
+                      "const": "equal"
+                    },
+                    "outcome": {
+                      "const": "pass"
+                    }
                   }
                 }
               },
               {
                 "contains": {
-                  "required": ["comparison_method", "expected_relation", "outcome"],
+                  "required": [
+                    "comparison_method",
+                    "expected_relation",
+                    "outcome"
+                  ],
                   "properties": {
-                    "comparison_method": { "const": "byte_for_byte_exact_string_comparison" },
-                    "expected_relation": { "const": "not_equal" },
-                    "outcome": { "const": "pass" }
+                    "comparison_method": {
+                      "const": "byte_for_byte_exact_string_comparison"
+                    },
+                    "expected_relation": {
+                      "const": "not_equal"
+                    },
+                    "outcome": {
+                      "const": "pass"
+                    }
                   }
                 }
               }
@@ -673,12 +1464,77 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "properties": {
+              "slice": {
+                "const": "transmittals-exact-version-snapshot"
+              }
+            }
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "required": [
+          "transmittal_observation",
+          "item_observation"
+        ],
+        "properties": {
+          "sanitisation": {
+            "properties": {
+              "profile_version": {
+                "const": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "properties": {
+              "slice": {
+                "const": "rfis-first-slice-read-verification"
+              }
+            }
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "required": [
+          "rfi_observation",
+          "caller_context_observation",
+          "contract_observation"
+        ],
+        "properties": {
+          "sanitisation": {
+            "properties": {
+              "profile_version": {
+                "const": 1
+              }
+            }
+          }
+        }
+      }
     }
   ],
-
   "definitions": {
     "alias": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Sanitised deterministic alias token (e.g. PROJECT_1, TRANSMITTAL_1, FOLDER_1, ITEM_1, VERSION_1). Never a live Autodesk identifier, URN, or GUID. LINEAGE_n is not an approved token for this profile.",
       "pattern": "^[A-Z][A-Z0-9_]*$"
     },
@@ -691,36 +1547,99 @@
       "type": "object",
       "description": "Whether a proof can be independently re-checked, and from where. An alias-only public artifact will normally set re_derivable_from_public_evidence false; that is intentional and does NOT invalidate the proof, and raw identifiers must never be duplicated into the public artifact to make a historical proof re-runnable.",
       "additionalProperties": false,
-      "required": ["basis", "re_derivable_from_private_evidence", "re_derivable_from_public_evidence"],
+      "required": [
+        "basis",
+        "re_derivable_from_private_evidence",
+        "re_derivable_from_public_evidence"
+      ],
       "properties": {
         "basis": {
           "description": "historical_attestation: the result was established while the independent operands were simultaneously available, and is recorded as an outcome.",
           "type": "string",
-          "enum": ["historical_attestation"]
+          "enum": [
+            "historical_attestation"
+          ]
         },
-        "re_derivable_from_private_evidence": { "type": "boolean" },
-        "re_derivable_from_public_evidence": { "type": "boolean" }
+        "re_derivable_from_private_evidence": {
+          "type": "boolean"
+        },
+        "re_derivable_from_public_evidence": {
+          "type": "boolean"
+        }
       }
     },
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository_slug", "inspected_revision", "runtime_worktree_state", "runtime_status", "tools_invoked"],
+      "required": [
+        "repository_slug",
+        "inspected_revision",
+        "runtime_worktree_state",
+        "runtime_status",
+        "tools_invoked"
+      ],
       "properties": {
-        "repository_slug": { "type": "string" },
-        "inspected_revision": { "type": "string" },
-        "runtime_worktree_state": { "type": "string", "enum": ["clean", "dirty", "unknown"] },
+        "repository_slug": {
+          "type": "string"
+        },
+        "inspected_revision": {
+          "type": "string"
+        },
+        "runtime_worktree_state": {
+          "type": "string",
+          "enum": [
+            "clean",
+            "dirty",
+            "unknown"
+          ]
+        },
         "runtime_status": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["reachable", "reported_status", "server_version"],
+          "required": [
+            "reachable",
+            "reported_status",
+            "server_version"
+          ],
           "properties": {
-            "reachable": { "type": "boolean" },
-            "reported_status": { "type": "string", "enum": ["ok", "error", "unavailable"] },
-            "server_version": { "type": "string" }
+            "reachable": {
+              "type": "boolean"
+            },
+            "reported_status": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "error",
+                "unavailable"
+              ]
+            },
+            "server_version": {
+              "type": "string"
+            }
           }
         },
-        "tools_invoked": { "type": "array", "items": { "type": "string" } }
+        "tools_invoked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fresh_process": {
+          "type": "boolean",
+          "description": "Whether the verification ran against a server process started fresh for the run, loaded from inspected_revision."
+        },
+        "mcp_protocol_verified": {
+          "type": "boolean",
+          "description": "Whether the tools were exercised over the MCP protocol surface (initialize / tools/list / tools/call) rather than by direct in-process import."
+        },
+        "registered_tool_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_tools_registered": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     }
   }

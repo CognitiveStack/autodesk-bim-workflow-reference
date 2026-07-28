@@ -225,3 +225,95 @@ Distinctions kept honest:
 - **overall Phase 4A completion** — no other Phase 4A module is implemented;
 - **that the Harrismith Autodesk project contains the fixture**;
 - **Transmittals stable lineage from the Transmittals surface itself**.
+
+## Phase 4A — RFI first-slice read verification
+
+- **Capability gap:** [`docs/architecture/PHASE_4_CAPABILITY_GAP.md`](../../../docs/architecture/PHASE_4_CAPABILITY_GAP.md) §16.7
+- **Schema:** [`schemas/phase-4-result.schema.json`](../../../schemas/phase-4-result.schema.json)
+- **Sanitisation:** [`docs/guides/SANITISATION_CONVENTION.md`](../../../docs/guides/SANITISATION_CONVENTION.md) —
+  RFI public-evidence profile **version 1**
+- **Governance:** [`ADR-0010`](../../../docs/decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)
+  (RFI public-evidence sanitisation profile),
+  [`ADR-0011`](../../../docs/decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)
+  (first-slice MCP contract and component boundary) as refined for search by
+  [`ADR-0012`](../../../docs/decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)
+  (search contract refined from runtime verification), and
+  [`ADR-0007`](../../../docs/decisions/0007-read-write-classification-by-state-semantics.md)
+  (the search `POST` is classified read by observable state semantics)
+
+The same public/private boundary applies: raw identifiers and the alias map live
+under the git-ignored private evidence area; only the sanitised result JSON is
+committed here.
+
+### Artifact
+
+- `rfis-first-slice-read-verification.result.json` — present. A **complete**,
+  read-only, sanitised Phase 4A evidence artifact from a live run on 2026-07-28,
+  with outcome **`rfi_read_slice_verified`**.
+
+### Scenario and capture provenance
+
+This directory is the repository's Harrismith BIM teaching/reference **scenario
+namespace**. For this artifact:
+
+1. the controlled synthetic RFI was **captured in the approved training project**;
+2. the evidence **belongs to the Harrismith BIM learning/reference scenario**;
+3. **no claim** is made that the Autodesk project named *Harrismith Fire Station*
+   contains this or any RFI fixture;
+4. **no Harrismith-project RFI readiness** is inferred from this artifact;
+5. **no real Autodesk project title and no alias-to-real-project mapping** is
+   published — that mapping stays outside Git.
+
+### What the evidence establishes (the narrow proof)
+
+- The three governed read-only tools were exercised against a **server started
+  fresh for the run**, loaded from published component revision
+  `5dca2297e610d5125ea123cd4203de63e96e943b`, over the **MCP protocol surface**
+  rather than by in-process import.
+- The **caller-context contract held**: exactly eight approved keys, with no user
+  id, name, email or workflow role identity returned.
+- The **search allowlist held**: every returned item carried exactly the four
+  approved keys. The upstream field-selection request is a **bounded selection
+  request, not an enforcement boundary** (ADR-0012) — the client allowlist is what
+  guarantees the caller boundary.
+- The **detail contract held**: exactly the 27 approved keys.
+- **Search-to-detail identity equality** was established by byte-for-byte exact
+  string comparison. **Neither raw operand is published**; the artifact records the
+  comparison, its method and its result.
+- The retrieved record **matched the controlled synthetic fixture** on title,
+  question and status. Those values are controlled synthetic narrative and are
+  **deliberately not reproduced** here or in the artifact — only the match outcome.
+- **Zero RFI write requests** were issued and the fixture is **unchanged**.
+
+Distinctions kept honest:
+
+- **Absence is preserved, not normalised.** The Draft carried no human RFI number,
+  so `custom_identifier_present` is `false` — the value itself is excluded from
+  public evidence by ADR-0010, and no `"-"`, `"Unspecified"` or `"N/A"` placeholder
+  is invented. `answered` and `closed` are published as **`null`**, because the
+  record supplied neither flag; they are **not** rewritten to `false`.
+- **Narrative is represented by presence booleans only.** No title, question,
+  official response, suggested answer or response text appears.
+- **Participants reduce to counts.** No participant identifier, name or email.
+- **An observed API shape is recorded as an observation.** `can_create_rfi` was
+  `true` while the permission-derived collections were empty and `max_assignees`
+  was `null`. That is recorded as a warning describing **this project, caller and
+  response**, and asserts nothing about the API, its documentation, the workflow,
+  or the caller's permissions in general.
+- **The search `POST` is declared, not disguised.** It is a read by observable
+  state semantics under ADR-0007, and the artifact says so rather than presenting
+  it as a `GET`.
+
+### What the evidence does not establish
+
+- **universal RFI behaviour**, or behaviour across every tenant, region or
+  configuration — the verdict is scoped to the controlled fixture;
+- **any other RFI workflow type** — only one was present in the verified context;
+- **readiness for any other Autodesk project**;
+- **any RFI write capability** — writes are neither supported nor authorised, and
+  none was attempted;
+- **Gate 8 as a global verdict** — Gate 8 closed for the RFI first read-only slice
+  only, under the operative §14 criteria of the capability gap;
+- **overall Phase 4A completion** — Submittals, Sheets and Meetings are
+  unimplemented;
+- **that the Harrismith Autodesk project contains the fixture**.
