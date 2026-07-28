@@ -356,9 +356,13 @@ document versions.
 
 **Approved by
 [reference-repo ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)
-(2026-07-28).** The contract below is fixed for the **RFI v1 first slice**; **no
-RFI code exists**, and `mcp_implementation_status` remains `planned` with
-`data_readiness` `not-assessed`.
+(2026-07-28), with the `search_rfis` contract refined 2026-07-28 by
+[ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)
+from runtime verification.** The contract below is the **current effective**
+contract for the **RFI v1 first slice**; **no RFI code exists**, and
+`mcp_implementation_status` remains `planned` with `data_readiness`
+`not-assessed`. ADR-0011 is not amended and remains authoritative for every
+decision ADR-0012 does not refine.
 
 **APS/Forma MCP owns RFI**, in a **dedicated `rfis_client`**. RFI semantics belong
 in no existing client and in no generic request infrastructure.
@@ -383,13 +387,24 @@ demonstrate that the code satisfies it.
 
 **Output boundary.** `rfis_client` normalises with an **explicit allowlist** (the
 Reviews / Model Coordination convention, not the Transmittals raw-shape special
-case). `search_rfis` returns `id`, `custom_identifier`, `title`, `status`,
-`workflow_type` plus pagination — enough to choose one RFI without fetching every
-detail object. `get_rfi` returns a curated DTO including core RFI narrative
-(`title`, `question`, `official_response`, `suggested_answer`). The search
-projection's **semantic field set** is `id`, `customIdentifier`, `title`,
-`status`, `workflowType`; its **transport encoding is deferred to
-implementation-time verification**.
+case). `search_rfis` returns `id`, `custom_identifier`, `title`, `status` plus
+pagination — enough to choose one RFI without fetching every detail object.
+`get_rfi` returns a curated DTO including core RFI narrative (`title`,
+`question`, `official_response`, `suggested_answer`).
+
+**Search request — runtime-verified 2026-07-28 (ADR-0012).** The request sends
+a **JSON-body `fields` array** of exactly `id`, `customIdentifier`, `title`,
+`status`. `workflowType` is a **rejected enum member**, so **`workflow_type` is
+not part of the search caller contract**; it is neither derived nor fetched by a
+second call, and it remains in `get_rfi_user_context` and `get_rfi`. Autodesk may
+still return additional top-level properties, so **`fields` is a validated
+bounded upstream selection request: its exact response-shaping effect is not
+established, and it is not an enforcement boundary.** The `rfis_client` allowlist
+is authoritative. Additional properties (`responses`, `assignedTo`, `reviewers`,
+`watchers`, `architects`, `coReviewers`, `optionalReviewers`,
+`officialResponseActors`, `permittedActions`, `virtualFolderUrn`, `hash`,
+`maxAssignees`) are discarded before caller output, never logged, and never
+placed in public evidence. `custom_identifier` is `None` when upstream omits it.
 
 **Embedded responses are summarised, not exposed.** `responses[].text`,
 `.createdBy` and `.onBehalf` are excluded; only `response_count`,

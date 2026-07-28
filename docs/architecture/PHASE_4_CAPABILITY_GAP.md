@@ -1390,11 +1390,19 @@ not a permanent prohibition on later deliberately adopted surfaces.
 
 **Contract summary:**
 
-- **Search is discovery** — `id`, `custom_identifier`, `title`, `status`,
-  `workflow_type` plus pagination, with a semantic upstream field set limited to
-  `id`, `customIdentifier`, `title`, `status`, `workflowType`. The projection's
-  **transport encoding is deferred to implementation-time verification**.
-  `statuses` and free-text search are deferred from v1.
+- **Search is discovery** — `id`, `custom_identifier`, `title`, `status` plus
+  pagination. **Refined 2026-07-28 by
+  [ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)**
+  from runtime verification: the request sends a **JSON-body `fields` array** of
+  exactly `id`, `customIdentifier`, `title`, `status`; `workflowType` is a
+  rejected enum member, so `workflow_type` is **not** in the search caller
+  contract and is neither derived nor fetched by a second call (it remains in
+  `get_rfi_user_context` and `get_rfi`). `fields` is a **validated bounded
+  upstream selection request** whose exact response-shaping effect is **not
+  established**, and it is **not an enforcement boundary** — the `rfis_client`
+  allowlist is the authoritative caller boundary, and additional upstream
+  properties are discarded, never logged and never published. `statuses` and
+  free-text search are deferred from v1.
 - **`get_rfi` returns a curated DTO** including core RFI narrative (`title`,
   `question`, `official_response`, `suggested_answer`).
 - **Embedded response narrative is excluded**; only `response_count`,
@@ -1423,6 +1431,28 @@ call; create a client, tool, test or fixture; assert that a controlled fixture
 exists; establish data readiness; assert that live verification occurred; or close
 Gate 8. **Gate 8 remains unresolved**, `mcp_implementation_status` remains
 `planned`, and `data_readiness` remains `not-assessed`.
+
+**Runtime refinement (2026-07-28).** Bounded read-only probes against
+`search:rfis` in the approved training project established that the JSON-body
+`fields` property is accepted and enum-validated, that `workflowType` is rejected
+as an enum member (`ENUM_MISMATCH`), and that a successful four-member request
+may still return additional top-level properties — so `fields` is not an
+enforcement boundary, and its exact response-shaping effect is **not
+established** (no control request omitting `fields` was performed). The
+`search_rfis` contract is refined accordingly by
+[ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md);
+ADR-0011 is not amended and **Gate 6 remains passed** — ADR-0011 required a
+material API conflict to return to governance rather than change implementation
+silently, and this is that mechanism working.
+
+**This refinement does not advance Gate 8.** The controlled synthetic Draft was
+observed as discoverable through the raw search endpoint, with API `status`
+`draft` and `customIdentifier` absent. Those are **controlled-fixture
+observations only**: no MCP implementation exists, `get_rfi` and
+`get_rfi_user_context` have not been verified through the approved contract, and
+no Gate-5-safe evidence artifact exists. **Gate 8 remains unresolved**,
+`mcp_implementation_status` remains `planned`, and `data_readiness` remains
+`not-assessed`.
 
 ## 17. Adopted first capability
 
