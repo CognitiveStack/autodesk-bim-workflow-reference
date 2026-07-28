@@ -1125,7 +1125,7 @@ and proven across three phases.
 | 3 | Read/write operation inventory | pass | pass | **pass** | pass | fail |
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
 | 5 | Privacy and sanitisation planning | **passed** (§16.5) | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
-| 6 | Component-boundary decision | **unresolved** | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
+| 6 | Component-boundary decision | **passed** (§16.6) | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **unresolved** | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
@@ -1368,6 +1368,61 @@ that live verification occurred; prescribe the caller-facing MCP interface (that
 is Gate 6); or close Gate 6 or Gate 8. **Gate 6 and Gate 8 remain unresolved**,
 `mcp_implementation_status` remains `planned`, and `data_readiness` remains
 `not-assessed`.
+
+### 16.6 RFIs Gate 6 — passed (2026-07-28)
+
+**Gate 6 (component-boundary decision) is passed for RFIs**, by
+[ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md),
+with the contract recorded in
+[COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §6.2. **This is a governance
+and component-boundary closure only: the contract is approved, and no RFI code
+exists.**
+
+**Owning component.** The APS/Forma MCP, in a dedicated `rfis_client`. RFI
+semantics are placed in no existing client and in no generic request
+infrastructure.
+
+**Approved v1 surface.** Three read-only tools in the first slice —
+`get_rfi_user_context` (GET `users/me`), `search_rfis` (**read-semantic POST**
+`search:rfis` under ADR-0007) and `get_rfi` (GET `rfis/:rfiId`). No write tool,
+and no arbitrary URL, path, method or body surface. Three tools is the v1 scope,
+not a permanent prohibition on later deliberately adopted surfaces.
+
+**Contract summary:**
+
+- **Search is discovery** — `id`, `custom_identifier`, `title`, `status`,
+  `workflow_type` plus pagination, with a semantic upstream field set limited to
+  `id`, `customIdentifier`, `title`, `status`, `workflowType`. The projection's
+  **transport encoding is deferred to implementation-time verification**.
+  `statuses` and free-text search are deferred from v1.
+- **`get_rfi` returns a curated DTO** including core RFI narrative (`title`,
+  `question`, `official_response`, `suggested_answer`).
+- **Embedded response narrative is excluded**; only `response_count`,
+  `response_states` and `response_statuses` are exposed. Core RFI narrative and
+  embedded response narrative are different contract domains.
+- **Participants reduce to counts**; no raw actor identifiers, and no adopted v1
+  tool resolves participant identities.
+- **Caller output is not public evidence** — real operational identifiers and
+  `custom_identifier` are returned to authenticated callers, while ADR-0010
+  continues to govern the evidence path. `RFI_n` aliases are never returned to a
+  normal caller.
+- **Transport** — existing bounded GET pattern reused; a private helper hardwired
+  to `search:rfis` for the POST. `forma_post` is neither reused nor generalised.
+- **Auth** — existing 3-legged user-context token, `data:read`; no
+  `client_credentials`, no SSA.
+- **Project ids** accepted with or without `b.` and normalised by stripping it.
+- **Pagination** `limit` 1–200 (default 10), `offset` ≥ 0; no fetch-all, no
+  automatic detail call per result, no bulk crawling.
+
+**Gate 6 closure approves the external tool and component contract. It does not
+prove that any implementation conforms to that contract** — that proof comes later
+through code, tests and live verification as appropriate.
+
+**Gate 6 closure does not**: authorise MCP implementation; authorise any Autodesk
+call; create a client, tool, test or fixture; assert that a controlled fixture
+exists; establish data readiness; assert that live verification occurred; or close
+Gate 8. **Gate 8 remains unresolved**, `mcp_implementation_status` remains
+`planned`, and `data_readiness` remains `not-assessed`.
 
 ## 17. Adopted first capability
 

@@ -296,7 +296,10 @@ verified from official Autodesk/APS documentation; the **Assets** API-family nam
 is still not asserted here until it is verified from an official Autodesk/APS or
 component source. **RFI is an adopted governed capability in the schema-v2
 workflow contract, not an implemented one** — its `mcp_implementation_status` is
-`planned` and its `data_readiness` is `not-assessed`; adoption closes no gate.
+`planned` and its `data_readiness` is `not-assessed`. Its component boundary and
+caller-facing contract are fixed by
+[reference-repo ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)
+(§6.2); **the contract is approved, the implementation is not written.**
 
 ### 6.1 Transmittals ownership split (adopted, implemented)
 
@@ -348,6 +351,70 @@ in the **approved training project**. The ownership split itself is unchanged.
 The first slice is fixed at the five documented read operations: list
 transmittals; get one transmittal; list recipients; list folders; list included
 document versions.
+
+### 6.2 RFI first-slice contract (adopted, planned)
+
+**Approved by
+[reference-repo ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)
+(2026-07-28).** The contract below is fixed for the **RFI v1 first slice**; **no
+RFI code exists**, and `mcp_implementation_status` remains `planned` with
+`data_readiness` `not-assessed`.
+
+**APS/Forma MCP owns RFI**, in a **dedicated `rfis_client`**. RFI semantics belong
+in no existing client and in no generic request infrastructure.
+
+**Three read-only tools in the v1 first slice:**
+
+| Tool | Endpoint | State semantics |
+|---|---|---|
+| `get_rfi_user_context` | `GET …/rfis/v3/projects/{projectId}/users/me` | read |
+| `search_rfis` | `POST …/rfis/v3/projects/{projectId}/search:rfis` | **read-semantic POST** (ADR-0007) |
+| `get_rfi` | `GET …/rfis/v3/projects/{projectId}/rfis/{rfiId}` | read |
+
+Three tools is the **v1 scope**, not a permanent prohibition; a later surface may
+be adopted deliberately through the same governance route.
+
+**Read-only by contract.** No write endpoint is in v1 scope; no tool accepts a
+caller-supplied URL, path, HTTP method or raw request body. The search POST uses a
+**private helper hardwired to `search:rfis`**; `forma_post` is **not** reused — it
+carries Site Design `x-ads-region` and `authcontext` semantics — and is not
+generalised. Gate 6 approves this contract; a later implementation increment must
+demonstrate that the code satisfies it.
+
+**Output boundary.** `rfis_client` normalises with an **explicit allowlist** (the
+Reviews / Model Coordination convention, not the Transmittals raw-shape special
+case). `search_rfis` returns `id`, `custom_identifier`, `title`, `status`,
+`workflow_type` plus pagination — enough to choose one RFI without fetching every
+detail object. `get_rfi` returns a curated DTO including core RFI narrative
+(`title`, `question`, `official_response`, `suggested_answer`). The search
+projection's **semantic field set** is `id`, `customIdentifier`, `title`,
+`status`, `workflowType`; its **transport encoding is deferred to
+implementation-time verification**.
+
+**Embedded responses are summarised, not exposed.** `responses[].text`,
+`.createdBy` and `.onBehalf` are excluded; only `response_count`,
+`response_states` and `response_statuses` are returned. Core RFI narrative and
+embedded response narrative are different contract domains, and the Response
+surface is not adopted.
+
+**Participants reduce to counts** — `assignee_count`, `reviewer_count`,
+`watcher_count`. No adopted v1 tool resolves participant identities and no
+first-slice use case requires them; a participant-resolution capability must be
+adopted deliberately before those identifiers enter the caller contract.
+
+**Caller output is not public evidence.** Authenticated callers receive real
+operational identifiers, `custom_identifier` and approved narrative; the
+public-evidence path applies
+[ADR-0010](../decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)
+and its aliases and reductions. `RFI_n` aliases are never returned to the normal
+MCP caller.
+
+**Auth and identifiers.** Existing 3-legged user-context token, `data:read`; no
+`client_credentials`, no SSA. Project ids are accepted with or without the `b.`
+prefix and normalised by stripping it, as the Transmittals client already does.
+
+**Pagination:** `limit` 1–200 (default 10), `offset` ≥ 0; no fetch-all, no
+automatic detail call per search result, no bulk crawling.
 
 ## 7. Experimental boundary
 
