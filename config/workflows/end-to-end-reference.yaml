@@ -213,11 +213,12 @@ stages:
     platform: Autodesk Forma
     automation_policy: focused_reference_examples
     # STAGE SCOPE. Phase 4A now spans Forma Data Management and Forma Build (ADR-0004).
-    # PHASE 4A IS NOT COMPLETE. Two capabilities are governed here: Transmittals
-    # (first capability — implemented and live-verified; confirmed / ready) and
-    # RFIs (second governed capability — API identity, version and lifecycle
-    # established; implementation planned; data readiness not-assessed).
-    # Submittals and Sheets are later candidates; Meetings is deferred (public API
+    # PHASE 4A IS NOT COMPLETE. Three capabilities are governed here: Transmittals
+    # (first capability — implemented and live-verified; confirmed / ready), RFIs
+    # (second governed capability — implemented and live-verified; confirmed /
+    # ready) and Submittals (third governed capability — first read-only slice
+    # CONTRACT ADOPTED by ADR-0014, IMPLEMENTATION NOT WRITTEN; planned /
+    # not-assessed). Sheets is a later candidate; Meetings is deferred (public API
     # not verified). Their API families are deliberately not listed in this task.
     capabilities:
       - id: transmittals
@@ -294,6 +295,49 @@ stages:
         # scope, per the header definition.
         data_readiness: ready
         data_readiness_reason: rfi-first-slice-ready-in-approved-training-project
+
+      - id: submittals
+        primary_system: Forma Build
+        # ADOPTED as the third governed Phase 4A capability by ADR-0014
+        # (2026-07-29). THE CONTRACT IS APPROVED; THE IMPLEMENTATION IS NOT
+        # WRITTEN. Zero Submittals MCP tools exist, and this adoption changes no
+        # tool count.
+        # API IDENTITY: asserted because it is verified from official Autodesk/APS
+        # documentation (see PHASE_4_CAPABILITY_GAP.md 4 and 6) — Autodesk Forma
+        # Build Submittals API, contract/request-route version v2 under
+        # /construction/submittals/v2/projects/:projectId, read phase generally
+        # available 2024-02-22. api_version is REQUIRED here because
+        # api_maturity: ga is a concrete lifecycle assertion (ADR-0009).
+        # ADOPTED FIRST READ-ONLY SLICE — CONTRACT ONLY, NOT IMPLEMENTED:
+        # 1. GET users/me; 2. GET items; 3. GET items/:itemId. All three are GET,
+        # so no POST-as-read classification is involved. Caller projections are
+        # 3 / 8 / 17 fields (COMPONENT_BOUNDARIES.md 6.3). Packages, spec sections
+        # as independent operations, item types, responses, review steps,
+        # attachments, comments, templates, settings/mappings and ALL WRITES are
+        # excluded from that initial slice.
+        # GATES / VERIFICATION: Gate 2 is sufficiently verified (16.8), Gate 5 is
+        # passed (16.9) and Gate 6 is passed (16.10). GATE 8 IS OPEN — no live MCP
+        # evidence exists. The single controlled synthetic fixture in the approved
+        # training project is DIAGNOSTIC INPUT ONLY, not Gate-8 evidence.
+        # SCOPE: the proven first-slice requirement is data:read alone. The normal
+        # server grant holds a broader four-scope configuration for other
+        # capabilities; that does not widen the Submittals requirement.
+        # SANITISATION: public evidence is governed by ADR-0013 and the Submittals
+        # public-evidence profile in docs/guides/SANITISATION_CONVENTION.md, which
+        # approves SUBMITTAL_n and reuses PROJECT_n. That profile governs PUBLIC
+        # EVIDENCE; ADR-0014 governs authenticated CALLER OUTPUT, and the two
+        # boundaries deliberately differ.
+        api_family: Autodesk Forma Build Submittals API
+        api_version: v2
+        api_maturity: ga
+        mcp_component: aps-forma-mcp
+        # `planned` is the vocabulary value for NO MCP TOOL YET — not `partial`,
+        # which describes a capability whose own tool surface is partly built.
+        mcp_implementation_status: planned
+        # NOT DERIVED FROM IMPLEMENTATION STATUS. Gate 8 is open and readiness has
+        # not been assessed for this capability. data_readiness_reason is omitted
+        # because it is optional and is never invented where none exists.
+        data_readiness: not-assessed
 
   - id: asset_handover
     platform: Autodesk Forma

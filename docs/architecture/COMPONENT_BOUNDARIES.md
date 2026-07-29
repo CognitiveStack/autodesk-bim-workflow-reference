@@ -294,6 +294,7 @@ of the component boundary.
 | Stage | Capability | Status |
 |---|---|---|
 | construction_information | RFI — adopted second Phase 4A capability; first read-only slice implemented and live-verified 2026-07-28 (§6.2) | confirmed |
+| construction_information | Submittals — adopted third Phase 4A capability; first read-only slice **contract approved, implementation not written** (§6.3) | planned |
 | asset_handover | Assets | planned |
 
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
@@ -446,6 +447,177 @@ prefix and normalised by stripping it, as the Transmittals client already does.
 
 **Pagination:** `limit` 1–200 (default 10), `offset` ≥ 0; no fetch-all, no
 automatic detail call per search result, no bulk crawling.
+
+### 6.3 Submittals first-slice contract (adopted, not implemented)
+
+**Approved by
+[reference-repo ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)
+(2026-07-29).** The contract below is the **current effective** contract for the
+**Submittals v1 first slice**.
+
+> **Read this subsection as describing SUBMITTALS ONLY.** Every statement in §6.3
+> is scoped to Submittals and to no other capability. **Zero Submittals MCP tools
+> exist**: `mcp_implementation_status` is `planned` and `data_readiness` is
+> `not-assessed`. Statements elsewhere in §6 about other capabilities'
+> implementation state — including any pre-implementation prose about RFIs — do not
+> describe Submittals, and Submittals statements do not describe them.
+
+**The contract is approved; the implementation is not written.** No
+`submittals_client` and no Submittals tool exists at APS/Forma MCP revision
+`5dca2297e610d5125ea123cd4203de63e96e943b`. **This adoption changes no tool count.**
+[`PHASE_4_CAPABILITY_GAP.md`](PHASE_4_CAPABILITY_GAP.md) §16.10 records the Gate 6
+closure; **Gate 8 is open**, and no live MCP evidence exists.
+
+**APS/Forma MCP owns Submittals**, in a **dedicated `submittals_client`**.
+Submittals semantics belong in no existing client and in no generic request
+infrastructure.
+
+**Three read-only tools in the v1 first slice — all GET:**
+
+| Tool | Endpoint | State semantics |
+|---|---|---|
+| `get_submittal_user_context` | `GET …/submittals/v2/projects/{projectId}/users/me` | read |
+| `list_submittals` | `GET …/submittals/v2/projects/{projectId}/items` | read |
+| `get_submittal` | `GET …/submittals/v2/projects/{projectId}/items/{itemId}` | read |
+
+**No POST-as-read classification is involved**; ADR-0007 is referenced but not
+exercised. Three tools is the **v1 scope**, not a permanent prohibition.
+
+**Naming.** `list_submittal_items` / `get_submittal_item` are rejected: the
+component already exposes `get_item_details` and `list_item_versions` for **Data
+Management items**, and reusing "item" would recreate the `ITEM_n` / `SUBMITTAL_n`
+identifier-domain collision that ADR-0013 made a normative prohibition. The
+upstream route says `items`; the tool surface says `submittal`.
+
+**Inputs.** `get_submittal_user_context(project_id)` ·
+`list_submittals(project_id, limit=None, offset=None)` ·
+`get_submittal(project_id, submittal_id)`. No search, filter map, sort, package
+filter, state or status filter, generic query parameters, or caller-supplied URL,
+path, method or body.
+
+**Caller context — exactly 3 fields:** `submittals_available` (bool) ·
+`permitted_action_count` (int) · `role_count` (int). A successful DTO **requires**
+an object body with `permittedActions` and `roles` both present as arrays;
+otherwise the operation returns the structured malformed-response outcome rather
+than a DTO with zeroed counts. Empty arrays legitimately yield zero.
+`submittals_available` has **no successful `false` state** — permission,
+authentication and module-availability failures are structured errors.
+
+**List — exactly 8 fields per result:** `submittal_id` ← `id` (required, non-empty
+string) · `identifier` ← `identifier` · `custom_identifier` ← `customIdentifier` ·
+`title` · `state_id` ← `stateId` · `status_id` ← `statusId` · `revision` ·
+`due_date` ← `dueDate`. Response shape `{ results, pagination }`.
+
+**Detail — exactly 17 fields:** `submittal_id` · `identifier` ·
+`custom_identifier` · `custom_identifier_human_readable` · `title` · `description` ·
+`state_id` · `status_id` · `revision` · `priority` · `spec_identifier` ·
+`spec_title` · `due_date` · `submitter_due_date` · `ball_in_court_type` ·
+`created_at` · `updated_at`.
+
+**Excluded from detail:** `spec_id` and `type_id` (no v1 operation consumes or
+resolves them) · `subsection` (observed only as `null`; populated type unobserved) ·
+`manager_type` and `subcontractor_type` (describe parties the slice deliberately
+does not name).
+
+**`customIdentifier` disambiguation.** The upstream payload carries two distinct
+keys. **`custom_identifier` maps only from `customIdentifier`**, and
+**`custom_identifier_human_readable` maps only from
+`customIdentifierHumanReadable`**. Every contract field maps 1:1 to the key it is
+named after.
+
+**List versus detail.** The upstream list row and direct detail response were
+observed as **the same 56-key schema** for the controlled fixture. `get_submittal`
+is therefore **not** adopted as a richer Autodesk representation. It is retained
+because it gives direct access to one known Submittal without paging the
+role-scoped collection, and because it independently exercises the canonical detail
+route. The 8-field and 17-field projections differ **by our design**, not because
+the upstream documents differ.
+
+**Nullability — wrong types fail closed.** Absent → `None`; upstream `null` →
+`None`; present with the expected type → the value; **present, non-null, wrong type
+→ malformed-response outcome**. A wrong-typed value is a transport-contract
+violation and is never coerced or erased to `None`. `bool` never satisfies an
+integer contract. `submittal_id` is required. Structural requirements: body an
+object; `results` an array; `pagination` an object. Pagination fields follow the
+same rule and are **never defaulted**. Each DTO is a new dict built key by key from
+a closed allowlist, so the 56-key upstream document cannot leak.
+
+**State and status** are typed `str | None`. Legal values are **not** enumerated,
+`statusId` is **not** typed as an integer and **not** treated as ordinal or
+sortable. The controlled observation (`stateId` `"sbc-1"`, `statusId` `"1"`,
+recorded while the UI displayed *Required / Waiting for submission*) is evidence,
+not runtime validation.
+
+**Identity and companies.** All raw person identities are excluded — `manager`,
+`subcontractor`, `createdBy`, `updatedBy`, `submittedBy`, `publishedBy`,
+`respondedBy`, `sentToReviewBy`, `ballInCourtUsers`, `watchers`, the caller `id`
+and `roles` values. Company identity, `ballInCourtCompanies` and commercial
+assignment relationships are excluded, and **no company DTO is invented** — the
+member shape was never observed. **No `USER_n` or `COMPANY_n` concept appears in
+any runtime DTO**; aliases are public-evidence constructs under ADR-0013, and an
+authenticated caller receives real values. `ball_in_court_type` is the only
+retained categorical discriminator.
+
+**Timeline.** No history object. Only `due_date`, `submitter_due_date`,
+`created_at` and `updated_at` are adopted, and no lateness, duration, interval,
+ordering or workflow-progression inference is derived. **`sentToSubmitter` is
+excluded**: the controlled fixture showed it populated **before submission**, with
+`submittedBy` still `null`, so its presence must never be read as proof of
+submission.
+
+**`permittedActions` is excluded entirely at both caller and item scope** —
+objects, member ids, `fields`, `mandatoryFields`, `transitions`, `actionId`,
+transition names, `stateFrom`, `stateTo` and `transitionFields`. It is
+**write-capability and workflow-configuration metadata, not the read-resource
+projection**: collectively the transition maps are the project's submittal state
+machine. Only `permitted_action_count` survives.
+
+**Auth and identifiers.** Existing 3-legged user-context token; **the proven
+first-slice scope is `data:read`**. No `client_credentials`, no SSA, no second
+token store, no `x-user-id`. **No `x-ads-region`** — the verified first slice
+succeeded against the global host with `Authorization` alone. Project ids are
+accepted with or without the `b.` prefix and normalised by stripping it, as the
+Transmittals and RFI clients already do, with capability-local validation and
+allowlisted path characters. Validation errors never echo supplied values. **The
+normal server grant holds a broader four-scope configuration for other
+capabilities; that is server configuration and does not widen the Submittals
+requirement.**
+
+**Pagination.** `limit` and `offset` are optional and **omitted parameters are not
+sent** — no local default is substituted. **No local maximum is encoded**: the
+Submittals maximum page size is unknown, and 50, 200 and any other bound are
+deliberately absent. Local input hygiene only: `limit` an integer `>= 1`, `offset`
+an integer `>= 0`, booleans rejected, values never clamped. A service-defined bound
+is enforced upstream and its rejection flows through the bad-request
+classification. The observed no-parameter response carried `limit` 20; **that is
+recorded evidence, not a local default**. The `limit >= 1` floor is this project's
+rule, not an assertion about the upstream accepted range.
+
+**Errors and logging.** The capability-local RFI error model is adopted unchanged
+in structure — no new global error architecture and no shared refactor. Envelope
+keys `error`, `status`, `detail`, `retry_after`. Categories: input validation,
+authentication/token failure, 400 bad request, 401 authentication failed, 403
+permission denied (whose detail also names that the Submittals module may not be
+active for the project), 404 not found, 429 rate limited with safe `Retry-After`
+handling only, transport failure, malformed upstream response, and other upstream
+failures per sibling precedent. The raw Autodesk error body, headers, resolved URL,
+tokens, identifiers and diagnostic payloads are **never** exposed. Logging is
+narrower than the output: operation name, status and bounded counts only.
+
+**Prescribed later implementation.** A dedicated `submittals_client.py`, GET-only,
+three internal helpers hardwired to three fixed routes, no generic request helper,
+no caller-supplied URL/path/method/body, no shared-client refactor, no
+transport-abstraction expansion, no write helpers, capability-local validation,
+reuse of the existing APS 3LO lifecycle, and eventual registration of three MCP
+tools. **None of it is authorised to be written by this adoption.**
+
+**Gate 5 versus Gate 6.** ADR-0013 governs **public repository evidence**;
+ADR-0014 governs **authenticated runtime caller output**. The caller may
+legitimately receive real submittal identifiers, `identifier`, custom identifiers,
+`title`, `description`, `priority`, spec identifier and title, and dates, while
+those same values remain forbidden or reduced to presence booleans under ADR-0013.
+`priority` is the clearest case: adopted here, explicitly omitted there. **This is
+intentional, and ADR-0013 is neither weakened nor reinterpreted.**
 
 ## 7. Experimental boundary
 

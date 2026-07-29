@@ -1142,7 +1142,7 @@ and proven across three phases.
 | 3 | Read/write operation inventory | pass | pass | **pass** | pass | fail |
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
 | 5 | Privacy and sanitisation planning | **passed** (§16.5) | **passed** (§16.9) | **passed** (§16.3) | **unresolved** | fail |
-| 6 | Component-boundary decision | **passed** (§16.6) | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
+| 6 | Component-boundary decision | **passed** (§16.6) | **passed** (§16.10) | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **closed for the first slice** (§16.7) | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
@@ -1154,11 +1154,13 @@ Recorded explicitly:
   by the research, **Gate 2 is sufficiently verified** (§16.1), **Gate 6 is
   passed** (§16.2), **Gate 5 is passed** (§16.3), and **Gate 8 is closed for the
   first slice** (§16.4).
-- For **Submittals**, **Gate 2 is sufficiently verified** (§16.8) and **Gate 5 is
-  passed** (§16.9). **Gates 6 and 8 remain unresolved.** Submittals is **not an
-  adopted capability** — it has no capability record in the workflow contract, so
-  it has no `mcp_implementation_status` and no `data_readiness` field. Closing
-  Gates 2 and 5 authorised no implementation.
+- For **Submittals**, **Gate 2 is sufficiently verified** (§16.8), **Gate 5 is
+  passed** (§16.9) and **Gate 6 is passed** (§16.10). **Gate 8 remains
+  unresolved.** The **first read-only slice is adopted and governed** — Submittals
+  now holds a capability record in the workflow contract, with
+  `mcp_implementation_status: planned` and `data_readiness: not-assessed`. **The
+  contract is approved and the implementation is not written**: zero Submittals MCP
+  tools exist, and closing Gates 2, 5 and 6 authorised no implementation.
 - Gates **2, 5, 6 and 8 remain unresolved** for **Sheets**, and Gate 2 remains
   unresolved for **RFIs**.
 - **No other candidate is implementation-ready.**
@@ -1655,6 +1657,87 @@ caller-facing MCP interface (that is Gate 6); or close Gate 6 or Gate 8.
 record exists in the workflow contract, so there is no `mcp_implementation_status`
 field and no `data_readiness` field for this capability. **No implementation is
 authorised.**
+
+> **Superseded in part (2026-07-29).** Gate 6 was subsequently closed by
+> [ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)
+> (§16.10), and Submittals now holds a capability record with
+> `mcp_implementation_status: planned` and `data_readiness: not-assessed`. The
+> Gate-5 closure recorded above is unchanged, and **Gate 8 remains unresolved**.
+
+### 16.10 Submittals Gate 6 — passed (2026-07-29)
+
+**Gate 6 (component-boundary decision) is passed for Submittals**, by
+[ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md),
+with the contract recorded in
+[COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §6.3. **This is a governance and
+component-boundary closure only: the contract is approved, and no Submittals code
+exists.**
+
+**Owning component.** The APS/Forma MCP, in a dedicated `submittals_client`.
+Submittals semantics are placed in no existing client and in no generic request
+infrastructure.
+
+**Approved v1 surface.** Three read-only tools, **all GET** —
+`get_submittal_user_context` (GET `users/me`), `list_submittals` (GET `items`) and
+`get_submittal` (GET `items/:itemId`). **No POST-as-read classification is
+involved**, so ADR-0007 is referenced but not exercised. No write tool, and no
+arbitrary URL, path, method or body surface. Three tools is the v1 scope, not a
+permanent prohibition.
+
+**Inputs.** `get_submittal_user_context(project_id)` ·
+`list_submittals(project_id, limit=None, offset=None)` ·
+`get_submittal(project_id, submittal_id)`. No search, filter map, sort, package
+filter, state or status filter, or generic query parameters. Project ids are
+accepted with or without the `b.` prefix and normalised by stripping it, matching
+the Transmittals and RFI clients, with capability-local validation.
+
+**Output projections — 3 / 8 / 17.**
+
+- **Caller context: 3 fields** — `submittals_available`, `permitted_action_count`,
+  `role_count`. A successful DTO requires an object body with `permittedActions`
+  and `roles` both present as arrays; otherwise the structured malformed-response
+  outcome is returned rather than a DTO with zeroed counts.
+- **List: 8 fields per result** — `submittal_id`, `identifier`,
+  `custom_identifier`, `title`, `state_id`, `status_id`, `revision`, `due_date`,
+  plus an allowlisted `pagination` object.
+- **Detail: 17 fields** — the eight above plus
+  `custom_identifier_human_readable`, `description`, `priority`,
+  `spec_identifier`, `spec_title`, `submitter_due_date`, `ball_in_court_type`,
+  `created_at` and `updated_at`.
+
+`custom_identifier` maps **only** from `customIdentifier` and
+`custom_identifier_human_readable` **only** from `customIdentifierHumanReadable`.
+`spec_id`, `type_id`, `subsection`, `manager_type` and `subcontractor_type` are
+excluded, as are all person and company identities, `permittedActions` at both
+scopes, `sentToSubmitter`, and every package, response, attachment, folder and
+custom-attribute field.
+
+**List versus detail.** The upstream list row and the direct detail response were
+observed as **the same 56-key schema** for the controlled fixture. `get_submittal`
+is therefore **not** justified as a richer Autodesk representation; it is retained
+for direct access to one known Submittal without paging the role-scoped collection,
+and to exercise the canonical detail route independently. The differing 8-field and
+17-field projections are our design decision, not an upstream summary/detail split.
+
+**Scope.** The proven first-slice requirement is **`data:read`** (§16.8). The normal
+server grant holds a broader four-scope configuration for other capabilities; that
+is server configuration and does not widen the Submittals requirement.
+
+**Capability record.** Submittals is now a governed capability with
+`api_family: Autodesk Forma Build Submittals API`, `api_version: v2`,
+`api_maturity: ga`, `mcp_component: aps-forma-mcp`,
+**`mcp_implementation_status: planned`** and **`data_readiness: not-assessed`**.
+`planned` is the vocabulary's value for *no MCP tool yet*; `data_readiness` is never
+derived from implementation status.
+
+**Gate 6 closure does not**: authorise MCP implementation; authorise any Autodesk
+call; change the APS/Forma MCP tool count, which **remains 38**; assert that any
+Submittals client, tool or helper exists; assert live MCP verification; establish
+data readiness; classify the controlled synthetic fixture as Gate-8 evidence; or
+support any write, package, review-step, response, attachment, comment, template,
+settings, item-type or spec-section-management operation.
+
+**Gate 8 remains unresolved.**
 
 ## 17. Adopted first capability
 
