@@ -86,6 +86,14 @@ identifier aliases belong in this reference repository.
 For the Revit MCP, the inventory was verified from the committed tree at
 `ae01d29`; unrelated uncommitted working-tree content was excluded.
 
+**Revit MCP source re-traced 2026-07-29**, read-only, at the same committed
+revision `ae01d29` — no re-pin, and **no capability status changed**. The pass
+established the execution path (§4.1), the transaction-based read/write classes
+(§4), the absence of any component write guard (§4.2) and the upstream provenance
+(§4.3). **Only the committed tree was interpreted.** The component's working tree
+carried uncommitted operator content, which remains excluded and is **not** part of
+the published architectural baseline; nothing in this document describes it.
+
 ## 2. Capability-status vocabulary
 
 - **confirmed** — MCP tool implemented and verified in component source at the
@@ -110,21 +118,47 @@ axes that are never conflated
 [reference-repo ADR-0009](../decisions/0009-define-capability-record-cardinality-for-schema-v2.md)).
 
 The **read / write class** used in the tables below is a semantic classification,
-not an HTTP-verb label:
+not an HTTP-verb label. The common principle is that **an operation is a `read`
+only if it leaves no persistent domain-state mutation another caller could observe**,
+and **the transport verb is never the classifier**. Two substrate branches sit
+beneath that principle, and the branches must not be mixed.
+
+**Autodesk cloud APIs (§3) —
+[reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md),
+unchanged:**
 
 - **read** — no observable Autodesk state mutation, and the OAuth scope Autodesk
   requires for the operation is read-only. `GET` is the normal read transport, but
   it is not the definition of read.
 - **write** — any operation that creates, modifies, deletes or transitions
   Autodesk state. Mutation endpoints stay outside the read boundary **regardless
-  of HTTP verb**, and this project's only write tool is guarded (§7).
+  of HTTP verb**.
 
-A **non-GET** operation may be classified `read` only through explicit
-endpoint-level approval under
-[reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md);
-`POST` is not presumed read-safe, and approval never generalises from one endpoint
-to another. Arbitrary URLs, caller-supplied paths and HTTP methods, and generic
-request helpers remain prohibited in every case (§3.1).
+A **non-GET** Autodesk cloud operation may be classified `read` only through
+explicit endpoint-level approval under ADR-0007; `POST` is not presumed read-safe,
+and approval never generalises from one endpoint to another.
+
+**Local Revit/pyRevit automation (§4) —
+[reference-repo ADR-0015](../decisions/0015-classify-local-automation-read-write-by-document-state.md):**
+
+- **read** — commits no Revit transaction and leaves no persistent BIM or document
+  state. A **`POST` route on the local bridge may still be a read**, because that
+  bridge's verbs carry no domain meaning.
+- **write** — commits a Revit transaction, or otherwise leaves persistent document
+  or view state. **Persistent view state counts as a write.**
+- A **bounded transient external side effect** (a temporary file created and
+  removed within the call) does not make an operation a write.
+
+ADR-0015 **neither modifies nor weakens ADR-0007**, and the local branch must never
+be cited for an Autodesk cloud operation.
+
+Arbitrary URLs, caller-supplied paths and HTTP methods, generic request helpers,
+and caller-supplied executable code remain prohibited in every governed read
+surface, on both branches (§3.1, §4.2).
+
+**`write` is a description, not an authorisation.** Which write tools may be
+invoked, and under what control, is stated per component in §3 and §4.2 — the two
+components differ materially and must not be assumed alike.
 
 ## 3. APS/Forma MCP — 35 tools (33 read · 1 guarded write · 1 local)
 
@@ -280,13 +314,130 @@ These three reads were live-exercised in the Phase 4A Transmittals verification.
 Identifier **aliasing** remains the job of this repository's evidence layer, not
 of the component boundary.
 
-## 4. Revit MCP — 14 tools (10 read/inspection · 4 mutating)
+## 4. Revit MCP — 14 tools (10 read · 4 write, none guarded by the component)
 
-| Capability group | Tools | Class | Status |
-|---|---|---|---|
-| Status & model inspection | `get_revit_status`, `get_revit_model_info`, `list_levels`, `list_families`, `list_family_categories`, `list_category_parameters` | read | confirmed |
-| View inspection | `get_revit_view`, `list_revit_views`, `get_current_view_info`, `get_current_view_elements` | read | confirmed |
-| Mutating / guarded | `execute_revit_code`, `place_family`, `color_splash`, `clear_colors` | write | confirmed (excluded from the read-only first slice) |
+Inspected read-only from the **committed tree at `ae01d29`** (2026-07-22 inventory,
+component source re-traced 2026-07-29). Read/write class follows the local-automation
+branch of §2 ([reference-repo ADR-0015](../decisions/0015-classify-local-automation-read-write-by-document-state.md)):
+the classifier is the **Revit transaction**, not the bridge verb.
+
+| Capability group | Tools | Bridge verb | Class | Status |
+|---|---|---|---|---|
+| Session status (runtime provenance, not a BIM capability) | `get_revit_status` | GET | read | confirmed |
+| Model inspection | `get_revit_model_info`, `list_levels`, `list_families`, `list_family_categories`, `list_category_parameters` | GET ×4, **POST ×1** | read | confirmed |
+| View inspection and export | `list_revit_views`, `get_current_view_info`, `get_current_view_elements`, `get_revit_view` | GET | read | confirmed |
+| Element authoring | `place_family` | POST | **write** | confirmed · **not guarded by the component** · excluded from every read-only slice |
+| View graphic overrides | `color_splash`, `clear_colors` | POST | **write** (persistent view state) | confirmed · **not guarded by the component** · excluded from every read-only slice |
+| Arbitrary code execution | `execute_revit_code` | POST | **write, unbounded** | confirmed · **not guarded by the component** · excluded from every read-only slice |
+
+**`list_category_parameters` is a read despite its `POST` route.** It opens no
+Revit transaction and returns parameter metadata gathered by an element collector;
+under ADR-0015 §4a the local bridge's verbs carry no domain meaning. This resolves
+the earlier inconsistency in which a non-`GET` operation was classified `read`
+while §2 required an ADR-0007 endpoint approval that could not exist for it.
+
+**`get_revit_view` is a read despite writing a file.** It exports a PNG to a
+temporary directory, encodes it, and **removes the file within the same call**,
+opening no transaction — a bounded transient external side effect under ADR-0015
+§4c, not a document write.
+
+**`color_splash` and `clear_colors` are writes even though they change no
+geometry.** Both commit a transaction setting element graphic overrides, producing
+persistent, undoable, savable view state that another caller can observe. The
+implementation also applies overrides to **other views of the same view type**, so
+the effect is not confined to the active view.
+
+The six groups above correspond to the governed Revit capability records in
+`config/workflows/end-to-end-reference.yaml`, except that **session status is
+deliberately not a capability record** — it is consumed as runtime provenance
+(`component_provenance.revit_mcp.runtime_status`), not as BIM content.
+
+### 4.1 Execution path and the pyRevit boundary
+
+The Revit path has **four layers**, not two. The APS/Forma pattern — an MCP server
+calling an Autodesk cloud API — does **not** apply here:
+
+```
+MCP client (e.g. Claude Desktop)
+   │  MCP protocol (stdio by default; SSE / streamable-HTTP optional)
+   ▼
+revit-mcp  ·  FastMCP server process (CPython)
+   │  local HTTP bridge → http://localhost:48884/revit_mcp
+   ▼
+pyRevit Routes  ·  HTTP host running INSIDE the Revit process (IronPython)
+   │  Revit API
+   ▼
+Autodesk Revit  ·  document, transaction engine, rendering, BIM state
+```
+
+**The local bridge is not an Autodesk cloud API.** It is loopback HTTP to a
+third-party in-process host. It has **no OAuth model, no scope, no token and no API
+key**, and no authentication is implemented in the inspected component at `ae01d29`.
+No Autodesk endpoint, host or credential is involved anywhere on this path.
+
+Consequences that must not be blurred:
+
+- **`revit-mcp` does not call the Revit API directly.** It calls pyRevit Routes.
+  The Revit API is reached only by the route handlers, which ship as a **pyRevit
+  extension** rather than as MCP-server code.
+- **`api_family: Autodesk Revit API`** is retained for every Revit capability
+  record because the BIM operation ultimately executes against the Revit
+  document/DB API. **pyRevit Routes is an integration transport, not the
+  capability's Autodesk BIM API family**, and is deliberately never written into
+  `api_family` ([ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md)).
+- **pyRevit is a third-party dependency, not an MCP component of this project.** It
+  appears in the responsibility matrix (§9) because it owns a real layer; it is not
+  a `mcp_component` value and never becomes one.
+
+### 4.2 Write control — where it actually lives
+
+**The Revit MCP component implements no write guard.** At the inspected revision it
+has **no confirmation step, no approval mechanism, no dry-run, no preview, no
+read-only mode and no authentication**. Its four write tools are directly callable
+by any client that reaches the server.
+
+**The only control in force is discipline in this repository** — the explicit
+never-invoke list in
+[PHASE_1_EXECUTION_PLAN.md](../workflows/PHASE_1_EXECUTION_PLAN.md) §2, which names
+`execute_revit_code`, `place_family`, `color_splash` and `clear_colors`, together
+with `writes_require_explicit_approval: true` in project configuration. That
+control is **orchestration-layer policy, not a component capability**, and it is
+honoured by never calling a write tool.
+
+This is a **material difference from the APS/Forma MCP**, whose sole write tool
+(`create_forma_proposal`, §3, §7) is guarded in the component itself and requires
+explicit confirmation. **The two components must not be assumed alike**, and
+`mcp_implementation_status: confirmed` on a Revit write capability records only
+that the tool exists and is registered — it authorises no use.
+
+`execute_revit_code` is additionally **unbounded**: it accepts caller-supplied
+IronPython executed inside Revit with the document and the Revit DB namespace in
+scope, wrapped in one committed transaction. It is classified `write` by capability
+regardless of any stated intent (ADR-0015 §4b), and is excluded from every governed
+workflow.
+
+Closing these gaps is a **component** concern and is deferred; no change to
+`revit-mcp-triviron` is authorised or made by this repository.
+
+### 4.3 Provenance and verification limits
+
+**Upstream provenance.** `revit-mcp-triviron` is **based on / forked from**
+[`revit-mcp/revit-mcp-python`](https://github.com/revit-mcp/revit-mcp-python), as
+declared by the `url` and `author` fields of the component's own `extension.json`
+(original authors: Juan D. Rodriguez and Jean-Marc Couffin). Recorded for
+attribution and provenance only; **no licensing assessment is made here**, and no
+component source is copied or vendored into this repository
+([ADR-0002](../decisions/0002-multi-repo-no-submodules.md)).
+
+**No offline verification mechanism exists.** The Revit MCP reports **14 tools at
+`ae01d29`**, established by **reading the committed source** — `tools/__init__.py`
+registers six modules declaring 14 `@mcp.tool()` functions, each resolving to a
+registered pyRevit route. Unlike the APS/Forma MCP, the component provides **no
+offline doctor, tool manifest or equivalent** that can evidence a tool count
+without a running Revit, so no `TOOL_COUNT` / `RESULT=PASS` line can be cited for
+it and no such claim appears anywhere in this repository. Building one is a
+component concern and is deferred. This is a **verification-provenance limitation,
+not a capability gap**.
 
 ## 5. First-slice capability ledger (read-only) — all confirmed
 
@@ -661,9 +812,13 @@ intentional, and ADR-0013 is neither weakened nor reinterpreted.**
 ## 7. Experimental boundary
 
 The Forma Site Design tools target Beta (`v1alpha`) APIs and are isolated as
-experimental. The project's only write tool, `create_forma_proposal`, sits inside
-this Beta boundary and is guarded. Nothing on the stable read-only path depends on
-Forma Site Design writes.
+experimental. The **APS/Forma MCP's only write tool**, `create_forma_proposal`,
+sits inside this Beta boundary and is guarded in the component itself. Nothing on
+the stable read-only path depends on Forma Site Design writes.
+
+This is the project's only **guarded** write tool. It is not the project's only
+write tool: the Revit MCP carries four write tools that the component does **not**
+guard, controlled instead at the orchestration layer (§4.2).
 
 ## 8. Data-readiness status (coordination training data ready)
 
@@ -683,9 +838,14 @@ names, element IDs, model-set IDs, URNs, GUIDs, or timestamps are recorded here.
 
 ## 9. Responsibility matrix
 
+This matrix covers the **two MCP components and this repository**. The Revit path
+has a fourth layer, pyRevit, which is a third-party dependency rather than an MCP
+component; it is set out separately in §9.1.
+
 | Concern | Revit MCP | APS/Forma MCP | This repository |
 |---|---|---|---|
-| Revit authoring / inspection | Owns | — | Documents, invokes, validates |
+| Revit inspection / authoring MCP tool surface (§4) | Owns | — | Documents, invokes, validates |
+| Revit write control and approval (§4.2) | **Does not implement** | — | **Owns** (workflow discipline, `writes_require_explicit_approval`) |
 | Autodesk authentication (APS) | — | Owns | Never implements |
 | Forma Data Management (CDE) | — | Owns | Documents, invokes, validates |
 | Model Derivative / properties | — | Owns | Documents, invokes, validates |
@@ -701,6 +861,23 @@ names, element IDs, model-set IDs, URNs, GUIDs, or timestamps are recorded here.
 "Owns" means the component is the source of truth for that behaviour. This
 repository may **invoke** or **validate** a behaviour but must never
 **re-implement** it.
+
+### 9.1 Revit-path layer ownership
+
+The Revit path traverses four layers (§4.1). Only one of them is an MCP component
+of this project; the table records the other three so no responsibility is
+attributed to the wrong layer.
+
+| Layer | Owns | Is it an MCP component of this project? |
+|---|---|---|
+| **Autodesk Revit** | The document and element model, the transaction engine, undo/redo, regeneration, view rendering, licensing, and all BIM state. Never re-implemented anywhere. | No — the native application |
+| **pyRevit** (third party, `pyrevitlabs`) | The in-process Routes HTTP host, the IronPython execution environment, extension loading, and the `DB` / `revit` bindings the route handlers use. | **No** — a third-party dependency. It is never a `mcp_component` value, and this project neither maintains nor re-implements it |
+| **revit-mcp** (`CognitiveStack/revit-mcp-triviron`) | The MCP tool surface and its registration, argument shaping and response formatting, the local HTTP bridge client, and the route handlers it ships as a pyRevit extension — including their transaction lifecycle. | **Yes** — `mcp_component: revit-mcp` |
+| **bim-workflow-reference** (this repository) | Architecture and roadmap, capability governance, workflow orchestration, read/write classification policy, the evidence schema and sanitisation policy, published evidence, acceptance — and, today, the **only write control in the Revit path** (§4.2). | Not a component — the orchestration layer ([ADR-0001](../decisions/0001-orchestration-layer-not-mcp-server.md)) |
+
+The APS/Forma path has no equivalent third layer: the APS/Forma MCP calls Autodesk
+cloud APIs directly. **The two component architectures are genuinely different, and
+neither should be described in the other's terms.**
 
 ## 10. Anti-duplication rules
 

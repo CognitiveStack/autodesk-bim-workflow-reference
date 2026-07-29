@@ -54,6 +54,17 @@ schema_version: 2
 #                             verified in a different approved project, name that
 #                             scope in data_readiness_reason. Never derived from
 #                             implementation status.
+#                             READINESS LIFETIME DIFFERS BY SYSTEM, VOCABULARY DOES
+#                             NOT. Cloud readiness is normally project/data scoped
+#                             and durable: an Autodesk project either holds the
+#                             fixture or it does not. Local Revit readiness is
+#                             normally session/document scoped: it holds only while
+#                             the expected model is open in a running Revit with the
+#                             pyRevit Routes bridge available. The same three values
+#                             express both; name the scope in data_readiness_reason.
+#                             No prerequisite field exists or is required — session
+#                             preconditions are verification-time facts recorded in
+#                             evidence, not capability-record fields.
 #
 # CAPABILITY-LEVEL fields — CONDITIONAL:
 #
@@ -126,13 +137,111 @@ stages:
   - id: revit_authoring
     platform: Autodesk Revit
     automation_policy: pyrevit_mcp
+    # STAGE SCOPE. Five governed capabilities, separated 2026-07-29 from a single
+    # earlier `revit_authoring` capability record that aggregated read-only document
+    # interrogation, model authoring and unbounded code execution under one
+    # implementation status and one readiness value. That aggregation could not
+    # express a capability that is data-ready alongside capabilities that are not,
+    # nor separate a read surface from a write surface — the stage-versus-capability
+    # conflation ADR-0008 exists to prevent, recurring inside one record. The split
+    # asserts NO new implementation: every tool named below already existed at the
+    # inspected Revit MCP revision ae01d29 (COMPONENT_BOUNDARIES.md 4).
+    #
+    # ALL FIVE share the same system, API and MCP metadata:
+    #   primary_system: Revit · api_family: Autodesk Revit API · api_version OMITTED
+    #   api_maturity: not-applicable · mcp_component: revit-mcp
+    # api_version is deliberately OMITTED for every one: no API contract/request-route
+    # version fact is established in this repository. Revit release years and pyRevit
+    # product versions are PRODUCT versions, which ADR-0009 4 excludes, and no
+    # version is invented to fill the field.
+    # api_maturity: not-applicable for every one: `beta` and `ga` are Autodesk
+    # lifecycle classifications, and neither the Revit desktop API nor the
+    # third-party pyRevit Routes bridge carries one (ADR-0008).
+    # API FAMILY: `Autodesk Revit API` is retained for all five because the BIM
+    # operation ultimately executes against the Revit document/DB API. The pyRevit
+    # Routes HTTP bridge is an INTEGRATION TRANSPORT between the MCP process and the
+    # Revit process, not the capability's Autodesk BIM API family; it is documented
+    # at the component boundary instead (COMPONENT_BOUNDARIES.md 4.1) and is
+    # deliberately never written into api_family.
+    # READ/WRITE: classified by observable local state semantics under ADR-0015, not
+    # by transport verb. No revit-mcp write tool is guarded by the component; see
+    # COMPONENT_BOUNDARIES.md 4.2.
     capabilities:
-      - id: revit_authoring
+      - id: revit_model_inspection
         primary_system: Revit
-        # api_version is deliberately OMITTED: no applicable API contract/request-route
-        # version fact is established in this repository, and api_maturity:
-        # not-applicable makes no concrete lifecycle assertion requiring a version
-        # binding.
+        # Read-only document interrogation: get_revit_model_info, list_levels,
+        # list_families, list_family_categories, list_category_parameters. No Revit
+        # transaction is opened by any of them, so none can mutate the document
+        # (ADR-0015). list_category_parameters is a read despite POST transport.
+        api_family: Autodesk Revit API
+        api_maturity: not-applicable
+        mcp_component: revit-mcp
+        mcp_implementation_status: confirmed
+        # SCOPE OF data_readiness BELOW: model-inspection data was demonstrated in
+        # the published Phase 1 live Revit session (2026-07-22), which returned the
+        # model title and its levels from the Harrismith model and is recorded in
+        # revit-to-cde-trace.result.json. That session exercised model and level
+        # reads only; the family, category and parameter reads in this group were
+        # NOT individually live verified, and no such claim is made here.
+        data_readiness: ready
+        data_readiness_reason: revit-model-inspection-demonstrated-in-phase-1-live-session
+
+      - id: revit_view_inspection_export
+        primary_system: Revit
+        # View interrogation and export: list_revit_views, get_current_view_info,
+        # get_current_view_elements, get_revit_view. Read under ADR-0015:
+        # get_revit_view writes a temporary PNG outside the document and removes it,
+        # which is a bounded transient external side effect, not a document write.
+        # The Phase 1 session recorded an empty view list, so readiness is unproven.
+        api_family: Autodesk Revit API
+        api_maturity: not-applicable
+        mcp_component: revit-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: not-assessed
+
+      - id: revit_element_authoring
+        primary_system: Revit
+        # Model authoring: place_family. Creates a family instance inside a committed
+        # Revit transaction, with rollback on failure — a document WRITE under
+        # ADR-0015. It has never been exercised in any governed run, and no write
+        # to any Revit model is authorised by this record.
+        api_family: Autodesk Revit API
+        api_maturity: not-applicable
+        mcp_component: revit-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: not-assessed
+
+      - id: revit_view_graphic_overrides
+        primary_system: Revit
+        # Presentation state: color_splash, clear_colors. Both commit a Revit
+        # transaction that sets element graphic overrides on views, so both are
+        # document WRITES under ADR-0015 — the mutation is PERSISTENT VIEW STATE
+        # rather than model geometry, and it survives as saved, undoable document
+        # state that another caller can observe. It is not a temporary display
+        # effect. This distinction is carried in prose because the read/write class
+        # already governs it; no schema field is added for it.
+        # Observed scope note: the implementation also applies overrides to other
+        # views of the same view type, so the effect is not confined to the active
+        # view. Never exercised in any governed run.
+        api_family: Autodesk Revit API
+        api_maturity: not-applicable
+        mcp_component: revit-mcp
+        mcp_implementation_status: confirmed
+        data_readiness: not-assessed
+
+      - id: revit_code_execution
+        primary_system: Revit
+        # Arbitrary local code execution: execute_revit_code. Accepts caller-supplied
+        # IronPython and executes it inside Revit with the document, the Revit DB
+        # namespace and the pyRevit module in scope, wrapped in one transaction that
+        # is committed on success. It is therefore UNBOUNDED: its reach is whatever
+        # the Revit API permits, it is classified WRITE under ADR-0015 regardless of
+        # any stated intent, and it is NOT a normal authoring operation.
+        # THIS CAPABILITY IS NOT GUARDED. The component implements no confirmation,
+        # approval, dry-run or read-only mode for it. The only control is
+        # reference-workflow discipline (PHASE_1_EXECUTION_PLAN.md 2), which lives in
+        # THIS repository, not in revit-mcp. `confirmed` records that the tool
+        # exists and is registered; it authorises no use.
         api_family: Autodesk Revit API
         api_maturity: not-applicable
         mcp_component: revit-mcp

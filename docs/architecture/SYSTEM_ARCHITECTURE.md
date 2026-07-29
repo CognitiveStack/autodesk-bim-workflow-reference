@@ -46,6 +46,14 @@ its APS API family.
 The orchestration layer never talks to Autodesk directly; it documents and
 coordinates the components, which own the Autodesk integration.
 
+**The two component paths are not symmetrical.** The APS/Forma MCP calls Autodesk
+cloud APIs directly. The Revit path has a **fourth layer**: the Revit MCP calls
+**pyRevit Routes** over a local HTTP bridge, and only those in-process route
+handlers reach the Revit API. pyRevit is a third-party dependency, not an MCP
+component of this project, and the local bridge is **not** an Autodesk cloud API —
+it has no OAuth, scope or token model. See
+[COMPONENT_BOUNDARIES.md](COMPONENT_BOUNDARIES.md) §4.1 and §9.1.
+
 ## 2. Runtime and control flow
 
 - An MCP client (for example Claude Code) is the entry point; a person remains in
@@ -129,6 +137,18 @@ hygiene rules.
   non-blocking; nothing on the core path depends on it.
 - API maturity is asserted only where verified and cited; otherwise it is marked
   "to be verified". Maturity is never inferred from product maturity.
+- **Read/write is classified by observable state semantics, never by transport
+  verb.** One common principle covers both substrates, with a branch each for
+  Autodesk cloud APIs
+  ([ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md),
+  OAuth-scope based) and local Revit/pyRevit automation
+  ([ADR-0015](../decisions/0015-classify-local-automation-read-write-by-document-state.md),
+  transaction based). The branches are not interchangeable.
+- **`data_readiness` uses one vocabulary with two lifetimes.** Cloud readiness is
+  normally project-scoped and durable; local Revit readiness is normally
+  session/document-scoped. `ready` / `blocked` / `not-assessed` express both, and
+  the scope is named in `data_readiness_reason`. No prerequisite field exists:
+  session preconditions are verification-time facts recorded in evidence.
 
 ## 7. Terminology model applied
 
