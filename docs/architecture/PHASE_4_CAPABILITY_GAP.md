@@ -988,6 +988,16 @@ Consequent rules for Transmittals public evidence:
 > Submittals, Sheets and Meetings remain proposals and are not approved.** The
 > original proposal table is preserved below unchanged.
 
+> **Submittals partially superseded (2026-07-29).** **`SUBMITTAL_n` is approved**
+> by
+> [ADR-0013](../decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md)
+> and recorded in
+> [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) — see §16.9.
+> **The other proposed Submittals families remain unapproved and must not be
+> used**: `SUBMITTAL_PACKAGE_n`, `SUBMITTAL_ITEM_TYPE_n`, `SUBMITTAL_RESPONSE_n`,
+> `SUBMITTAL_STEP_n` and `SPEC_SECTION_n`. The proposal row below is preserved
+> unchanged.
+
 These were **proposed for future consideration**. No change had been made at the
 time of writing to
 [SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md), and none of
@@ -1128,10 +1138,10 @@ and proven across three phases.
 | # | Gate | RFIs | Submittals | Transmittals | Sheets | Meetings |
 |---|---|---|---|---|---|---|
 | 1 | Authoritative APS capability verification | pass | pass | **pass** | pass | fail |
-| 2 | Authentication-scope verification | **unresolved** | **unresolved** | **sufficiently verified** (§16.1) | **unresolved** | fail |
+| 2 | Authentication-scope verification | **unresolved** | **sufficiently verified** (§16.8) | **sufficiently verified** (§16.1) | **unresolved** | fail |
 | 3 | Read/write operation inventory | pass | pass | **pass** | pass | fail |
 | 4 | Data-model and identifier-domain analysis | pass | pass | **pass** | pass | fail |
-| 5 | Privacy and sanitisation planning | **passed** (§16.5) | **unresolved** | **passed** (§16.3) | **unresolved** | fail |
+| 5 | Privacy and sanitisation planning | **passed** (§16.5) | **passed** (§16.9) | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **passed** (§16.6) | **unresolved** | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
 | 8 | Harrismith scenario and data readiness | **closed for the first slice** (§16.7) | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
@@ -1144,7 +1154,13 @@ Recorded explicitly:
   by the research, **Gate 2 is sufficiently verified** (§16.1), **Gate 6 is
   passed** (§16.2), **Gate 5 is passed** (§16.3), and **Gate 8 is closed for the
   first slice** (§16.4).
-- Gates **2, 5, 6 and 8 remain unresolved** for every other candidate.
+- For **Submittals**, **Gate 2 is sufficiently verified** (§16.8) and **Gate 5 is
+  passed** (§16.9). **Gates 6 and 8 remain unresolved.** Submittals is **not an
+  adopted capability** — it has no capability record in the workflow contract, so
+  it has no `mcp_implementation_status` and no `data_readiness` field. Closing
+  Gates 2 and 5 authorised no implementation.
+- Gates **2, 5, 6 and 8 remain unresolved** for **Sheets**, and Gate 2 remains
+  unresolved for **RFIs**.
 - **No other candidate is implementation-ready.**
 - **Closing Gates 2, 5 and 6 did not authorise implementation** — it selected the
   capability, assigned it, and defined how its evidence must be sanitised.
@@ -1530,6 +1546,115 @@ operation; does **not** claim readiness for any other Autodesk project; does
 the Harrismith Fire Station example project contains this or any RFI fixture;
 does **not** close any gate for Submittals, Sheets or Meetings; and does **not**
 make Phase 4A complete.
+
+### 16.8 Submittals Gate 2 — evidence boundary
+
+Gate 2 is **sufficiently verified for Submittals** (2026-07-29), on **bounded
+read-only runtime evidence** obtained in the verified controlled training context.
+
+Unlike §16.1, which rests on module documentation, this closure rests on observed
+responses. Three requests were issued with a three-legged token whose granted scope
+claim was **exactly `data:read`** — no `data:write`, no `account:read`, no
+`viewables:read`:
+
+| Endpoint | Result |
+|---|---|
+| `GET /construction/submittals/v2/projects/:projectId/users/me` | **200** |
+| `GET /construction/submittals/v2/projects/:projectId/items` | **200** |
+| `GET /construction/submittals/v2/projects/:projectId/items/:itemId` | **200** |
+
+**This closure applies only to:**
+
+- **these three endpoints**, and
+- **this three-legged, read-only evidence claim** — that `data:read` alone is
+  sufficient for them in the verified controlled training context.
+
+**It does not establish:** two-legged authentication · Secure Service Accounts ·
+any other Submittals endpoint · any other project · any other role or permission
+configuration · any write scope · general module entitlement · that a narrower or
+broader scope would behave identically anywhere else.
+
+**Gate 2 is an evidence finding, not an architecture decision, and receives no ADR
+of its own** — following the Transmittals precedent at §16.1.
+
+Codifying this row does **not** advance any other gate, does **not** adopt
+Submittals as a capability, and does **not** authorise implementation.
+
+### 16.9 Submittals Gate 5 — passed (2026-07-29)
+
+**Gate 5 (privacy and sanitisation planning) is passed for Submittals**, by
+[ADR-0013](../decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md).
+The governing detail lives in
+[SANITISATION_CONVENTION.md](../guides/SANITISATION_CONVENTION.md) as the
+**Submittals public-evidence profile, version 1**. **The privacy and sanitisation
+policy is complete; nothing else is asserted by this closure.**
+
+**Scope.** The first read-only slice only — `GET /users/me`, `GET /items`,
+`GET /items/:itemId`, all GET-only. Packages, spec sections as independent
+operations, item types, responses, review steps, attachments, comments, revisions
+as independent operations, templates, settings and mappings, custom identifier
+operations, and all writes are outside it.
+
+**Approved alias registry.** Reused unchanged: `PROJECT_n`. Newly approved:
+**`SUBMITTAL_n`** — the only Submittals-specific alias. **Not approved:** `ITEM_n`
+for a Submittals item (a normative prohibition, since Autodesk calls both resources
+"item"), `SUBMITTAL_PACKAGE_n`, `SUBMITTAL_ITEM_TYPE_n`, `SUBMITTAL_RESPONSE_n`,
+`SUBMITTAL_STEP_n`, `SPEC_SECTION_n`, `USER_n` for this slice, `COMPANY_n` for this
+slice, and narrative aliases.
+
+**Field-policy summary:**
+
+- **Raw identifier values always removed** — the project ID, the Submittals item
+  `id`, `specId`, `typeId`, `packageId`, `responseId`, `folderUrn`, the folder URNs
+  **nested inside `revisionsFoldersUrns`**, storage identifiers, other URNs and
+  identifier-bearing URLs. Not unmodified, hashed, truncated or partially masked.
+  **Where a reference or equality proof is genuinely required, an approved domain
+  alias replaces the raw value.**
+- **Omitted in version 1** — `identifier`, `customIdentifier`,
+  `customIdentifierHumanReadable`, `specIdentifier` (presence booleans only) and
+  **`priority`**, whose value set is configured per project and which is not
+  load-bearing. This determination is Submittals-specific and does not modify the
+  RFI profile.
+- **Retained as controlled structural evidence** — `stateId`, `statusId`,
+  `revision`, `ballInCourtType` while verified as a non-identifying discriminator,
+  `managerType` and `subcontractorType` as non-identifying categorical
+  discriminators, HTTP method and endpoint family, status class, authentication-mode
+  category and the scope name `data:read`.
+- **Retained as counts** — permitted-action, role, watcher, custom-attribute,
+  revision-folder, ball-in-court, result and page counts, subject to the existing
+  aggregate rule, and omitted where they add no proof.
+- **Identity** — no `USER_n` is published for this slice at all, stricter than the
+  RFI default; caller `id`, `roles` values, `manager`, `subcontractor`,
+  `createdBy`, `updatedBy` and all actor fields are never published.
+- **Company** — `COMPANY_n` deliberately not reused; `company_data_published:
+  false` is the standard representation; the company member shape has not been
+  observed.
+- **Narrative** — content omitted by default and represented by presence booleans,
+  with `specTitle` classified as narrative rather than a safe label. Readable text
+  only from a controlled synthetic fixture, clearly labelled. **Synthetic status
+  waives no requirement of the profile.**
+- **Timestamps** — behavioural-telemetry treatment, not the ordinary date-only
+  reduction, because every Submittals workflow timestamp is actor-paired. No exact
+  values, no lateness, no intervals, no person-linked ordering. **`sentToSubmitter`
+  must not be described as evidence of submission.**
+- **`permittedActions`** — never published at caller or item scope; it is a
+  write-capability descriptor carrying the project's workflow configuration. Only
+  `permitted_action_count`. `roles` values never published; `role_count` acceptable.
+- **State vocabulary** — the single controlled observation `stateId` = `"sbc-1"`
+  and `statusId` = `"1"` may be recorded, scoped to that observation. **No
+  universal mapping is inferred, no other state vocabulary is established, and
+  `statusId` must not be presented as ordinal, sortable or ranked.**
+
+**Gate 5 closure does not**: authorise MCP implementation; authorise any Autodesk
+call; establish data readiness; classify the existing controlled synthetic fixture
+as Gate-8 evidence; authorise publication of that fixture's content; assert that
+live verification of a first-slice implementation occurred; prescribe the
+caller-facing MCP interface (that is Gate 6); or close Gate 6 or Gate 8.
+
+**Gate 6 and Gate 8 remain unresolved. Submittals is not adopted** — no capability
+record exists in the workflow contract, so there is no `mcp_implementation_status`
+field and no `data_readiness` field for this capability. **No implementation is
+authorised.**
 
 ## 17. Adopted first capability
 

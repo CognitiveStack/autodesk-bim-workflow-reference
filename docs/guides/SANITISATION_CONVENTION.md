@@ -575,6 +575,357 @@ public evidence must be capable of enforcing it**.
 **This is policy guidance, not the Phase 4 schema.** No artifact is created by
 this profile.
 
+### Submittals public-evidence profile
+
+**Approved by [ADR-0013](../decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md)
+(2026-07-29), profile version 1.** This section governs public evidence for the
+Phase 4A Submittals read slice. It **extends** the conventions above and
+**redefines nothing**; every existing rule continues to apply. It changes neither
+the Transmittals profile nor the RFI profile — including the RFI profile's own
+retention of `priority`.
+
+**Submittals is not an adopted capability.** No workflow-contract record exists,
+so this profile is **pre-adoption governance**. Gate state is not a capability
+field.
+
+**Scope.** The first read-only slice only: `GET /users/me`, `GET /items`,
+`GET /items/:itemId`. All three are **GET-only**. Outside this profile: packages ·
+spec sections as independent operations · item types · responses · review steps ·
+attachments · comments · revisions as independent operations · templates ·
+settings and mappings · custom identifier operations · **all writes**.
+
+**Boundary.** This profile governs **what may cross into public repository
+evidence**. Raw Submittals data may exist transiently during authenticated
+processing and inside the git-ignored `.local/` raw-observation boundary under the
+rules already in force. **Real Submittals narrative, identity, commercial
+assignment, timestamps and workflow configuration must never appear in public
+evidence.** The allowed standard representation is approved aliases, controlled
+structural vocabulary, presence booleans and safe counts.
+
+**Observed shape.** The list row and the detail response are **shape-identical** —
+the same 56 keys with the same types on both surfaces. Every state-dependent key
+is present as `null` on an item that has never been submitted, so the schema is
+fixed and populated by state. **One field-handling policy therefore governs both
+surfaces**, and it is written state-independently.
+
+#### Approved alias registry
+
+**Existing reused alias** — unchanged: `PROJECT_n` (the Autodesk project).
+
+**Newly approved alias:**
+
+| Alias | Domain |
+|---|---|
+| `SUBMITTAL_n` | a **Submittals item** record |
+
+`SUBMITTAL_n` is the only Submittals-specific alias in version 1.
+
+**Not approved, and not to be introduced:** `ITEM_n` for a Submittals item ·
+`SUBMITTAL_PACKAGE_n` · `SUBMITTAL_ITEM_TYPE_n` · `SUBMITTAL_RESPONSE_n` ·
+`SUBMITTAL_STEP_n` · `SPEC_SECTION_n` · `USER_n` for this slice · `COMPANY_n` for
+this slice · narrative aliases.
+
+- **`SUBMITTAL_PACKAGE_n`** — `packageId` is omitted; the populated package shape
+  has not been observed.
+- **`SUBMITTAL_ITEM_TYPE_n`** — `typeId` is omitted; type identity proves none of
+  the first-slice propositions.
+- **`SUBMITTAL_RESPONSE_n`** — responses are outside the first slice.
+- **`SUBMITTAL_STEP_n`** — review steps are not read by any first-slice endpoint.
+- **`SPEC_SECTION_n`** — spec identity reduces to a presence boolean.
+- **`USER_n`** — no person reference is required by any first-slice proof.
+- **`COMPANY_n`** — commercial assignment is a distinct disclosure category and the
+  company member shape has not been observed.
+- **Narrative aliases** — text is content, not stable repository identity.
+
+#### Normative rule — `ITEM_n` must never identify a Submittals item
+
+`ITEM_n` belongs to the **Data Management item** identifier domain. `SUBMITTAL_n`
+belongs to the **Submittals item** identifier domain. **These domains are not
+interchangeable, even though Autodesk calls both resources "item" and the
+Submittals collection endpoint returns them under an `items` key.**
+
+Writing `ITEM_n` for a Submittals item would silently merge two identifier domains
+while passing every other check in this convention. Because the API field name
+invites the error, the prohibition is normative rather than inferred.
+
+#### Identifier policy
+
+**Raw values are always removed from public evidence.** The raw identifier value
+must never appear unmodified, hashed, truncated, partially masked, or otherwise
+transformed in a way that preserves the operand. **Where an identity, reference, or
+equality proof is genuinely required, replace the raw value only with an approved
+domain-specific alias under this convention** — approved alias replacement is
+permitted, and is the mechanism by which equality is expressed without disclosure.
+
+The raw values covered are:
+
+the project ID · the Submittals item `id` · `specId` · `typeId` · `packageId` ·
+`responseId` · `folderUrn` · **the folder URNs nested inside
+`revisionsFoldersUrns`** · any storage identifier · any other URN ·
+identifier-bearing URLs.
+
+`revisionsFoldersUrns` is called out explicitly: it is an **index-keyed map whose
+values contain folder URNs**, so a sanitiser inspecting only top-level scalars
+would not reach them.
+
+Also never published in any form: personal names, emails and contact fields ·
+company names and identifiers · OAuth tokens and request headers · raw upstream
+error bodies and diagnostic payloads.
+
+Equality is expressed through **deterministic capture-local alias equality** —
+`SUBMITTAL_1` returned by the list read is the same `SUBMITTAL_1` fetched by the
+detail read — while the raw operand is never published.
+
+#### Field-handling policy
+
+**Alias only** — the raw value is never published:
+
+the project ID (`PROJECT_n`) · the Submittals item `id` (`SUBMITTAL_n`).
+
+**May retain as controlled structural evidence:**
+
+`stateId` · `statusId` · `revision` · `ballInCourtType`, **only** while verified as
+a non-identifying discriminator · `managerType` and `subcontractorType`, **only**
+as non-identifying categorical discriminators · HTTP method and endpoint family ·
+HTTP status class or an approved exact status code · authentication-mode category ·
+the required OAuth scope name **`data:read`**.
+
+**`priority` is not in this set** — see below.
+
+**Presence booleans only** — the value is never published:
+
+`identifier` · `customIdentifier` · `customIdentifierHumanReadable` ·
+`specIdentifier` · `title` · `description` · `specTitle` · `subsection` ·
+`priority` · `dueDate` · `submitterDueDate` · `requiredDate` ·
+`requiredApprovalDate` · `requiredOnJobDate` · `managerDueDate` · `leadTime` · the
+package relationship where structurally necessary.
+
+**Use presence booleans only where load-bearing.** A presence boolean that proves
+nothing is omitted.
+
+**May retain as counts,** subject to the existing aggregate rule:
+
+`permittedActions` → `permitted_action_count` · `roles` → `role_count` ·
+`watchers` → `watcher_count` · `customAttributes` → `custom_attribute_count` ·
+revision folders → `revision_folder_count` · ball-in-court arrays → their
+respective counts · result count · pagination page count.
+
+**Omit counts when they add no proof.**
+
+**Never published in actual value form:**
+
+the caller `id` · `roles` values · `manager` · `subcontractor` · `createdBy` ·
+`updatedBy` · `submittedBy` · `publishedBy` · `respondedBy` · `sentToReviewBy` ·
+`ballInCourtUsers` values · `watchers` values · `ballInCourt` ·
+`ballInCourtCompanies` values · `ballInCourtRoles` values · commercial assignment
+relationships · `specId` · `typeId` · `packageId` · `responseId` · `folderUrn` ·
+nested `revisionsFoldersUrns` URNs · storage identifiers · `identifier` ·
+`customIdentifier` · `customIdentifierHumanReadable` · `specIdentifier` · `title` ·
+`description` · `responseComment` · `specTitle` · `subsection` · `packageTitle` ·
+`packageIdentifier` · `packageSpecIdentifier` · `permittedActions` content ·
+transition maps · every timestamp and date value · `customAttributes` contents.
+
+#### `priority` — omitted
+
+**`priority` is caller-operational and omitted from public evidence.** It is
+**not** a publishable controlled categorical value.
+
+Its value set is **configured per project**, so publishing it converts project
+configuration into public metadata. It is not load-bearing for Gate-5 policy or for
+first-slice evidence, and public evidence does not need the actual value. Where
+structural proof is ever genuinely required, `priority_present` is preferred.
+
+**This is Submittals-specific and does not modify the RFI profile**, which retains
+`priority` under its own approved terms.
+
+#### Narrative policy
+
+- **Default: omit the content.** The standard public representation is **derived
+  machine-safe properties** — `title_present`, `description_present`,
+  `response_comment_present`, `spec_title_present`,
+  `narrative_content_published`.
+- **Never published as real content:** `title` · `description` · `responseComment`
+  · `specTitle` · `subsection` · `packageTitle` · attachment and file names · any
+  response narrative.
+- **`specTitle` is narrative, not a safe label** — spec section titles name
+  building systems and procurement scope.
+- **No narrative aliases are created.**
+- **Character counts are discouraged** — length is weakly identifying and proves
+  nothing a presence boolean does not.
+
+#### Human-identifier policy
+
+`identifier`, `customIdentifier`, `customIdentifierHumanReadable` and
+`specIdentifier` are **caller-operational, not public-evidence values**. They are
+**omitted and not aliased**; only presence booleans may be recorded.
+
+`identifier` is an **integer sequence number** and receives the treatment already
+applied to the Transmittals `sequenceId` and the RFI `customIdentifier`: publishing
+it discloses project scope and volume, and it is never a join key.
+
+#### Personal identity policy
+
+**No `USER_n` is published for this slice** — not for the authenticated caller, not
+for the manager, not for the subcontractor, not for ball-in-court, not for
+watchers. This is stricter than the RFI default posture; nothing in the first-slice
+proof set requires a person reference, so the default becomes an absolute here.
+This tightens within the existing model and redefines nothing.
+
+Permitted substitutes: `role_count` · `watcher_count` · `ball_in_court_user_count`
+· `manager_assigned` · `subcontractor_assigned` · `managerType` and
+`subcontractorType` as non-identifying categorical discriminators.
+
+#### Company and commercial policy
+
+**`COMPANY_n` is deliberately not reused for Submittals.** The standard
+representation is **`company_data_published: false`**.
+
+Submittals company data is **commercial assignment** — which contractor is
+responsible for which procurement scope — not a distribution list; no first-slice
+proof requires it; and the company member shape **has not been observed**, since
+`ballInCourtCompanies` was empty in the verified context.
+
+Never published: company names · company identifiers · `ballInCourtCompanies`
+values · `subcontractor` values · commercial assignment relationships. Where
+structure must be proven, `ball_in_court_company_count` only.
+
+#### `users/me` minimisation
+
+**Default posture: no `USER_n` is published for the authenticated caller**, and the
+caller `id` and `roles` values are never published.
+
+The caller-context public structural evidence is exactly: `submittals_available` ·
+`permitted_action_count` · `role_count`.
+
+#### `items` list public-evidence projection
+
+Public evidence may include `SUBMITTAL_n` · `PROJECT_n` · `stateId` · `statusId` ·
+`revision` · result and pagination counts · presence booleans where load-bearing.
+
+It does **not** include `identifier`, `customIdentifier`,
+`customIdentifierHumanReadable`, `specIdentifier`, `title`, `description`,
+`specTitle`, `priority`, any person or company value, any timestamp, any raw
+identifier or URN, or any `permittedActions` content.
+
+The observed no-parameter page size is 20. **The maximum page size is unknown**,
+and no claim about page-size limits may be published.
+
+#### `items/:itemId` public-evidence projection
+
+Public evidence may prove Submittal alias continuity, state and status
+readability, revision, safe counts and presence booleans. **The same exclusions
+apply** — the detail response is shape-identical to the list row, so no field
+becomes publishable by virtue of the surface it was read from.
+
+#### State, status and revision policy
+
+`stateId`, `statusId` and `revision` may be retained as controlled structural
+workflow evidence. The following constraints are normative:
+
+- These are **observed API workflow vocabulary values**, not free text and not
+  identifiers.
+- **Only observed values may be reported.** The single controlled observation is
+  `stateId` = `"sbc-1"` and `statusId` = `"1"`, recorded while the product
+  interface displayed **Required / Waiting for submission**.
+- **No universal mapping is inferred**, and no other state vocabulary is
+  established.
+- **`statusId` is a string.** `"1"` **must not be represented as ordinal, sortable
+  or ranked.**
+- **Sanitisation must not strengthen the claim beyond the one observation**, under
+  the evidence-wording rule that sanitising must never upgrade a claim.
+
+`revision` may be published as structural integer evidence — it is a per-item
+counter and, unlike `identifier`, discloses no project volume.
+
+#### Ball-in-court policy
+
+`ballInCourtType` may be published as a non-identifying categorical discriminator,
+and **only** while verified as such.
+
+**The four collections are never published in any form** — `ballInCourt`,
+`ballInCourtUsers`, `ballInCourtCompanies`, `ballInCourtRoles`. Not aliased, not
+truncated, not partially masked.
+
+Counts are permitted where structure must be proven, subject to the aggregate rule,
+and **omitted where they add no proof** — in a small project a type plus a count of
+one narrows the responsible party considerably.
+
+#### Workflow-timestamp policy
+
+**No actual date or timestamp value is published**, and **no lateness, interval,
+chronological reconstruction or person-linked ordering** is derived.
+
+Submittals timestamps receive the stricter treatment applied to behavioural
+telemetry above, **not** the ordinary date-only reduction. The reason is
+structural: **every Submittals workflow timestamp is actor-paired** —
+`sentToReview` with `sentToReviewBy`, `respondedAt` with `respondedBy` — so a
+published time is a published fact about an identified person's conduct.
+
+Presence booleans such as `has_due_date`, `has_submitter_due_date` and
+`has_required_on_job_date` are permitted where load-bearing.
+
+**Wording rule — `sentToSubmitter` does not mean the item was submitted.** The
+controlled fixture proved this field can be populated while the item remains in
+**Required / Waiting for submission**, with `submittedBy` still null: it records
+routing to the submitter, not submission by the submitter. Evidence and notes must
+not describe its presence as evidence of submission.
+
+#### `permittedActions` and roles policy
+
+**`permittedActions` is never published** — at either caller scope or item scope.
+This covers the objects and every part of them: member `id` values · `fields`
+contents · `mandatoryFields` contents · `transitions` · `actionId` · transition
+`name` · `stateFrom` · `stateTo` · `transitionFields`.
+
+The array describes **write capability** a read-only slice never exercises, and the
+transition maps collectively **are the project's workflow configuration**.
+
+Permitted where genuinely needed: `permitted_action_count` only. **`roles` values
+are never published**; `role_count` is acceptable.
+
+#### Error policy
+
+**The raw upstream Submittals error body is never published.** Permitted: HTTP
+status code or class · a stable **local** error category (`authentication_failed`,
+`permission_denied`, `not_found`, `rate_limited`, `transport_error`, `timeout`) ·
+a fixed sanitised **local** reason · safe booleans.
+
+#### Controlled synthetic fixture rule
+
+**Readable narrative may be publicly published only when it originates from an
+explicitly controlled synthetic fixture satisfying this profile.**
+
+A deliberately controlled synthetic Submittal **materially reduces disclosure risk
+and is more mechanically auditable** than post-hoc sanitisation of arbitrary real
+content. **Synthetic status waives no requirement of this profile** — synthetic
+content must still satisfy the identifier rules, narrative rules, timestamp rules,
+identity rules, company rules, error rules and the full checklist below. The label
+"synthetic" is not, by itself, proof of safety.
+
+Synthetic narrative is **optional**; omission is always acceptable and remains the
+default.
+
+A controlled synthetic Submittal fixture **exists** in the training project and was
+used as **diagnostic input** for runtime contract verification. Its existence is a
+diagnostic fact, **not** a readiness finding: it is not Gate-8 evidence, its
+content is not authorised for publication, and Gate 8 remains unresolved.
+
+#### Gate 5 / Gate 6 boundary
+
+This profile specifies the **public-evidence contract**. It does **not** prescribe
+the complete caller-facing MCP interface. Gate 6 later decides tool boundaries,
+caller-facing fields, client design and the enforcement mechanism. This profile
+requires only that **any future path producing public evidence must be capable of
+enforcing it**.
+
+The two contracts will legitimately differ: a caller-facing DTO may carry values
+this profile forbids in public evidence, because an authenticated caller holding
+`data:read` already has role-scoped access to them. That is a difference of
+boundary, not a contradiction.
+
+**This is policy guidance, not the Phase 4 schema.** No artifact is created by this
+profile.
+
 ## Identifier domains are not interchangeable
 
 Each alias family names a **different kind of thing**. Mixing them silently
@@ -594,11 +945,16 @@ manufactures a relationship that the API never returned.
 | `ROLE_1` | **project-role** domain |
 | `FOLDER_1` | **Data Management folder** domain |
 | `ITEM_1` | **Data Management item** domain — the stable item/lineage identity for that surface |
+| `SUBMITTAL_1` | **Submittals item** domain — distinct from `ITEM_1`, which is the Data Management item domain |
 
 Rules:
 
 - Aliases from different domains are **not interchangeable**, and one is never
   written where another is meant.
+- **`ITEM_n` must never identify a Submittals item**, and `SUBMITTAL_n` must never
+  identify a Data Management item. Autodesk calls both resources "item" and the
+  Submittals collection endpoint returns them under an `items` key, so the field
+  name actively invites the error. This prohibition is normative, not inferred.
 - **Matching numeric suffixes imply nothing.** `MODEL_1`, `VERSION_1`,
   `MODEL_SET_VERSION_1` and `ISSUE_1` sharing the suffix `_1` does **not** imply
   identity, correspondence, or a relationship between them. Suffixes are
@@ -752,3 +1108,49 @@ omit it rather than reduce it.
 31. **No `RFI_TYPE_n`, `RESPONSE_n`, `WORKFLOW_n` or narrative alias appears.**
 32. **No raw upstream RFI error body appears** — errors are a status, a local
     category, a fixed sanitised local reason, and booleans.
+
+### Additional checks for Submittals evidence
+
+33. **No raw Submittals item, project, `specId`, `typeId`, `packageId` or
+    `responseId` value appears**, no `folderUrn`, **no folder URN nested inside
+    `revisionsFoldersUrns`**, and no storage identifier — not unmodified, hashed,
+    truncated or partially masked. Where a reference was required, an **approved
+    alias** was used instead.
+34. **`identifier`, `customIdentifier`, `customIdentifierHumanReadable` and
+    `specIdentifier` values are absent**, and none was aliased. Only presence
+    booleans appear, and only where load-bearing.
+35. **No real Submittals narrative appears** — no `title`, `description`,
+    `responseComment`, `specTitle`, `subsection`, `packageTitle` or attachment
+    name. Narrative is represented by presence booleans.
+36. **Any readable narrative present came from the controlled synthetic fixture,
+    is clearly labelled synthetic, and satisfies every other rule in this
+    checklist** — synthetic status waived nothing.
+37. **No person value appears** — no caller `id`, `roles` value, `manager`,
+    `subcontractor`, `createdBy`, `updatedBy`, `submittedBy`, `publishedBy`,
+    `respondedBy`, `sentToReviewBy`, `ballInCourtUsers` or `watchers` value — and
+    **no `USER_n` is published for this slice**.
+38. **`company_data_published: false`**, no company name or identifier appears, no
+    `ballInCourtCompanies` value appears, no commercial assignment relationship is
+    described, and **no `COMPANY_n` is used for this slice**.
+39. **No ball-in-court array member appears** in any form; only
+    `ballInCourtType` and, where load-bearing, counts.
+40. **No timestamp or date value appears**, and no lateness, interval,
+    chronological reconstruction or person-linked ordering is derived.
+    **`sentToSubmitter` is not described as evidence of submission** — the
+    controlled fixture proved it can be populated while the item remains in
+    *Required / Waiting for submission* with `submittedBy` still null.
+41. **No `permittedActions` content appears** at caller or item scope — no member
+    `id`, `fields`, `mandatoryFields`, `transitions`, `actionId`, transition
+    `name`, `stateFrom`, `stateTo` or `transitionFields` — and **no `roles`
+    value**. Only `permitted_action_count` and `role_count` where needed.
+42. **`priority` values are absent**; only `priority_present` where genuinely
+    required.
+43. **`statusId` is not presented as ordinal, sortable or ranked**, and the state
+    vocabulary is scoped to the single controlled observation — no universal
+    mapping is claimed and no other state vocabulary is asserted.
+44. **No `ITEM_n` is written for a Submittals item**, and no `SUBMITTAL_n` is
+    written for a Data Management item.
+45. **No `SUBMITTAL_PACKAGE_n`, `SUBMITTAL_ITEM_TYPE_n`, `SUBMITTAL_RESPONSE_n`,
+    `SUBMITTAL_STEP_n` or `SPEC_SECTION_n` appears**, and no narrative alias.
+46. **No raw upstream Submittals error body appears** — errors are a status, a
+    local category, a fixed sanitised local reason, and booleans.
