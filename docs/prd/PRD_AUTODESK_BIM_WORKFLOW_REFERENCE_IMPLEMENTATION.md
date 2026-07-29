@@ -5,15 +5,20 @@ Phase 3 closed at its evidence ceiling **`shared_model_context_proven`**: a
 coordination issue and a coordination snapshot were proven to refer to the same
 models at the same coordinated versions. **Clash-level reads remain
 unimplemented**, so a direct clash-to-issue link and geometric resolution remain
-**unproven**. **Phase 4A capability research is complete and its first slice is
-selected**: Autodesk Forma **Transmittals** read-only, owned by the APS/Forma MCP
-([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
-That first slice is **implemented and live-verified** (2026-07-27) — Gates 2, 5, 6
-and 8 are closed for it, Gate 8 under the operative §14 criteria with readiness
-established in the **approved training project**. **Phase 4A as a whole is not
-complete**: no other Phase 4A module is implemented, and the Phase 4 result schema,
-public-evidence governance and public evidence remain outstanding.
-**Created:** 2026-07-22 · **Last reviewed:** 2026-07-27
+**unproven**. **The Phase 4A Forma proving ground is complete at three governed
+read-only capabilities** — Autodesk Forma **Transmittals**
+([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md),
+live-verified 2026-07-27), Forma Build **RFIs**
+([ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md),
+2026-07-28) and Forma Build **Submittals**
+([ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md),
+2026-07-29) — all owned by the APS/Forma MCP, all with Gate 8 closed under the
+operative §14 criteria and readiness established in the **approved training
+project**, and all with a published sanitised evidence artifact. The Phase 4
+result schema and per-capability public-evidence governance are **in place**.
+**No fourth Autodesk Forma capability enters V1**: Sheets is not adopted and
+Meetings remains deferred.
+**Created:** 2026-07-22 · **Last reviewed:** 2026-07-29
 **Terminology last verified:** 2026-07-23 (see
 [GLOSSARY.md](../guides/GLOSSARY.md) and
 [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md))
@@ -356,22 +361,23 @@ operations). Its **API family name is now
 authoritatively verified**; per [ADR-0003](../decisions/0003-autodesk-platform-product-and-api-terminology.md)
 the other modules' family names remain unasserted here.
 
+**Also resolved since (2026-07-28/29).** **RFIs** and **Submittals** were
+subsequently adopted, implemented and live-verified as the second and third
+governed Phase 4A capabilities, both in the APS/Forma MCP. RFI listing requires a
+POST-based search, and that POST-as-read policy decision was **taken** by
+[reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md),
+which approves that one search endpoint as read-semantic; Submittals needed no such
+classification, being GET-only. Neither capability has any write support, and none
+is authorised.
+
 Open:
 
-- **RFI** capabilities: no MCP tools yet (**planned**); now the **preferred second**
-  Phase 4A capability, in the APS/Forma MCP. Listing requires a POST-based search,
-  so a POST-as-read policy decision was needed before any RFI read slice; that
-  decision has now been **taken** by
-  [reference-repo ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md),
-  which approves that one search endpoint as read-semantic. **RFI implementation
-  remains unauthorised**, and the other RFI prerequisites remain unresolved.
 - **Assets** capabilities: no MCP tools yet (**planned**); when and in which component?
-- **Submittals**: GA capability researched; **later candidate**, not selected first;
-  no MCP tool exists.
-- **Sheets**: GA capability researched, including a genuine read surface; **later
-  candidate**. It still requires **domain disambiguation**: the component's existing
-  `list_model_views` and `get_derivative_manifest` are **Model Derivative** reads and
-  are **not** a Sheets module; the two must not be conflated.
+- **Sheets**: GA capability researched, including a genuine read surface; **not
+  adopted, and not part of the V1 roadmap**. It would still require **domain
+  disambiguation**: the component's existing `list_model_views` and
+  `get_derivative_manifest` are **Model Derivative** reads and are **not** a Sheets
+  module; the two must not be conflated.
 - **Meetings**: **deferred — public API not verified.** No authoritative public
   surface was located in the sources checked; that records those sources, not a
   claim that none exists.
@@ -473,8 +479,9 @@ capability verification**:
   Management and Autodesk Forma Build** (widened by
   [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md);
   it is no longer scoped to Forma Build alone): **Transmittals** (adopted first
-  read-only capability), **RFIs** (preferred second), Submittals and Sheets
-  (later/research candidates), Meetings (deferred).
+  read-only capability), **RFIs** (adopted second) and **Submittals** (adopted
+  third) — all three implemented and live-verified; **Sheets** not adopted,
+  **Meetings** deferred.
 - **Phase 4B — field quality and execution:** Issues, Forms, inspections and
   construction records.
 - **Phase 4C — asset handover:** Assets, equipment records, defects, inspections
@@ -484,7 +491,7 @@ Shared platform services (Issues, Relationships, Data Management) may be used in
 several phases; their use in Phase 2 or Phase 3 **does not** mean the complete
 Forma Build phase has begun.
 
-#### Phase 4A began as capability research; the first slice is now selected
+#### Phase 4A began as capability research; three capabilities are now complete
 
 Phase 4A's first increment was **authoritative APS capability research**, not
 tool implementation. That research is recorded in
@@ -492,19 +499,26 @@ tool implementation. That research is recorded in
 outcome was a roadmap and component-boundary decision, taken in
 [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md).
 
-**The Transmittals first slice is implemented and live-verified (2026-07-27); no
-other Phase 4A capability is implemented.** Five read-only Transmittals MCP
-operations exist in the APS/Forma MCP
-([COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) §3.3). No MCP
-tool exists for any other Phase 4A module, and **Phase 4A as a whole is not
-complete**.
+**Current state (2026-07-29): the Phase 4A Forma proving ground is complete at
+three governed capabilities.** Transmittals (five read-only operations,
+live-verified 2026-07-27), RFIs (three, 2026-07-28) and Submittals (three,
+2026-07-29) are all implemented in the APS/Forma MCP and live-verified against
+controlled synthetic fixtures in the approved training project
+([COMPONENT_BOUNDARIES.md](../architecture/COMPONENT_BOUNDARIES.md) §3.3, §6.2,
+§6.3). All are read-only; **no Phase 4A write capability is implemented, supported
+or authorised**, and every readiness value is scoped to that project and to that
+capability's own first slice.
+
+**No fourth Autodesk Forma capability enters V1.** Sheets is not adopted, Meetings
+remains deferred, and Assets remains a governed **planned** capability in Phase 4C.
+V1 proceeds to common-schema consolidation and Revit MCP alignment.
 
 | Module | Classification | Status |
 |---|---|---|
-| **Transmittals** | **Adopted first Phase 4A read-only capability** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)). Autodesk Forma Data Management module; five documented `GET` operations; owning component **APS/Forma MCP**; sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) | **Gates 2, 5, 6 and 8 closed for this slice** — Gate 8 under the operative §14 criteria, readiness established in the approved training project. **Implemented · live-verified 2026-07-27.** Phase 4 result schema, public-evidence governance and public evidence outstanding |
-| **RFIs** | **Preferred second Phase 4A capability.** Closest structural analogue to the Issues reads already proven in Phases 2 and 3 | Researched; **not first** (privacy exposure, larger surface, POST-based listing). Implementation not approved |
-| **Submittals** | **Later candidate** | GA capability researched; not selected first |
-| **Sheets** | **Later candidate**, requiring **domain disambiguation** — must **not** be confused with the component's Model Derivative model views (`list_model_views`) or manifests (`get_derivative_manifest`) | GA capability researched, including a genuine read surface; not selected first |
+| **Transmittals** | **Adopted first Phase 4A read-only capability** ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)). Autodesk Forma Data Management module; five documented `GET` operations; owning component **APS/Forma MCP**; sanitisation profile approved ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md)) as extended by [ADR-0006](../decisions/0006-approve-cross-surface-transmittals-evidence-semantics.md) | **Gates 2, 5, 6 and 8 closed for this slice** — Gate 8 under the operative §14 criteria, readiness established in the approved training project. **Implemented · live-verified 2026-07-27.** Phase 4 result schema, public-evidence governance and the public evidence artifact are **in place** |
+| **RFIs** | **Adopted second Phase 4A capability** ([ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md), search contract refined by [ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)). Autodesk Forma Build module; three read-only operations, one of them a `POST` classified read by state semantics ([ADR-0007](../decisions/0007-read-write-classification-by-state-semantics.md)); sanitisation profile approved ([ADR-0010](../decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)) | **Gates 5, 6 and 8 closed for this slice.** **Implemented · live-verified 2026-07-28.** Public evidence artifact in place. **No RFI write is supported or authorised** |
+| **Submittals** | **Adopted third Phase 4A capability** ([ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)). Autodesk Forma Build module; three read-only `GET` operations; sanitisation profile approved ([ADR-0013](../decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md)) | **Gates 2, 5, 6 and 8 closed for this slice.** **Implemented · live-verified 2026-07-29**, `data:read` proven sufficient. Public evidence artifact in place. **No Submittals write is supported or authorised** |
+| **Sheets** | **Not adopted for V1**, and would require **domain disambiguation** — must **not** be confused with the component's Model Derivative model views (`list_model_views`) or manifests (`get_derivative_manifest`) | GA capability researched, including a genuine read surface; Gates 2, 5, 6 and 8 remain unresolved. Not selected, and **not part of the V1 roadmap** |
 | **Meetings** | **Deferred** | **Public API not verified** — no authoritative public surface was located in the sources checked. This records those sources, not a claim that none exists |
 
 The original selection of RFIs as the provisional first candidate was a
@@ -512,10 +526,11 @@ The original selection of RFIs as the provisional first candidate was a
 document required. RFIs remain a governed Phase 4A capability and are **not**
 rejected.
 
-**Transmittals first-slice scope, once the remaining gates close**, is fixed at
-the five documented read operations: list transmittals; get one transmittal;
-list recipients; list folders; list included document versions. **No write
-operation is in scope.**
+**Transmittals first-slice scope** is fixed at the five documented read
+operations: list transmittals; get one transmittal; list recipients; list folders;
+list included document versions. **No write operation is in scope.** The gates
+this scope was conditional on are now closed (§16 of the capability gap), and the
+slice is implemented and live-verified.
 
 #### Phase 4A entry gate
 

@@ -584,9 +584,22 @@ Phase 4A Submittals read slice. It **extends** the conventions above and
 the Transmittals profile nor the RFI profile — including the RFI profile's own
 retention of `priority`.
 
-**Submittals is not an adopted capability.** No workflow-contract record exists,
-so this profile is **pre-adoption governance**. Gate state is not a capability
-field.
+**State at approval (2026-07-29).** When ADR-0013 approved this profile,
+**Submittals was not an adopted capability**: no workflow-contract record existed,
+so the profile was **pre-adoption governance**. Gate state is not a capability
+field. That statement is preserved because it records the basis on which the
+profile was approved.
+
+**Current state (2026-07-29, later the same day).** Submittals was subsequently
+adopted as the **third governed Phase 4A capability** by
+[ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md),
+then **implemented, published and live-verified**. It now holds a schema-v2
+workflow-contract capability record with `mcp_implementation_status: confirmed`
+and `data_readiness: ready`, both scoped to the approved training project and to
+the first read-only slice. **This profile is unchanged by that adoption.** It
+remains **profile version 1**, and every alias registry, identifier-domain rule and
+field-handling rule below stands exactly as approved — including the normative
+`ITEM_n` / `SUBMITTAL_n` separation and the omission of `priority`.
 
 **Scope.** The first read-only slice only: `GET /users/me`, `GET /items`,
 `GET /items/:itemId`. All three are **GET-only**. Outside this profile: packages ·

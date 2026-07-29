@@ -55,6 +55,19 @@ rows above are deliberately **not** rewritten: they record the 2026-07-27
 inventory verification, and no full component re-inventory has been performed
 since. Only the RFI capability rows in this document reflect the newer revision.
 
+**Delta since this inventory date (2026-07-29).** The component has since published
+the **Submittals first read-only slice** (§6.3) at
+`f763d190871743e4c638902ddd6fdadf2d740e88`. The live verification of that slice
+was exercised through a freshly launched server over the MCP protocol surface, and
+that surface reported **41 registered tools**, of which **3 are Submittals reads**
+and **0 are Submittals writes** — the three Submittals reads added to the 38 above.
+**No offline doctor result is recorded here for this revision**, because none was
+captured; the 41 figure is the count observed on the verified MCP protocol surface.
+The dated ledger rows above and the 2026-07-28 RFI delta are both deliberately
+**not** rewritten: each records the state established on its own date, and no full
+component re-inventory has been performed since 2026-07-27. Only the Submittals
+capability rows in this document reflect this newer revision.
+
 The five read-only Model
 Coordination model-set reads were added by component commit
 `c92ee079408500b74f7c2f7efd8b1ab0b8047fe3` (*feat: add read-only Model
@@ -289,7 +302,7 @@ of the component boundary.
 **No component tool capability is missing for the read-only first slice.** Steps
 5–6 remain this repository's work to build.
 
-## 6. Later-stage missing MCP capabilities (planned)
+## 6. Phase 4A capability state and remaining MCP gaps
 
 | Stage | Capability | Status |
 |---|---|---|
@@ -300,17 +313,31 @@ of the component boundary.
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
 and live-verified (§3); they are no longer a gap. The **Transmittals** first slice
 is likewise **implemented and live-verified** (§3.3) and is no longer a gap — it
-has been removed from the table above; **Phase 4A as a whole is not complete**,
-and RFIs, Submittals, Sheets and Meetings remain unimplemented. The
-**Transmittals** and **RFI** API-family names are asserted because they are
-verified from official Autodesk/APS documentation; the **Assets** API-family name
-is still not asserted here until it is verified from an official Autodesk/APS or
-component source. **RFI is an adopted governed capability in the schema-v2
-workflow contract, not an implemented one** — its `mcp_implementation_status` is
-`planned` and its `data_readiness` is `not-assessed`. Its component boundary and
-caller-facing contract are fixed by
+has been removed from the table above.
+
+**All three governed Phase 4A capabilities are now implemented and live-verified**:
+Transmittals (§3.3, 2026-07-27), RFIs (§6.2, 2026-07-28) and Submittals (§6.3,
+2026-07-29). Each carries `mcp_implementation_status: confirmed` and
+`data_readiness: ready` in the schema-v2 workflow contract, and **each of those
+values is scoped to the approved training project and to that capability's own
+first read-only slice** — no other project, and no write capability. **No Phase 4A
+write tool exists for any of the three.** **Sheets** and **Meetings** remain
+unimplemented, and **Assets** remains planned; the V1 scope decision for Phase 4A
+is recorded in
+[PHASE_4_CAPABILITY_GAP.md](PHASE_4_CAPABILITY_GAP.md) §1 and is not restated here.
+
+The **Transmittals**, **RFI** and **Submittals** API-family names are asserted
+because they are verified from official Autodesk/APS documentation; the **Assets**
+API-family name is still not asserted here until it is verified from an official
+Autodesk/APS or component source. The RFI component boundary and caller-facing
+contract are fixed by
 [reference-repo ADR-0011](../decisions/0011-adopt-rfi-first-slice-mcp-contract-and-component-boundary.md)
-(§6.2); **the contract is approved, the implementation is not written.**
+as refined for search by
+[ADR-0012](../decisions/0012-refine-rfi-search-contract-from-runtime-verification.md)
+(§6.2), and the Submittals equivalents by
+[reference-repo ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)
+(§6.3). For both, **the contract is approved and the implementation is written,
+published and live-verified.**
 
 ### 6.1 Transmittals ownership split (adopted, implemented)
 
@@ -664,7 +691,8 @@ names, element IDs, model-set IDs, URNs, GUIDs, or timestamps are recorded here.
 | Model Derivative / properties | — | Owns | Documents, invokes, validates |
 | Issues, Reviews & Relationships (assets planned) | — | Owns | Documents, invokes, validates |
 | RFI first-slice reads (adopted, implemented — §6.2) | — | Owns | Documents, invokes, validates |
-| Transmittals reads (adopted, planned — §6.1) | — | Owns | Documents, invokes, validates |
+| Transmittals reads (adopted, implemented — §3.3, §6.1) | — | Owns | Documents, invokes, validates |
+| Submittals first-slice reads (adopted, implemented — §6.3) | — | Owns | Documents, invokes, validates |
 | Model Coordination model-set/version reads | — | Owns | Documents, invokes, validates |
 | Model Coordination clash engine (native) | — | Consumes / surfaces | Documents only |
 | Clash detection | Must not build | Must not build | Must not build |

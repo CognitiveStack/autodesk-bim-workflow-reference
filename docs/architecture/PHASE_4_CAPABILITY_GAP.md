@@ -10,15 +10,19 @@ sufficiently verified** (§16.1) and **Gate 6 is passed** — Transmittals is th
 ([ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md),
 §16.3). **Gate 8 is closed for the Transmittals first slice** under the operative
 §14 criteria, with readiness established in the **approved training project**
-(§16.4). **Gate 8 is also closed for the RFI first read-only slice** (§16.7),
-with readiness established in the same approved training project against a
-controlled synthetic fixture. The **Transmittals first slice is implemented and
-live-verified** (2026-07-27) and the **RFI first read-only slice is implemented,
-published and live-verified** (2026-07-28); **no other Phase 4A module is
-implemented**, and **Phase 4A as a whole is not complete**.
+(§16.4). **Gate 8 is also closed for the RFI first read-only slice** (§16.7) and
+for the **Submittals first read-only slice** (§16.11), with readiness established
+in the same approved training project against controlled synthetic fixtures.
+**All three governed Phase 4A capabilities are implemented, published and
+live-verified**: Transmittals (2026-07-27), RFIs (2026-07-28) and Submittals
+(2026-07-29). **The Phase 4A Forma proving ground is complete at those three
+capabilities, and no fourth Autodesk Forma capability enters V1** — Sheets is not
+adopted and Meetings remains deferred (§1).
 **Research date:** 2026-07-24 · **Transmittals normative spike:** 2026-07-25 ·
 **Architecture and privacy decisions:** 2026-07-25 · **Transmittals
-implementation and live verification:** 2026-07-27
+implementation and live verification:** 2026-07-27 · **RFI implementation and live
+verification:** 2026-07-28 · **Submittals implementation and live verification:**
+2026-07-29
 
 > **Superseded 2026-07-27 for Transmittals.** This document's research sections
 > were written before any live Autodesk call had been made and before any Phase 4A
@@ -51,7 +55,7 @@ source is recorded as **unresolved**, never as a negative finding.
 | Reference-repository baseline (initial pass) | `cc4321a0f585662367d940ae1c9b109d4b0f3753` (`main`, clean) |
 | Reference-repository baseline (normative spike) | `08eb2a24ac33c6519d15be3a238f09efa708baef` (`main`, clean) |
 | APS/Forma MCP baseline | `6ec64110f506ff96ac5744c5e6481c13a3f43806` (implementation revision `295c2530acdd25cc5cfa8e4b361c4c2358a355f4`) |
-| Registered MCP tool count | **38** (36 read-only Autodesk, 1 guarded Autodesk write, 1 local-only) at component revision `5dca229`; offline doctor `TOOL_COUNT=38`, `RESULT=PASS`, 2026-07-28. The previous count of 35 (2026-07-27) differs by exactly the three RFI read-only tools |
+| Registered MCP tool count | **41** at component revision `f763d19`, observed on the verified MCP protocol surface 2026-07-29, of which 3 are Submittals reads and 0 are Submittals writes. The previous count of **38** (36 read-only Autodesk, 1 guarded Autodesk write, 1 local-only) at component revision `5dca229` was evidenced by offline doctor `TOOL_COUNT=38`, `RESULT=PASS`, 2026-07-28, and itself differed from the 35 of 2026-07-27 by exactly the three RFI read-only tools. **No offline doctor result is recorded for `f763d19`**, because none was captured |
 | Transmittals normative research | **`normative_transmittals_research_complete`** |
 | Transmittals Gate 2 | **sufficiently verified** (§16.1) |
 | Transmittals Gate 6 | **passed** — adopted, owned by APS/Forma MCP ([ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md), §16.2) |
@@ -62,8 +66,14 @@ source is recorded as **unresolved**, never as a negative finding.
 | RFIs Gate 5 | **passed** — public-evidence sanitisation profile approved ([ADR-0010](../decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)), §16.5 |
 | RFIs Gate 8 | **closed for the RFI first read-only slice** under the operative §14 criteria, readiness established in the approved training project (§16.7) |
 | RFI first slice | **implemented · published · live-verified 2026-07-28** — three read-only MCP operations at component revision `5dca229`; **no RFI write is supported or authorised** |
-| Phase 4 overall | **not complete** — the Transmittals and RFI first slices only; Submittals, Sheets and Meetings are unimplemented |
-| Phase 4 MCP capability implemented | **Transmittals first slice** (5 read-only operations) and **RFI first slice** (3 read-only operations) |
+| Submittals Gate 2 | **sufficiently verified** (§16.8) |
+| Submittals Gate 6 | **passed** — contract and component boundary adopted ([ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)), §16.10 |
+| Submittals Gate 5 | **passed** — public-evidence sanitisation profile approved ([ADR-0013](../decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md)), §16.9 |
+| Submittals Gate 8 | **closed for the Submittals first read-only slice** under the operative §14 criteria, readiness established in the approved training project (§16.11) |
+| Submittals first slice | **implemented · published · live-verified 2026-07-29** — three read-only `GET` MCP operations at component revision `f763d19`, minimum proven scope `data:read`; **no Submittals write is supported or authorised** |
+| Phase 4A Forma proving ground | **complete at three governed capabilities** — Transmittals, RFIs and Submittals, each implemented, live-verified and evidenced. **No fourth Autodesk Forma capability enters V1**: Sheets is not adopted (Gates 2, 5, 6 and 8 unresolved) and Meetings remains deferred (public API not verified) |
+| Phase 4 MCP capability implemented | **Transmittals first slice** (5 read-only operations), **RFI first slice** (3 read-only operations) and **Submittals first slice** (3 read-only operations) — **11 read-only operations, zero writes** |
+| Phase 4B / 4C | **not started** — Assets remains a governed **planned** capability in the `asset_handover` stage |
 | Implementation authorised by this document | **None** — this document authorises nothing; it records state |
 
 The initial pass concluded `additional_authoritative_research_required`. The
@@ -253,9 +263,9 @@ another module. Verdicts are recorded in §16.
 | Module | Official API / module name | Version | Maturity | Module ownership | Read surface | Write surface | Authentication | Repository classification |
 |---|---|---|---|---|---|---|---|---|
 | **RFIs** | Autodesk Forma Build RFI API (S1) | v3 | General availability, announced 2025-07-23 (S1) | Forma Build | Verified present; includes a read-semantic POST search (S1, S9) | Verified present (S1, S9) | 3-legged or SSA evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; **adopted second Phase 4A read-only capability**; **Gates 5, 6 and 8 closed** for the first slice (§16.5–§16.7); **implemented · published · live-verified 2026-07-28** |
-| **Submittals** | Autodesk Forma Build Submittals API (S3) | v2 | General availability, read phase 2024-02-22, write phase 2024-08-05 (S3, S4) | Forma Build | Verified present and broad (S3, S4, S9) | Verified present, sharing the same base path (S4, S9) | 3-legged evidenced; per-endpoint scopes unresolved (S9, S13) | verified GA capability; candidate; **not implementation-ready** |
+| **Submittals** | Autodesk Forma Build Submittals API (S3) | v2 | General availability, read phase 2024-02-22, write phase 2024-08-05 (S3, S4) | Forma Build | Verified present and broad (S3, S4, S9) | Verified present, sharing the same base path (S4, S9) | 3-legged evidenced; per-endpoint scopes unresolved (S9, S13). Minimum first-slice scope **live-verified as `data:read`** 2026-07-29 | verified GA capability; **adopted third Phase 4A read-only capability**; **Gates 2, 5, 6 and 8 closed** for the first slice (§16.8–§16.11); **implemented · published · live-verified 2026-07-29** |
 | **Transmittals** | Autodesk Forma Transmittals API (N1, S2) | v1 | General availability, announced 2025-12-10 (S2) | **Autodesk Forma Data Management** (S2) | **Normatively verified** — five read-only operations (N1, N3–N7) | **Normatively excluded** — the Field Guide lists creating, updating settings, adding recipients and exporting as unsupported (N1) | **Normatively verified** — `data:read`, user context optional, 2-legged **or** 3-legged (N3–N7). Module activation and entitlement **live-verified 2026-07-27** in the approved training project | verified GA capability; **Gates 2, 5, 6 and 8 closed** for this slice (§16.1–§16.4); **adopted first Phase 4A read-only capability**, owned by the **APS/Forma MCP**; **implemented · live-verified 2026-07-27** |
-| **Sheets** | Autodesk Forma Build Sheets API (S5) | v1 | General availability (S5, S6, S7) | Forma Build | **Genuine read surface verified present** — sheets, version sets, collections (S5, S6, S10) | Verified present, including asynchronous export creation (S5, S7, S10) | 2-legged **and** 3-legged evidenced (S5, S6) | verified GA capability with a genuine read surface; **later candidate**; **not implementation-ready** |
+| **Sheets** | Autodesk Forma Build Sheets API (S5) | v1 | General availability (S5, S6, S7) | Forma Build | **Genuine read surface verified present** — sheets, version sets, collections (S5, S6, S10) | Verified present, including asynchronous export creation (S5, S7, S10) | 2-legged **and** 3-legged evidenced (S5, S6) | verified GA capability with a genuine read surface; **not adopted, and not part of the V1 roadmap**; Gates 2, 5, 6 and 8 remain unresolved |
 | **Meetings** | — | — | — | — | — | — | — | **`meetings_public_api_not_verified`** |
 
 The four verified modules are named, versioned and statused **independently**.
@@ -1839,10 +1849,12 @@ is required; does **not** assert that the Harrismith Fire Station example projec
 contains this or any Submittal fixture; does **not** close any gate for Sheets or
 Meetings; and does **not** make Phase 4A complete.
 
-## 17. Adopted first capability
+## 17. Adopted capabilities
 
-**Architecture status: adopted — Transmittals read-only slice, owned by the
-APS/Forma MCP, implemented and live-verified 2026-07-27.**
+**Architecture status: three capabilities adopted — Transmittals, RFIs and
+Submittals, all read-only slices owned by the APS/Forma MCP, all implemented and
+live-verified (2026-07-27, 2026-07-28, 2026-07-29). The Phase 4A Forma proving
+ground is complete at these three; no fourth Forma capability enters V1.**
 
 **Transmittals v1 is the adopted first Phase 4A read-only capability**, decided in
 [ADR-0004](../decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)
@@ -1857,16 +1869,18 @@ What the adopted state means, precisely:
 - the **first-slice scope is fixed** at the five documented `GET` operations, and
   **no write operation is in scope**;
 - **Phase 4A now spans Autodesk Forma Data Management and Autodesk Forma Build**;
-- **RFIs are the preferred second Phase 4A capability**, not rejected;
+- **RFIs**, preferred as the second capability when ADR-0004 was taken, were
+  subsequently **adopted** as the second governed capability (below);
 - **Gates 2, 5, 6 and 8 are closed for this slice** (§16.1–§16.4);
 - the **five read-only MCP tools exist, are registered, and are live-verified**
   (2026-07-27, component `295c253`, pinned `6ec6411`); the **Transmittals alias
   family is approved** by
   [ADR-0005](../decisions/0005-approve-transmittals-sanitisation-profile.md); and
   **live data readiness is established in the approved training project**;
-- **Phase 4A is not complete.** The Phase 4 result schema, the public-evidence
-  governance for the exact-version behavioural finding, and the public evidence
-  artifact all remain outstanding, and no other Phase 4A module is implemented.
+- the Phase 4 result schema, the public-evidence governance for the exact-version
+  behavioural finding ([ADR-0006](../decisions/0006-approve-cross-surface-transmittals-evidence-semantics.md))
+  and the public evidence artifact are all **in place**; the outstanding items
+  recorded here before 2026-07-27 are closed.
 
 **Historical note, retained deliberately.** Before 2026-07-25 this section carried
 the status `transmittals_read_slice_recommended_pending_decision`. The research
@@ -1891,8 +1905,32 @@ for this first slice** (§16.5, §16.6, §16.7), and **RFI live verification occ
 on 2026-07-28** through a freshly launched server over the MCP protocol surface.
 The POST-as-read policy decision recorded in §5 is **taken (reference-repo
 ADR-0007)**; a correspondingly stricter free-text evidence policy (§13) remains
-outstanding. Submittals and Sheets remain later candidates;
-Meetings remains deferred (§9).
+outstanding.
+
+**Adopted third capability.** **Submittals** is **adopted as the third governed
+Phase 4A capability** in the schema-v2 workflow contract:
+`api_family: Autodesk Forma Build Submittals API`, `api_version: v2`,
+`api_maturity: ga`.
+
+**ADOPTED, IMPLEMENTED AND LIVE-VERIFIED.** `mcp_implementation_status` is
+**`confirmed`** — the three governed read-only `GET` tools exist in the APS/Forma
+MCP at published revision `f763d190871743e4c638902ddd6fdadf2d740e88`, adopted by
+[ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)
+with public evidence governed by
+[ADR-0013](../decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md).
+`data_readiness` is **`ready`**, scoped to the **approved training project** and
+this read-only slice against one controlled synthetic fixture in one workflow
+state; it asserts nothing about other projects, other Submittal states, other
+caller roles, or any write capability. **Gates 2, 5, 6 and 8 are closed for this
+first slice** (§16.8–§16.11), **live verification occurred on 2026-07-29** through
+a freshly launched server over the MCP protocol surface using three
+Autodesk-facing `GET` requests and zero writes, and the **minimum proven scope is
+`data:read`**. No POST-as-read classification is involved.
+
+**No fourth Forma capability enters V1.** **Sheets** is **not adopted** — Gates 2,
+5, 6 and 8 remain unresolved (§8, §16) — and **Meetings remains deferred** (§9).
+Neither is part of the V1 roadmap. **Assets** remains a governed **planned**
+capability in the `asset_handover` stage, outside Phase 4A.
 
 ## 18. Missing evidence and open questions
 
@@ -1920,6 +1958,17 @@ These are closed **for Transmittals only** and remain open for the other modules
 > is **unchanged and deliberately untouched** — it is reserved for a separate
 > public-evidence governance decision. All other items stand as written. The
 > historical list is preserved unchanged beneath this notice.
+
+> **Further partially superseded 2026-07-29 for RFIs and Submittals.** Items **1**
+> (normative documentation retrieval), **2** (minimal read scopes), **5**, **6**,
+> **10** and **15** are now **also resolved for RFIs** (live-verified 2026-07-28,
+> §16.7) and for **Submittals** (live-verified 2026-07-29, §16.11, with `data:read`
+> proven sufficient). Item **11** was subsequently settled for Transmittals by
+> [ADR-0006](../decisions/0006-approve-cross-surface-transmittals-evidence-semantics.md),
+> which records lineage **per surface** and holds Transmittals-surface stable
+> lineage as `not_proven`. Every listed item **remains open for Sheets**, which is
+> not adopted. All other items stand as written, and the historical list below is
+> preserved unchanged.
 
 1. **Normative Field Guide and Reference Guide retrieval for RFIs, Submittals and
    Sheets** — the remaining load-bearing documentation gap (S13). Retrieved for
@@ -1984,16 +2033,32 @@ Completed:
 - **Private live evidence capture** — held under the git-ignored `.local/`
   boundary.
 
-Remaining, in order:
+Also completed since (2026-07-27 → 2026-07-29), in the order originally listed
+below as remaining:
 
-1. **Public-evidence governance for the exact-version behavioural finding** — the
-   cross-surface result observed during the live run is **not** settled by this
-   document; §18.2 item 11 is unchanged.
-2. **Create the Phase 4 result schema and execution plan** — encoding the approved
-   sanitisation profile.
-3. **Generate and validate the public evidence** through the approved profile, as
-   a separate artifact.
-4. **Publish the sanitised artifact separately.**
+1. **Public-evidence governance for the exact-version behavioural finding** —
+   settled by
+   [ADR-0006](../decisions/0006-approve-cross-surface-transmittals-evidence-semantics.md),
+   which records lineage per surface and raised the Transmittals profile to
+   version 2.
+2. **The Phase 4 result schema** —
+   [`schemas/phase-4-result.schema.json`](../../schemas/phase-4-result.schema.json),
+   encoding the approved sanitisation profiles.
+3. **Public evidence generated and validated** through the approved profile for
+   each capability, as separate artifacts.
+4. **The sanitised artifacts published** under
+   `examples/harrismith-fire-station/expected-results/` — one per capability.
+5. **RFI adoption, implementation and Gate 5/6/8 closure** (§16.5–§16.7), and
+   **Submittals adoption, implementation and Gate 2/5/6/8 closure**
+   (§16.8–§16.11), each as its own separate increment.
+
+Remaining:
+
+**None for Phase 4A within V1.** The Forma proving ground is complete at three
+capabilities and **no fourth Autodesk Forma capability enters V1** (§1, §17).
+Sheets and Meetings are not adopted, and adopting either would require its own
+research, gate and adoption increments under the rules above. The stricter
+free-text evidence policy noted in §17 remains outstanding and is tracked there.
 
 **Ordering note.** The original sequence placed Gate 8 closure first and
 implementation third; it was **not followed**, and §16.4 records that departure

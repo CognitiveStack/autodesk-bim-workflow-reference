@@ -26,9 +26,9 @@ software components:
 - `CognitiveStack/autodesk-aps-forma-mcp`
   - Autodesk Platform Services and Forma integration
   - Currently confirmed read capabilities: Data Management, Model Derivative,
-    Issues, Reviews, issue Relationships, and Model Coordination
-    model-set/version reads, plus Forma Site Design (Beta `v1alpha`) reads and a
-    single guarded Beta write
+    Issues, Reviews, issue Relationships, Model Coordination model-set/version
+    reads, and the Phase 4A Transmittals, RFI and Submittals first-slice reads,
+    plus Forma Site Design (Beta `v1alpha`) reads and a single guarded Beta write
   - See [COMPONENT_BOUNDARIES.md](docs/architecture/COMPONENT_BOUNDARIES.md) for
     the authoritative, dated capability ledger
 
@@ -53,8 +53,9 @@ Site and context
 ```
 ## Current Status
 
-**Phases 0, 1, 2 and 3 are complete**, all strictly read-only, each with a
-sanitised public evidence artifact committed under
+**Phases 0, 1, 2 and 3 are complete, and the Phase 4A Forma proving ground is
+complete.** Every slice is strictly read-only, and each has a sanitised public
+evidence artifact committed under
 [`examples/harrismith-fire-station/expected-results/`](examples/harrismith-fire-station/expected-results/):
 
 | Phase | Slice | Artifact |
@@ -62,34 +63,57 @@ sanitised public evidence artifact committed under
 | 1 | Revit-to-CDE trace | `revit-to-cde-trace.result.json` |
 | 2 | Review-to-Issue governance trace | `review-to-issue-trace.result.json` |
 | 3 | Model Coordination-to-Issue trace | `model-coordination-to-issue-trace.result.json` |
+| 4A | Transmittals exact-version snapshot | `transmittals-exact-version-snapshot.result.json` |
+| 4A | RFI first-slice read verification | `rfis-first-slice-read-verification.result.json` |
+| 4A | Submittals first-slice read verification | `submittals-first-slice-read-verification.result.json` |
 
 The current **Phase 3 evidence ceiling is `shared_model_context_proven`**: a
 coordination issue and a coordination snapshot were proven to refer to the same
 models at the same coordinated versions. Clash-level reads remain unimplemented, so
 a **direct clash-to-issue link and geometric resolution remain unproven**.
 
-**Next: Phase 4A — construction information exchange across Forma Data Management
-and Forma Build.** Capability research is complete and the first slice is
-selected: **Autodesk Forma Transmittals, read-only** — five documented `GET`
-operations — owned by the **APS/Forma MCP**
-([ADR-0004](docs/decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
-RFIs are the preferred second capability.
+### Phase 4A — three governed capabilities
 
-**Current state: Gates 2 (authentication), 5 (privacy and sanitisation), 6
-(component boundary) and 8 (project activation, permission and training data) are
-closed for the Transmittals first slice, and that slice is implemented and
-live-verified (2026-07-27)** — five read-only Transmittals MCP operations in the
-APS/Forma MCP. Gate 8 closed under the operative §14 criteria of the capability
-gap, with readiness established in the **approved training project**.
+Construction information exchange spans **Forma Data Management** and **Forma
+Build** ([ADR-0004](docs/decisions/0004-adopt-transmittals-as-first-phase-4a-read-slice.md)).
+Three capabilities are governed, implemented in the **APS/Forma MCP**, and
+live-verified against controlled synthetic fixtures in the **approved training
+project**:
 
-**Phase 4A as a whole is not complete.** No other Phase 4A module is implemented,
-and the remaining work includes the Phase 4 result schema, the public-evidence
-governance decision for the cross-surface behavioural finding, and the public
-evidence artifact itself.
+| Capability | API family and contract version | First slice | Live-verified |
+|---|---|---|---|
+| Transmittals | Autodesk Forma Transmittals API `v1` (GA) | 5 read-only operations | 2026-07-27 |
+| RFIs | Autodesk Forma Build RFI API `v3` (GA) | 3 read-only operations | 2026-07-28 |
+| Submittals | Autodesk Forma Build Submittals API `v2` (GA) | 3 read-only operations | 2026-07-29 |
 
-The Transmittals public-evidence sanitisation profile is governed by
-[ADR-0005](docs/decisions/0005-approve-transmittals-sanitisation-profile.md) and
-[SANITISATION_CONVENTION.md](docs/guides/SANITISATION_CONVENTION.md).
+All three record `mcp_implementation_status: confirmed` and `data_readiness: ready`
+in [`config/workflows/end-to-end-reference.yaml`](config/workflows/end-to-end-reference.yaml),
+and Gates 5, 6 and 8 are closed for each first read-only slice.
+
+**Every slice is read-only.** No Phase 4A write capability is implemented,
+supported or authorised. Each `confirmed` / `ready` value is scoped to the approved
+training project and to that capability's own first slice — **not** to the
+Harrismith example project, which is not asserted to hold any of these fixtures,
+and not to any other project.
+
+**No fourth Autodesk Forma capability is in the V1 roadmap.** Sheets and Meetings
+are not adopted, and Assets remains a governed **planned** capability in the
+`asset_handover` stage. V1 now proceeds to common-schema consolidation and Revit
+MCP alignment rather than to a further Forma capability.
+
+The Phase 4 evidence schema
+([`schemas/phase-4-result.schema.json`](schemas/phase-4-result.schema.json)) and
+the per-capability public-evidence governance are **in place**. Sanitisation is
+governed by [SANITISATION_CONVENTION.md](docs/guides/SANITISATION_CONVENTION.md)
+with a profile per capability:
+[ADR-0005](docs/decisions/0005-approve-transmittals-sanitisation-profile.md) as
+extended by
+[ADR-0006](docs/decisions/0006-approve-cross-surface-transmittals-evidence-semantics.md)
+(Transmittals),
+[ADR-0010](docs/decisions/0010-approve-rfi-public-evidence-sanitisation-profile.md)
+(RFIs) and
+[ADR-0013](docs/decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md)
+(Submittals).
 
 See the
 [PRD](docs/prd/PRD_AUTODESK_BIM_WORKFLOW_REFERENCE_IMPLEMENTATION.md) for the
