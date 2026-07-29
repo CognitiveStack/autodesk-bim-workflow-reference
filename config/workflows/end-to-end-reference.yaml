@@ -177,12 +177,18 @@ stages:
         api_maturity: not-applicable
         mcp_component: revit-mcp
         mcp_implementation_status: confirmed
-        # SCOPE OF data_readiness BELOW: model-inspection data was demonstrated in
-        # the published Phase 1 live Revit session (2026-07-22), which returned the
+        # SCOPE OF data_readiness BELOW: model-inspection data was first demonstrated
+        # in the published Phase 1 live Revit session (2026-07-22), which returned the
         # model title and its levels from the Harrismith model and is recorded in
-        # revit-to-cde-trace.result.json. That session exercised model and level
-        # reads only; the family, category and parameter reads in this group were
-        # NOT individually live verified, and no such claim is made here.
+        # revit-to-cde-trace.result.json. That session exercised model and level reads
+        # only. The Revit Alignment live read verification (2026-07-29,
+        # COMPONENT_BOUNDARIES.md 4.4) subsequently exercised the remainder of this
+        # group against the active HFS-ARC document: model inspection, level
+        # inspection, family categories, families and category parameters. The
+        # readiness value is unchanged and remains scoped to that model in that
+        # session — it asserts nothing about other Revit models, other documents,
+        # other view or category contexts, any write capability, or production
+        # readiness.
         data_readiness: ready
         data_readiness_reason: revit-model-inspection-demonstrated-in-phase-1-live-session
 
@@ -192,12 +198,22 @@ stages:
         # get_current_view_elements, get_revit_view. Read under ADR-0015:
         # get_revit_view writes a temporary PNG outside the document and removes it,
         # which is a bounded transient external side effect, not a document write.
-        # The Phase 1 session recorded an empty view list, so readiness is unproven.
+        # The Phase 1 session recorded an empty view list, so this group was
+        # not-assessed until the Revit Alignment live read verification.
         api_family: Autodesk Revit API
         api_maturity: not-applicable
         mcp_component: revit-mcp
         mcp_implementation_status: confirmed
-        data_readiness: not-assessed
+        # SCOPE OF data_readiness BELOW: readiness was established by the Revit
+        # Alignment live read verification (2026-07-29, COMPONENT_BOUNDARIES.md 4.4)
+        # against the active HFS-ARC document, through the governed read tools only.
+        # It is scoped to THAT model in THAT session and asserts nothing about other
+        # Revit models, every possible view name, any write capability, component
+        # hardening, or production readiness. One export was observed to fail on a
+        # view name containing braces and to succeed on a brace-free exportable view
+        # (COMPONENT_BOUNDARIES.md 4.4), so view-name handling is not universal.
+        data_readiness: ready
+        data_readiness_reason: revit-view-inspection-export-demonstrated-in-hfs-arc-live-read-session
 
       - id: revit_element_authoring
         primary_system: Revit

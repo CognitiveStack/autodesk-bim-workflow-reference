@@ -94,6 +94,10 @@ established the execution path (§4.1), the transaction-based read/write classes
 carried uncommitted operator content, which remains excluded and is **not** part of
 the published architectural baseline; nothing in this document describes it.
 
+The **Revit Alignment live read verification** followed on the same date, at the
+same pinned revision and with no re-pin (§4.4). It changed **one** capability's
+`data_readiness`, on live evidence rather than on any change to the component.
+
 ## 2. Capability-status vocabulary
 
 - **confirmed** — MCP tool implemented and verified in component source at the
@@ -438,6 +442,86 @@ without a running Revit, so no `TOOL_COUNT` / `RESULT=PASS` line can be cited fo
 it and no such claim appears anywhere in this repository. Building one is a
 component concern and is deferred. This is a **verification-provenance limitation,
 not a capability gap**.
+
+### 4.4 Revit Alignment — Live Read Verification (2026-07-29)
+
+**Read-only throughout. No Revit write tool was invoked.**
+
+The full runtime path was exercised end to end and reached the **active `HFS-ARC`
+document**:
+
+```
+Claude Desktop → revit-triviron → FastMCP → pyRevit Routes → Autodesk Revit → HFS-ARC
+```
+
+`HFS-ARC` is named here because it is already published in the Phase 1 evidence
+artifact; nothing new about the model is disclosed.
+
+**Result — recorded as PASS statements and booleans rather than counts**, so that
+no figure appears here that was not taken from recorded output:
+
+| Item | Result |
+|---|---|
+| Runtime path reached the active document | **PASS** |
+| `get_revit_status` | **PASS** — active document present |
+| Model-inspection read set (`get_revit_model_info`, `list_levels`, `list_families`, `list_family_categories`, `list_category_parameters`) | **PASS** |
+| View-inspection/export read set (`list_revit_views`, `get_current_view_info`, `get_current_view_elements`, `get_revit_view`) | **PASS** — image returned; image not saved into this repository |
+| Any Revit write tool invoked | **No** |
+
+**Capability consequences.** `revit_model_inspection` remains `confirmed` /
+`ready`, with this session extending the evidence beyond the Phase 1 model and
+level reads to the family, category and parameter reads. `revit_view_inspection_export`
+moves from `not-assessed` to **`ready`**, scoped by
+`revit-view-inspection-export-demonstrated-in-hfs-arc-live-read-session`.
+
+**The three write capabilities are unchanged and remain `not-assessed`** —
+`revit_element_authoring`, `revit_view_graphic_overrides` and
+`revit_code_execution`. **No live write verification was performed, and none is
+required for V1.** `confirmed` implementation status and assessed data readiness
+remain independent axes (ADR-0008): a registered tool is not an exercised one.
+
+**Scope.** Every result above is scoped to **one model, in one session, through the
+read tools only**. It asserts nothing about other Revit models, other documents,
+every possible view name, any write capability, component hardening, or production
+readiness.
+
+**ADR-0015 consistency.** The live results were **consistent with** the
+classification: the `POST`-route parameter read behaved as a read, and the view
+export returned successfully with no intentional persistent document-state change.
+**The client observed outcomes, not internals.** The no-transaction property, the
+bounded temporary-export lifecycle and the transaction/document-state basis of the
+classification itself remain **source-established facts from the static Revit MCP
+inspection** (§4, §4.1) — a live MCP client cannot observe a handler's internal
+transaction or file-cleanup mechanics, and nothing here claims it did. **No
+reclassification is required**, and
+[ADR-0015](../decisions/0015-classify-local-automation-read-write-by-document-state.md)
+stands unchanged.
+
+**Independent bridge evidence.** A separate read-only diagnostic probe on the same
+date confirmed the bridge directly from the Windows host:
+`GET http://127.0.0.1:48884/revit_mcp/status/` returned **HTTP 200** with
+`revit_available: true` and the `HFS-ARC` document title, and the port-48884
+listener was owned by the `Revit` process itself — confirming that pyRevit Routes
+is hosted **in-process by Revit** (§4.1) rather than as a separate service.
+
+**Runtime observations — not V1 blockers, no component change made:**
+
+- **`list_families` did not honour a requested small limit** and returned a
+  default-size result. The caller-supplied limit is therefore **not** an enforced
+  bound at this revision.
+- **`get_revit_view` failed on a view name containing braces** (`{3D}`) and
+  succeeded on a brace-free exportable view. View-name handling across the route is
+  **not** universal, which is why the view-export readiness reason is scoped to the
+  session rather than to every view.
+- **pyRevit Routes binds `0.0.0.0:48884`, not loopback**, while Revit is running.
+  This is **pyRevit's own default**, not a setting of this project or of
+  `revit-mcp`. Because that bridge fronts the unguarded write tools (§4.2) with no
+  authentication, it is reachable from the local network for as long as Revit is
+  open. **Recorded as a live security observation only**; remediation is a component
+  and environment concern and is deferred.
+
+None of the three alters a capability status, a read/write classification, or the
+component boundary.
 
 ## 5. First-slice capability ledger (read-only) — all confirmed
 
@@ -898,7 +982,10 @@ neither should be described in the other's terms.**
   2026-07-27 at the implementation revision `295c253`, of which the pinned
   `6ec6411` is a documentation-only descendant). The five Model Coordination
   model-set reads were live-verified on 2026-07-23, and the five Transmittals
-  reads on 2026-07-27; all ten were confirmed still registered at `295c253`.
+  reads on 2026-07-27; all ten were confirmed still registered at `295c253`. The
+  Revit read surface was live-verified on 2026-07-29 at `ae01d29` (§4.4), with **no
+  re-pin and no tool-count change**; the Revit MCP has no offline doctor, so no
+  equivalent `TOOL_COUNT` line exists for it (§4.3).
 - A re-pin driven by a reliability-only component change updates the revision and
   date but **must not** change any capability status; capability status changes
   only on evidence of a new or altered tool.
