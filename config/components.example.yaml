@@ -1,8 +1,18 @@
 schema_version: 1
 
+# `mcp_component` is the IDENTITY BINDING between this file and the capability
+# contract. It carries exactly the vocabulary value used by
+# config/workflows/end-to-end-reference.yaml (`aps-forma-mcp` | `revit-mcp` |
+# `none`), so cross-repository acceptance can resolve a capability's owning
+# component from a declaration rather than by inferring it from a repository-name
+# prefix or suffix. Neither token equals its repository slug, and no inference
+# rule works for both — the declaration is the binding. `none` is a contract
+# value meaning "no owning component" and is deliberately never declared here.
+
 components:
   forma_mcp:
     name: Autodesk APS Forma MCP
+    mcp_component: aps-forma-mcp
     repository: CognitiveStack/autodesk-aps-forma-mcp
     local_path_env: FORMA_MCP_REPO
     responsibility:
@@ -14,6 +24,7 @@ components:
 
   revit_mcp:
     name: Revit MCP Triviron
+    mcp_component: revit-mcp
     repository: CognitiveStack/revit-mcp-triviron
     local_path_env: REVIT_MCP_REPO
     responsibility:

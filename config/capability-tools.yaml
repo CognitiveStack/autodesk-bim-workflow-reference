@@ -1,0 +1,200 @@
+schema_version: 1
+
+# EXECUTABLE PROJECTION of the component tool boundaries.
+#
+# This file is the machine-readable form of the tool/component assignment that
+# docs/architecture/COMPONENT_BOUNDARIES.md explains in prose. The Markdown
+# document remains the architectural explanation and the authority for WHY a
+# boundary is drawn; this file exists so cross-repository acceptance can check
+# the assignment WITHOUT parsing prose. Parsing the Markdown was considered and
+# rejected: §3 preserves a dated historical inventory table, later tools are
+# documented in §6.2/§6.3 instead, and backtick extraction also sweeps up field
+# names, capability ids and revisions — so a prose parser reports failures that
+# are not real. Where the two disagree, the disagreement is itself the finding:
+# acceptance assertion A7 exists to surface it.
+#
+# THIS FILE ADDS NO CAPABILITY. It assigns already-registered component tools to
+# one of three categories, and creates no governance state of its own.
+#
+# THREE CATEGORIES, DELIBERATELY DISTINCT:
+#
+#   capabilities    Tools belonging to a governed capability record in
+#                   config/workflows/end-to-end-reference.yaml. The capability id
+#                   must exist there, and its `mcp_component` must equal the
+#                   component this mapping sits under. These participate in
+#                   acceptance A6: a capability recorded `confirmed` must name at
+#                   least one tool that really exists in the committed component
+#                   tree.
+#
+#   support_tools   Implementation/runtime/infrastructure tools that are
+#                   intentionally NOT BIM capability records. A support tool
+#                   implies no capability, no mcp_implementation_status and no
+#                   data_readiness. It is counted for inventory completeness only.
+#
+#   deferred_tools  Real registered component tools that the V1 capability
+#                   contract does not represent as governed capabilities, carried
+#                   deliberately outside the V1 governed capability surface.
+#                   A deferred tool is NOT unsafe, broken, unverified or
+#                   abandoned — several are implemented and live-verified. It
+#                   counts toward inventory accounting; it creates no capability;
+#                   it receives no implementation status and no data readiness; it
+#                   satisfies A6 for nothing; and it implies no guarantee of
+#                   future adoption. Each group states a truthful reason.
+#
+# A tool is classified exactly once within its component. Tool identity is
+# COMPONENT-SCOPED — the pair (component, tool) — so the same tool name may
+# legitimately appear in two different components. That the current two
+# components happen to share no tool name is incidental, not a rule.
+#
+# ACCEPTANCE (docs/architecture/COMPONENT_BOUNDARIES.md §12) requires
+# capabilities + support_tools + deferred_tools to equal exactly the tools
+# extracted from the component's committed tree. A deferred tool is not an
+# acceptance failure. An UNACCOUNTED tool is.
+
+components:
+
+  aps-forma-mcp:
+
+    capabilities:
+
+      document_management:
+        tools:
+          - list_autodesk_hubs
+          - list_projects
+          - list_top_folders
+          - list_folder_contents
+          - get_item_details
+          - list_item_versions
+
+      issues:
+        tools:
+          - list_issues
+          - get_issue_details
+          - list_issue_types
+
+      model_coordination:
+        tools:
+          - list_model_sets
+          - get_model_set
+          - list_model_set_versions
+          - get_latest_model_set_version
+          - get_model_set_version
+
+      transmittals:
+        tools:
+          - list_transmittals
+          - get_transmittal
+          - get_transmittal_recipients
+          - get_transmittal_folders
+          - get_transmittal_documents
+
+      rfis:
+        tools:
+          - get_rfi_user_context
+          - search_rfis
+          - get_rfi
+
+      submittals:
+        tools:
+          - get_submittal_user_context
+          - list_submittals
+          - get_submittal
+
+      site_context:
+        tools:
+          - get_forma_project
+
+      # The proposal reads plus the project's only guarded write tool, matching
+      # the capability record's own note that "MCP proposal read + one guarded
+      # proposal-create tool exist (Beta)" — which is why that record is
+      # `partial` rather than `confirmed`.
+      concept_proposals:
+        tools:
+          - list_forma_proposals
+          - list_forma_proposal_elements
+          - create_forma_proposal
+
+    support_tools:
+      # Local-only preview builder. Makes no Autodesk call
+      # (COMPONENT_BOUNDARIES.md §3), so it is infrastructure rather than a BIM
+      # capability.
+      - prepare_native_floor_stack_preview
+
+    deferred_tools:
+
+      reviews:
+        reason: >-
+          Adoption as a separate governed capability record is deferred because
+          the Reviews API-family name remains deliberately unasserted under
+          ADR-0003, as the reviews_and_issues stage comment records. The reads
+          themselves are implemented and live-verified; only the capability
+          record is deferred.
+        tools:
+          - list_review_workflows
+          - list_reviews
+          - get_review_details
+          - get_review_workflow
+          - list_review_file_versions
+          - get_review_progress
+          - get_file_version_approval_statuses
+
+      relationships:
+        reason: >-
+          Adoption as a separate governed capability record is deferred because
+          the Relationships API-family name remains deliberately unasserted under
+          ADR-0003, as the reviews_and_issues stage comment records. The read is
+          implemented and live-verified; only the capability record is deferred.
+        tools:
+          - list_issue_relationships
+
+      model_derivative:
+        reason: >-
+          not-represented-as-a-v1-capability. The tools are implemented and are
+          exercised by the Phase 1 first-slice ledger, but the V1 capability
+          contract does not model Model Derivative as a capability of its own.
+          Whether it should become one is a question deferred beyond V1, and no
+          decision either way is made here or implied by this entry.
+        tools:
+          - get_derivative_manifest
+          - list_model_views
+          - get_model_properties
+
+  revit-mcp:
+
+    capabilities:
+
+      revit_model_inspection:
+        tools:
+          - get_revit_model_info
+          - list_levels
+          - list_families
+          - list_family_categories
+          - list_category_parameters
+
+      revit_view_inspection_export:
+        tools:
+          - list_revit_views
+          - get_current_view_info
+          - get_current_view_elements
+          - get_revit_view
+
+      revit_element_authoring:
+        tools:
+          - place_family
+
+      revit_view_graphic_overrides:
+        tools:
+          - color_splash
+          - clear_colors
+
+      revit_code_execution:
+        tools:
+          - execute_revit_code
+
+    support_tools:
+      # Session/runtime health check. Consumed as evidence provenance
+      # (component_provenance.revit_mcp.runtime_status), never as BIM content,
+      # which is why it is deliberately not a sixth Revit capability record.
+      - get_revit_status
+
+    deferred_tools: {}

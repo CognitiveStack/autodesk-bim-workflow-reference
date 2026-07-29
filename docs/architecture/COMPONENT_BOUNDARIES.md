@@ -994,3 +994,96 @@ neither should be described in the other's terms.**
 - Component tool surfaces evolve; expectations are captured here in documentation,
   not by submodule pins (see
   [REPOSITORY_STRATEGY.md](REPOSITORY_STRATEGY.md)).
+
+## 12. V1 cross-repository acceptance
+
+`scripts/acceptance.py` checks that this repository, the APS/Forma MCP and the
+Revit MCP describe **one coherent architecture**. It is a validator, not a gate
+system, and it adds no governance state: every fact it checks is already asserted
+somewhere in this repository.
+
+**Eight assertions — seven executable, one documentary:**
+
+| | Assertion | Kind |
+|---|---|---|
+| A1 | The capability contract is valid — vocabularies, unique ids, ADR-0009 cardinality | executable |
+| A2 | Every `mcp_component` resolves to one declared component | executable |
+| A3 | Tool assignment and capability ownership are coherent | executable |
+| A4 | Published evidence validates against its schema | executable |
+| A5 | Evidence provenance revisions resolve in the right component | executable |
+| A6 | `confirmed` capabilities map to tools that really exist | executable |
+| A7 | Registered component inventories are fully accounted for | executable |
+| A8 | A read/write governance basis exists | **documentary** |
+
+**A8 is deliberately not code.** ADR-0007 (Autodesk cloud branch) and
+[ADR-0015](../decisions/0015-classify-local-automation-read-write-by-document-state.md)
+(local Revit branch) already govern classification, including the two non-`GET`
+reads and the write-by-capability treatment of `execute_revit_code`. The validator
+names that basis; **it does not re-derive transaction or request semantics and
+claims no proof of component internals.**
+
+**Offline by design.** No Autodesk call, no running Revit, no MCP server, no
+component doctor. Acceptance must be repeatable on any checkout, which is exactly
+what a dependence on two live sessions would forfeit. Live verification happened
+separately and is recorded per capability (§3.3, §4.4, §6.2, §6.3).
+
+**Identity binding.** `config/components.example.yaml` declares an
+`mcp_component` token per component. Neither token equals its repository slug and
+no prefix or suffix rule works for both, so **the declaration is the binding** —
+identity is never inferred, and never hardcoded in the validator.
+
+**Committed-tree rule.** Every component fact is read from committed Git objects
+(`git show <rev>:<path>`), with tool inventories extracted by Python AST from the
+registration decorators. **A component working tree is never read.** The Revit
+component's long-standing uncommitted line-ending churn and operator `main.py`
+binding therefore cannot enter an inventory or a provenance check.
+
+**Dirty worktrees are informational.** The validator reports a component's
+working-tree state and continues. A dirty worktree is **not** an acceptance
+failure; acceptance validates published component state, not an operator's desk.
+
+**Historical provenance is valid.** A published artifact pins the revision it was
+produced against, which normally *precedes* the accepted revision. A5 therefore
+requires each `inspected_revision` to be a real commit **in the accepted lineage**
+— never equality with HEAD, which would fail several valid published artifacts.
+
+**Three tool categories** (`config/capability-tools.yaml`), the executable
+projection of the boundaries §3 and §4 explain in prose:
+
+- **capability tools** — belong to a governed capability record, and are what A6
+  checks;
+- **support tools** — runtime/infrastructure, deliberately not BIM capabilities
+  (`get_revit_status`, `prepare_native_floor_stack_preview`). A support tool
+  implies no capability, no implementation status and no readiness;
+- **deferred tools** — real registered tools the V1 capability contract does not
+  represent as governed capabilities. They are **not** unsafe, broken or
+  abandoned — the Reviews and Relationships reads are implemented and
+  live-verified — they are simply outside the governed V1 capability surface,
+  each with a stated reason. A deferred tool creates no capability, receives no
+  implementation status or readiness, and satisfies A6 for nothing.
+
+**Prose is not parsed.** This document remains the architectural explanation;
+the YAML map is what executes. Parsing the Markdown was considered and rejected:
+§3 preserves a dated historical inventory, later tools are documented in §6.2 and
+§6.3 instead, and backtick extraction also captures field names and capability
+ids — so a prose parser reports failures that are not real.
+
+**What acceptance proves.** That the reference architecture truthfully accounts
+for the **complete** published component implementation surface, while
+distinguishing governed capabilities from support tools and from functionality
+deferred out of the V1 capability contract. **It does not prove that every
+component tool has become a governed V1 capability**, and it is not intended to:
+a deferred tool is an accounted-for tool, whereas an **unaccounted** tool is an
+acceptance failure.
+
+**`confirmed` never implies `ready`.** Implementation status and data readiness
+are independent axes (ADR-0008), and the validator encodes no relationship
+between them — three Revit capabilities are legitimately `confirmed` /
+`not-assessed`. Nor is any evidence symmetry required between the components:
+Revit does not use Phase-4 evidence, Forma has no Revit observation, and neither
+needs a caller-context, OAuth or run-discipline analogue of the other.
+
+**Requires** Python 3.9+, PyYAML, `jsonschema` and `git`; component paths come
+from the declared `local_path_env` variables. **A component that cannot be
+resolved makes the run INCOMPLETE and exits non-zero** — a skipped component
+check never yields success.
