@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "phase": "4A",
+    "slice": "submittals-first-slice-read-verification",
+    "execution_date": "2026-07-29",
+    "read_only": true,
+    "status": "complete"
+  },
+  "scenario": {
+    "scenario_key": "harrismith-fire-station",
+    "capture_context": "approved_training_project",
+    "scenario_project_contains_fixture": false
+  },
+  "capability": {
+    "modules": [
+      "submittals"
+    ],
+    "read_only": true,
+    "operations_verified": [
+      "get_submittal_user_context",
+      "list_submittals",
+      "get_submittal"
+    ]
+  },
+  "component_provenance": {
+    "aps_forma_mcp": {
+      "repository_slug": "CognitiveStack/autodesk-aps-forma-mcp",
+      "inspected_revision": "f763d190871743e4c638902ddd6fdadf2d740e88",
+      "runtime_worktree_state": "clean",
+      "runtime_status": {
+        "reachable": true,
+        "reported_status": "ok",
+        "server_version": "unavailable"
+      },
+      "tools_invoked": [
+        "get_submittal_user_context",
+        "list_submittals",
+        "get_submittal"
+      ],
+      "fresh_process": true,
+      "mcp_protocol_verified": true,
+      "registered_tool_count": 41,
+      "capability_tools_registered": 3
+    }
+  },
+  "caller_context_observation": {
+    "available": true,
+    "key_count": 3,
+    "identity_published": false,
+    "note": "The governed Submittals user-context tool returned exactly three structural fields. Caller identity is excluded by construction: no caller id and no role value is read into the caller projection, and the permitted-action payload reduces to a count that this artifact deliberately does not publish. That payload is a write-capability and workflow-configuration descriptor rather than a read-permission flag, so its contents are outside the read slice entirely."
+  },
+  "submittals_observation": {
+    "available": true,
+    "project_alias": "PROJECT_1",
+    "record_alias": "SUBMITTAL_1",
+    "controlled_fixture_matched": true,
+    "submittals_write_tool_count": 0,
+    "list_field_count": 8,
+    "list_fields_exact": true,
+    "detail_field_count": 17,
+    "detail_fields_exact": true,
+    "unexpected_fields_published": false,
+    "forbidden_keys_checked": 31,
+    "forbidden_key_count": 0,
+    "list_detail_id_equal": true,
+    "list_detail_state_equal": true,
+    "list_detail_status_equal": true,
+    "list_detail_revision_equal": true,
+    "identity_published": false,
+    "company_data_published": false,
+    "permitted_actions_published": false,
+    "narrative_content_published": false,
+    "timestamps_published": false,
+    "raw_spec_values_published": false,
+    "custom_identifier_value_published": false,
+    "get_request_count": 3,
+    "write_request_count": 0,
+    "harness_executions": 1,
+    "required_scope": "data:read",
+    "fixture_write_performed": false,
+    "fixture_transition_performed": false,
+    "fixture_unchanged": true,
+    "sensitive_logging_observed": false
+  },
+  "surface_claims": [
+    {
+      "surface": "submittals",
+      "claim": "caller_context_boundary",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "The governed user-context tool returned exactly three approved structural keys. No caller identity was returned, and the permitted-action and role payloads reduced to counts that this artifact does not publish."
+    },
+    {
+      "surface": "submittals",
+      "claim": "list_allowlist_enforced",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "Every returned list row carried exactly the eight approved caller keys. The Submittals list row and the detail response carry the SAME upstream document, so the client allowlist — not any upstream projection request — is the authoritative caller boundary."
+    },
+    {
+      "surface": "submittals",
+      "claim": "detail_contract_exact",
+      "status": "proven",
+      "basis": "directly_returned_field",
+      "note": "The governed detail tool returned exactly the seventeen approved keys. The wider projection is this project's design decision, not a richer Autodesk representation."
+    },
+    {
+      "surface": "submittals",
+      "claim": "participant_identity_excluded",
+      "status": "proven",
+      "basis": "absence_verified_in_returned_projection",
+      "note": "Thirty-one governed forbidden keys were checked by key presence alone and none was present, covering manager, subcontractor, creator, updater, submitter, publisher, responder and review-sender identities, every ball-in-court collection, watchers, company assignment, permitted actions and workflow-transition configuration."
+    }
+  ],
+  "proofs": [
+    {
+      "code": "P1_LIST_DETAIL_IDENTITY_EQUAL",
+      "statement": "The Submittal identity returned by the governed list operation is the same exact identity returned by the governed detail operation.",
+      "left_alias": "SUBMITTAL_1",
+      "left_surface": "submittals_list",
+      "right_alias": "SUBMITTAL_1",
+      "right_surface": "submittals_detail",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": true,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "Both operands were retained in process memory during the same single controlled run and were never published."
+    },
+    {
+      "code": "P2_LIST_DETAIL_STATE_EQUAL",
+      "statement": "The workflow state returned by the governed list operation equals the workflow state returned by the governed detail operation.",
+      "left_alias": "SUBMITTAL_1",
+      "left_surface": "submittals_list",
+      "right_alias": "SUBMITTAL_1",
+      "right_surface": "submittals_detail",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": true,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "The compared state vocabulary value is deliberately not published. The equality outcome carries the proof without it."
+    },
+    {
+      "code": "P3_LIST_DETAIL_STATUS_EQUAL",
+      "statement": "The status returned by the governed list operation equals the status returned by the governed detail operation.",
+      "left_alias": "SUBMITTAL_1",
+      "left_surface": "submittals_list",
+      "right_alias": "SUBMITTAL_1",
+      "right_surface": "submittals_detail",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": true,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "State and status are distinct fields on this surface. The compared status value is deliberately not published."
+    },
+    {
+      "code": "P4_LIST_DETAIL_REVISION_EQUAL",
+      "statement": "The revision returned by the governed list operation equals the revision returned by the governed detail operation.",
+      "left_alias": "SUBMITTAL_1",
+      "left_surface": "submittals_list",
+      "right_alias": "SUBMITTAL_1",
+      "right_surface": "submittals_detail",
+      "comparison_method": "byte_for_byte_exact_string_comparison",
+      "expected_relation": "equal",
+      "outcome": "pass",
+      "reproducibility": {
+        "basis": "historical_attestation",
+        "re_derivable_from_private_evidence": true,
+        "re_derivable_from_public_evidence": false
+      },
+      "note": "Revision equality across the two surfaces, together with the unchanged pre-verification baseline, is what supports the fixture-unchanged finding without a fourth read."
+    }
+  ],
+  "evidence_integrity": {
+    "freeze_policy": "VERIFIED_SURVIVING_VALUE",
+    "strict_originating_result_preflight_passed": true,
+    "recovery_reads_performed": false,
+    "note": "SUBMITTAL_1 was retained directly from the originating list result, and the detail operand was the same retained value within the same single controlled run. Provenance classes describe evidence provenance only, never Autodesk resource semantics, and permit no reconstruction, inference or derivation of an identifier."
+  },
+  "aliases": [
+    {
+      "alias": "PROJECT_1",
+      "domain": "project",
+      "provenance_class": "VALIDATED_RETAINED_INVOCATION",
+      "note": "The project identity was already bound privately by an earlier controlled run and was reused as the parameter of every successful Submittals operation here."
+    },
+    {
+      "alias": "SUBMITTAL_1",
+      "domain": "submittal",
+      "provenance_class": "ORIGINATING_RESULT",
+      "note": "The Submittals item identifier domain. SUBMITTAL_n is never interchanged with ITEM_n, which denotes the Data Management item domain, even though Autodesk calls both resources an item."
+    }
+  ],
+  "outcome": "submittals_read_slice_verified",
+  "outcome_scope": "controlled_fixture",
+  "governance_checks": [
+    {
+      "code": "NO_RAW_IDENTIFIER_PUBLISHED",
+      "outcome": "pass",
+      "statement": "No raw project, Submittal, spec, type, package or response identifier appears, and no identifier or custom identifier value; identity is carried by aliases alone."
+    },
+    {
+      "code": "NO_NARRATIVE_PUBLISHED",
+      "outcome": "pass",
+      "statement": "No title, description, spec title, response comment or any other narrative value appears."
+    },
+    {
+      "code": "NO_PARTICIPANT_IDENTITY",
+      "outcome": "pass",
+      "statement": "No person value appears, and no USER_n alias is published for this slice."
+    },
+    {
+      "code": "NO_COMPANY_IDENTITY",
+      "outcome": "pass",
+      "statement": "No company value or commercial assignment relationship appears, and no COMPANY_n alias is used; the company member shape was never observed and none is invented."
+    },
+    {
+      "code": "NO_PERMITTED_ACTIONS_PUBLISHED",
+      "outcome": "pass",
+      "statement": "No permitted-action object, member id, field set, mandatory field, transition, action id, transition name or state-transition mapping appears at caller or item scope."
+    },
+    {
+      "code": "NO_TIMESTAMP_PUBLISHED",
+      "outcome": "pass",
+      "statement": "No date or timestamp value appears, and no lateness, interval, chronology or person-linked ordering is derived."
+    },
+    {
+      "code": "NO_STATE_VOCABULARY_PUBLISHED",
+      "outcome": "pass",
+      "statement": "State and status values are omitted even though the profile permits the observed structural vocabulary. The equality proofs carry the continuity evidence without them, so omission loses no proof and is strictly safer."
+    },
+    {
+      "code": "GET_ONLY_VERIFIED",
+      "outcome": "pass",
+      "statement": "Three Autodesk-facing GET requests and zero write requests. The governed client defines no write verb and registers no write tool, so no Submittals write route exists to call."
+    },
+    {
+      "code": "SINGLE_EXECUTION_DISCIPLINE",
+      "outcome": "pass",
+      "statement": "This artifact derives from exactly one verification harness execution against one fresh MCP process launched from the published implementation revision. No evidence is aggregated across runs."
+    },
+    {
+      "code": "IDENTIFIER_DOMAIN_SEPARATION",
+      "outcome": "pass",
+      "statement": "SUBMITTAL_1 denotes the Submittals item domain and is never written where ITEM_n, the Data Management item domain, is meant."
+    }
+  ],
+  "sanitisation": {
+    "convention_version": 1,
+    "profile_version": 1,
+    "tokens_used": [
+      "PROJECT_1",
+      "SUBMITTAL_1"
+    ]
+  },
+  "warnings": [
+    {
+      "code": "PUBLIC_ARTIFACT_NOT_SELF_REDERIVABLE",
+      "stage": "proof",
+      "message": "This alias-only artifact records historically established proof outcomes. Raw operands are deliberately excluded, so no proof is recomputable from the public artifact. That is intentional and is not an evidence defect."
+    },
+    {
+      "code": "SINGLE_FIXTURE_STATE_OBSERVED",
+      "stage": "submittals",
+      "message": "One controlled synthetic fixture in one workflow state was verified. No behaviour is asserted for any other Submittal state, any other project, any other caller role, or any workflow transition."
+    },
+    {
+      "code": "LIST_AND_DETAIL_CARRY_THE_SAME_UPSTREAM_DOCUMENT",
+      "stage": "submittals",
+      "message": "The Submittals list row and detail response were observed carrying the same upstream document. The direct detail operation is therefore retained for direct access to one known record without paging a role-scoped collection, and to exercise the canonical detail route independently — not because it returns a richer Autodesk representation. The differing caller projection widths are this project's design decision."
+    },
+    {
+      "code": "MAXIMUM_PAGE_SIZE_UNKNOWN",
+      "stage": "submittals",
+      "message": "The Submittals maximum page size is not documented and was not probed. The governed client encodes no maximum and no local default: an omitted page size is not sent, and a service-defined bound is enforced upstream. No claim about page-size limits is made here."
+    }
+  ]
+}

@@ -1050,6 +1050,19 @@ record exists.
 > Submittals and Sheets**. The historical readiness plan is preserved unchanged
 > beneath this notice.
 
+> **Superseded in part — status only (2026-07-29).** The statement immediately
+> above that the closing sentence "remains true for RFIs, Submittals and Sheets"
+> recorded the position **when that notice was written**. Two closures have
+> happened since: for **RFIs**, Gate 8 closed for the first read-only slice
+> (§16.7); for **Submittals**, Gate 8 closes for the adopted first read-only
+> slice (§16.11). For **Sheets** the closing statement continues to apply
+> unchanged, and nothing here asserts anything new about Sheets.
+>
+> This is a **status supersession only**. The §14 criteria below are preserved
+> historically and are **not weakened, relaxed or rewritten** — they remain the
+> operative Gate-8 checklist, and each closure is accounted for against them row
+> by row in its own §16 subsection.
+
 No Autodesk call was made and no live project inspection was performed. The five
 readiness axes are kept **separate**, as they were in Phase 3, where capability
 and data readiness blocked independently.
@@ -1144,7 +1157,7 @@ and proven across three phases.
 | 5 | Privacy and sanitisation planning | **passed** (§16.5) | **passed** (§16.9) | **passed** (§16.3) | **unresolved** | fail |
 | 6 | Component-boundary decision | **passed** (§16.6) | **passed** (§16.10) | **passed** (§16.2) | **unresolved** | fail |
 | 7 | Read-only-first sequencing | pass; the POST-as-read policy decision it was conditional on is **taken** — reference-repo ADR-0007 (§5) | pass | **pass** | pass | fail |
-| 8 | Harrismith scenario and data readiness | **closed for the first slice** (§16.7) | **unresolved** | **closed for the first slice** (§16.4) | **unresolved** | fail |
+| 8 | Harrismith scenario and data readiness | **closed for the first slice** (§16.7) | **closed for the first slice** (§16.11) | **closed for the first slice** (§16.4) | **unresolved** | fail |
 | 9 | No unsupported writes | pass | pass | **pass** | pass | fail |
 | 10 | No monolithic Forma Build API assumption | pass | pass | **pass** | pass | pass |
 
@@ -1155,12 +1168,11 @@ Recorded explicitly:
   passed** (§16.2), **Gate 5 is passed** (§16.3), and **Gate 8 is closed for the
   first slice** (§16.4).
 - For **Submittals**, **Gate 2 is sufficiently verified** (§16.8), **Gate 5 is
-  passed** (§16.9) and **Gate 6 is passed** (§16.10). **Gate 8 remains
-  unresolved.** The **first read-only slice is adopted and governed** — Submittals
-  now holds a capability record in the workflow contract, with
-  `mcp_implementation_status: planned` and `data_readiness: not-assessed`. **The
-  contract is approved and the implementation is not written**: zero Submittals MCP
-  tools exist, and closing Gates 2, 5 and 6 authorised no implementation.
+  passed** (§16.9), **Gate 6 is passed** (§16.10) and **Gate 8 is closed for the
+  first slice** (§16.11). The **first read-only slice is adopted, governed,
+  implemented and live-verified**, with `mcp_implementation_status: confirmed` and
+  `data_readiness: ready`, both scoped to the approved training project and that
+  read-only slice. **Submittals writes remain unsupported and unauthorised.**
 - Gates **2, 5, 6 and 8 remain unresolved** for **Sheets**, and Gate 2 remains
   unresolved for **RFIs**.
 - **No other candidate is implementation-ready.**
@@ -1738,6 +1750,94 @@ support any write, package, review-step, response, attachment, comment, template
 settings, item-type or spec-section-management operation.
 
 **Gate 8 remains unresolved.**
+
+> **Superseded in part (2026-07-29).** Gate 8 was subsequently closed for the
+> Submittals first read-only slice (§16.11), and the capability record now reads
+> `mcp_implementation_status: confirmed` / `data_readiness: ready`. The Gate-6
+> decision recorded above is unchanged.
+
+### 16.11 Submittals Gate 8 — closed for the first slice (2026-07-29)
+
+**Gate 8 is closed for the Submittals first read-only slice** under the operative
+§14 criteria, with readiness established in the **approved training project**
+against **one controlled synthetic fixture**, verified through the **published MCP
+contract**.
+
+**Criteria, each individually accounted for:**
+
+| §14 criterion | Status | Basis |
+|---|---|---|
+| Approved training project (§14 preamble) | **satisfied** | The approved training project was used; the binding is private |
+| Project entitlement / accessible | **satisfied** | Every governed Submittals operation returned data rather than a permission error |
+| Submittals module active | **satisfied** | `GET users/me` returned a caller context rather than a permission error |
+| Project metadata configured | **satisfied** | The item carried a spec section and item type; recorded as observed, not assumed |
+| Caller permission to read Submittals | **satisfied** | All three governed read operations succeeded |
+| One synthetic submittal item | **satisfied** | One controlled synthetic fixture exists and was returned |
+| Fixture discoverable | **satisfied** | Returned by `list_submittals` and matched against the private controlled binding |
+| Fixture retrievable by id | **satisfied** | Returned by `get_submittal`, with list-to-detail identity equality proven byte-for-byte |
+
+**Verified against the published implementation.** APS/Forma MCP revision
+`f763d190871743e4c638902ddd6fdadf2d740e88`, exercised through **one freshly
+launched MCP server process** over the MCP protocol surface. **41 registered
+tools**, of which **3 are the governed Submittals reads** and **0 are Submittals
+writes**.
+
+**Caller projections, exact.** Caller context **3 fields**; list row **8 fields**;
+detail **17 fields**. Each field set matched the governed allowlist exactly, and
+**no unexpected field reached a caller**.
+
+**Continuity, four proofs.** The list and detail surfaces agreed byte-for-byte on
+**identity**, **state**, **status** and **revision**. The compared operands are
+private and are not published; the equality outcomes carry the proof.
+
+**Privacy negative space.** **31 governed forbidden keys were checked by key
+presence alone and 0 were present** — covering manager, subcontractor, creator,
+updater, submitter, publisher, responder and review-sender identities; every
+ball-in-court collection; watchers; company assignment; `permittedActions` at both
+caller and item scope; `sentToSubmitter`; package, folder, storage,
+custom-attribute and revision-folder structures. Sensitive logging **not
+observed** — logs carried only operation, status and bounded counts.
+
+**No writes.** Submittals **GET request count 3**, **write request count 0**, and
+the controlled fixture is **unchanged** with no write and no workflow transition
+performed. The client defines no write verb and registers no write tool, so no
+Submittals write route exists to call.
+
+**Single-execution discipline.** The evidence derives from **exactly one**
+verification harness execution against one fresh process. No evidence is
+aggregated across runs.
+
+**Scope proven.** `data:read` alone was sufficient (§16.8). The normal server grant
+holds a broader four-scope configuration for other capabilities; that does not
+widen the Submittals requirement.
+
+**Evidence.** Raw identifiers remain in the git-ignored private evidence area,
+bound as `PROJECT_1` and `SUBMITTAL_1` with provenance classes; the Gate-5-safe
+public artifact is
+[`submittals-first-slice-read-verification.result.json`](../../examples/harrismith-fire-station/expected-results/submittals-first-slice-read-verification.result.json),
+outcome **`submittals_read_slice_verified`**, scoped to the controlled fixture.
+State and status **values** are deliberately omitted from that artifact even though
+the profile permits the observed structural vocabulary: the equality proofs carry
+the continuity evidence without them, so omission loses no proof.
+
+**Capability record.** `mcp_implementation_status: confirmed` and
+`data_readiness: ready`, both scoped to the approved training project and this
+read-only slice.
+
+**Ordering.** Like RFIs (§16.7) and unlike Transmittals (§16.4), Submittals closed
+Gate 8 **through** the published, reviewed MCP contract rather than around it —
+implementation and publication preceded verification, so there is no ordering
+defect to record.
+
+**What this closure does not do.** It does **not** authorise any Submittals write
+operation; does **not** support submission, workflow transitions, responses,
+comments, attachments, packages, review steps, spec-section management,
+item-type operations, or templates and settings; does **not** claim verification
+of any other Submittal workflow state, any other Autodesk project, or any other
+caller role; does **not** assert that `data:write` or the broader four-scope grant
+is required; does **not** assert that the Harrismith Fire Station example project
+contains this or any Submittal fixture; does **not** close any gate for Sheets or
+Meetings; and does **not** make Phase 4A complete.
 
 ## 17. Adopted first capability
 

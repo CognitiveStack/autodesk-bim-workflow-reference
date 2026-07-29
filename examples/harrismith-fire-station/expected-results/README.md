@@ -317,3 +317,94 @@ Distinctions kept honest:
 - **overall Phase 4A completion** — Submittals, Sheets and Meetings are
   unimplemented;
 - **that the Harrismith Autodesk project contains the fixture**.
+
+## Phase 4A — Submittals first-slice read verification
+
+- **Public-evidence policy:**
+  [`ADR-0013`](../../../docs/decisions/0013-approve-submittals-public-evidence-sanitisation-profile.md)
+  (Submittals public-evidence sanitisation profile)
+- **Caller contract:**
+  [`ADR-0014`](../../../docs/decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)
+  (first-slice MCP contract and component boundary)
+- **Schema:** [`schemas/phase-4-result.schema.json`](../../../schemas/phase-4-result.schema.json)
+- **Sanitisation:** [`docs/guides/SANITISATION_CONVENTION.md`](../../../docs/guides/SANITISATION_CONVENTION.md)
+
+The same public/private boundary applies: raw identifiers and the alias map live
+under the git-ignored private evidence area; only the sanitised result JSON is
+committed here.
+
+### Artifact
+
+- `submittals-first-slice-read-verification.result.json` — present. A
+  **complete**, read-only, sanitised Phase 4A Gate-8 evidence artifact from a live
+  run on 2026-07-29, with outcome **`submittals_read_slice_verified`**.
+
+### Scenario and capture provenance
+
+1. the controlled synthetic Submittal was **captured in the approved training
+   project**;
+2. the evidence **belongs to the Harrismith BIM learning/reference scenario**
+   namespace;
+3. **no claim** is made that the Autodesk project named *Harrismith Fire Station*
+   contains this or any Submittal fixture;
+4. **no Harrismith-project Submittals readiness** is inferred from this artifact;
+5. **no real Autodesk project title and no alias-to-real-project mapping** is
+   published.
+
+### What the evidence establishes (the narrow proof)
+
+- The three governed read-only tools were exercised against a **server started
+  fresh for the run**, loaded from published component revision
+  `f763d190871743e4c638902ddd6fdadf2d740e88`, over the **MCP protocol surface**.
+- The **caller-context contract held**: exactly three approved structural keys,
+  with no caller id and no role value returned.
+- The **list allowlist held**: every returned row carried exactly the eight
+  approved keys.
+- The **detail contract held**: exactly the 17 approved keys.
+- **List-to-detail continuity** was established on identity, state, status and
+  revision by byte-for-byte exact comparison. **No compared operand is
+  published** — the artifact records each comparison, its method and its result.
+- **31 governed forbidden keys were checked by key presence alone and none was
+  present**, covering every person and company identity, ball-in-court collection,
+  watchers, `permittedActions` at both scopes, and the package, folder,
+  custom-attribute and revision-folder structures.
+- **Three Autodesk-facing GET requests, zero writes**, and the fixture is
+  **unchanged**.
+- The evidence derives from **exactly one** verification run against one fresh
+  process; nothing is aggregated across runs.
+
+Distinctions kept honest:
+
+- **The list and detail surfaces carry the same upstream document.** The direct
+  detail tool is **not** presented as a richer Autodesk read. It exists for direct
+  access to one known record without paging a role-scoped collection, and to
+  exercise the canonical detail route; the differing 8-field and 17-field caller
+  projections are this project's design decision.
+- **State and status values are omitted**, even though ADR-0013 permits the
+  observed structural vocabulary. The equality proofs carry the continuity
+  evidence without them, so omission loses no proof.
+- **`SUBMITTAL_n` is not `ITEM_n`.** They denote different identifier domains —
+  the Submittals item and the Data Management item — even though Autodesk calls
+  both resources an item.
+- **Permitted actions are workflow configuration, not read permissions**, and are
+  excluded at both caller and item scope; the caller context reduces to counts
+  that this artifact does not publish.
+
+### What the evidence does not establish
+
+- **universal Submittals behaviour** — the verdict is scoped to the controlled
+  fixture;
+- **any other Submittal workflow state** — one state was present in the verified
+  context;
+- **readiness for any other Autodesk project, or any other caller role**;
+- **any Submittals write capability** — writes are neither supported nor
+  authorised, and none was attempted; submission, workflow transitions, responses,
+  comments, attachments, packages, review steps, spec-section management,
+  item-type operations and templates/settings are all outside the slice;
+- **that `data:write` or the broader four-scope grant is required** — `data:read`
+  alone was proven sufficient;
+- **any page-size limit** — the maximum is undocumented and was not probed;
+- **Gate 8 as a global verdict** — Gate 8 closed for the Submittals first
+  read-only slice only, under the operative §14 criteria of the capability gap;
+- **overall Phase 4A completion** — Sheets and Meetings remain unimplemented;
+- **that the Harrismith Autodesk project contains the fixture**.

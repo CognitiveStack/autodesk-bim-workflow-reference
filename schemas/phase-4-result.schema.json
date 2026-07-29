@@ -46,7 +46,8 @@
           "type": "string",
           "enum": [
             "transmittals-exact-version-snapshot",
-            "rfis-first-slice-read-verification"
+            "rfis-first-slice-read-verification",
+            "submittals-first-slice-read-verification"
           ]
         },
         "execution_date": {
@@ -115,7 +116,8 @@
             "enum": [
               "transmittals",
               "data_management",
-              "rfis"
+              "rfis",
+              "submittals"
             ]
           }
         },
@@ -323,7 +325,8 @@
               "transmittals",
               "data_management",
               "cross_surface",
-              "rfis"
+              "rfis",
+              "submittals"
             ]
           },
           "claim": {
@@ -337,6 +340,7 @@
               "current_tip_relation",
               "caller_context_boundary",
               "search_allowlist_enforced",
+              "list_allowlist_enforced",
               "detail_contract_exact",
               "response_narrative_excluded",
               "participant_identity_excluded",
@@ -405,6 +409,8 @@
               "data_management",
               "rfis_search",
               "rfis_detail",
+              "submittals_list",
+              "submittals_detail",
               "controlled_fixture"
             ]
           },
@@ -419,6 +425,8 @@
               "data_management",
               "rfis_search",
               "rfis_detail",
+              "submittals_list",
+              "submittals_detail",
               "controlled_fixture"
             ]
           },
@@ -520,7 +528,8 @@
               "external_member",
               "company",
               "role",
-              "rfi"
+              "rfi",
+              "submittal"
             ]
           },
           "provenance_class": {
@@ -546,7 +555,8 @@
         "exact_version_relation_not_proven",
         "transmittals_read_slice_verified",
         "phase_4_evidence_incomplete",
-        "rfi_read_slice_verified"
+        "rfi_read_slice_verified",
+        "submittals_read_slice_verified"
       ]
     },
     "outcome_scope": {
@@ -644,7 +654,8 @@
               "governance",
               "provenance",
               "sanitisation",
-              "rfis"
+              "rfis",
+              "submittals"
             ]
           },
           "message": {
@@ -797,6 +808,113 @@
           "description": "Must be false. Records explicitly that no RFI narrative content was published in this artifact.",
           "const": false
         }
+      }
+    },
+    "submittals_observation": {
+      "description": "Submittals-surface evidence for the governed first read-only slice (reference-repo ADR-0014). Structural only: the Submittals list row and detail response carry the SAME upstream document, so this object records caller-projection widths, exactness booleans, list/detail continuity, forbidden-field absence, privacy indicators and method accounting. No raw identifier, identifier value, custom identifier, narrative, spec value, participant, company, date, state value or status value is recorded anywhere in this object. The list/detail equality booleans carry the continuity proof without publishing the compared operands.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "project_alias",
+        "record_alias",
+        "controlled_fixture_matched",
+        "list_field_count",
+        "list_fields_exact",
+        "detail_field_count",
+        "detail_fields_exact",
+        "unexpected_fields_published",
+        "forbidden_keys_checked",
+        "forbidden_key_count",
+        "list_detail_id_equal",
+        "list_detail_state_equal",
+        "list_detail_status_equal",
+        "list_detail_revision_equal",
+        "identity_published",
+        "company_data_published",
+        "permitted_actions_published",
+        "narrative_content_published",
+        "timestamps_published",
+        "get_request_count",
+        "write_request_count",
+        "harness_executions",
+        "required_scope",
+        "fixture_unchanged"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean",
+          "description": "The governed Submittals operations returned data rather than a permission error."
+        },
+        "project_alias": { "$ref": "#/definitions/alias" },
+        "record_alias": {
+          "description": "Alias of the controlled Submittal record (for example SUBMITTAL_1). Never a raw Autodesk Submittal identifier. SUBMITTAL_n and ITEM_n are distinct identifier domains and are never interchanged (ADR-0013).",
+          "$ref": "#/definitions/alias"
+        },
+        "controlled_fixture_matched": {
+          "type": "boolean",
+          "description": "The controlled synthetic fixture was located in the governed list result. The matching operand is private and is never published."
+        },
+        "submittals_write_tool_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0,
+          "description": "Registered Submittals write tools. The adopted slice defines none, so the only admissible value is 0."
+        },
+        "list_field_count": { "type": "integer", "minimum": 0 },
+        "list_fields_exact": {
+          "type": "boolean",
+          "description": "Every returned list row carried exactly the approved caller keys and no other."
+        },
+        "detail_field_count": { "type": "integer", "minimum": 0 },
+        "detail_fields_exact": {
+          "type": "boolean",
+          "description": "The governed detail tool returned exactly the approved caller keys and no other."
+        },
+        "unexpected_fields_published": {
+          "type": "boolean",
+          "description": "Whether any field outside the governed allowlists reached a caller. The adopted contract requires false."
+        },
+        "forbidden_keys_checked": { "type": "integer", "minimum": 0 },
+        "forbidden_key_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0,
+          "description": "Governed forbidden keys present in the caller projection, tested by key presence only. The adopted contract admits 0 alone."
+        },
+        "list_detail_id_equal": { "type": "boolean" },
+        "list_detail_state_equal": { "type": "boolean" },
+        "list_detail_status_equal": { "type": "boolean" },
+        "list_detail_revision_equal": { "type": "boolean" },
+        "identity_published": { "type": "boolean" },
+        "company_data_published": { "type": "boolean" },
+        "permitted_actions_published": { "type": "boolean" },
+        "narrative_content_published": { "type": "boolean" },
+        "timestamps_published": { "type": "boolean" },
+        "raw_spec_values_published": { "type": "boolean" },
+        "custom_identifier_value_published": { "type": "boolean" },
+        "get_request_count": { "type": "integer", "minimum": 0 },
+        "write_request_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0,
+          "description": "Autodesk-facing Submittals write requests. Gate 9 admits 0 alone."
+        },
+        "harness_executions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "description": "Verification harness executions contributing to this artifact. Exactly one, so the evidence derives from a single controlled run rather than an aggregate."
+        },
+        "required_scope": {
+          "type": "string",
+          "const": "data:read",
+          "description": "The minimum OAuth scope proven sufficient for the governed slice. The server may hold a broader grant for other capabilities; that does not widen this requirement."
+        },
+        "fixture_write_performed": { "type": "boolean" },
+        "fixture_transition_performed": { "type": "boolean" },
+        "fixture_unchanged": { "type": "boolean" },
+        "sensitive_logging_observed": { "type": "boolean" }
       }
     },
     "caller_context_observation": {
@@ -1516,6 +1634,38 @@
           "rfi_observation",
           "caller_context_observation",
           "contract_observation"
+        ],
+        "properties": {
+          "sanitisation": {
+            "properties": {
+              "profile_version": {
+                "const": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "properties": {
+              "slice": {
+                "const": "submittals-first-slice-read-verification"
+              }
+            }
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "comment": "contract_observation is deliberately NOT required here. Its required vocabulary is search-shaped (search_item_key_count, search_allowlist_enforced) and the governed Submittals discovery operation is a GET list, not a search. Forcing it would either misdescribe the operation or require relaxing the RFI guarantee. The Submittals contract facts live in submittals_observation instead.",
+        "required": [
+          "submittals_observation",
+          "caller_context_observation"
         ],
         "properties": {
           "sanitisation": {

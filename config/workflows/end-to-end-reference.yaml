@@ -217,8 +217,8 @@ stages:
     # (first capability — implemented and live-verified; confirmed / ready), RFIs
     # (second governed capability — implemented and live-verified; confirmed /
     # ready) and Submittals (third governed capability — first read-only slice
-    # CONTRACT ADOPTED by ADR-0014, IMPLEMENTATION NOT WRITTEN; planned /
-    # not-assessed). Sheets is a later candidate; Meetings is deferred (public API
+    # adopted by ADR-0014, implemented and live-verified; confirmed / ready).
+    # Sheets is a later candidate; Meetings is deferred (public API
     # not verified). Their API families are deliberately not listed in this task.
     capabilities:
       - id: transmittals
@@ -299,26 +299,36 @@ stages:
       - id: submittals
         primary_system: Forma Build
         # ADOPTED as the third governed Phase 4A capability by ADR-0014
-        # (2026-07-29). THE CONTRACT IS APPROVED; THE IMPLEMENTATION IS NOT
-        # WRITTEN. Zero Submittals MCP tools exist, and this adoption changes no
-        # tool count.
+        # (2026-07-29), and now IMPLEMENTED, PUBLISHED and LIVE-VERIFIED
+        # (2026-07-29). The three governed read-only tools exist in the APS/Forma
+        # MCP at published revision f763d190871743e4c638902ddd6fdadf2d740e88 and
+        # were exercised through a freshly launched MCP server over the MCP
+        # protocol surface against the controlled synthetic fixture in the
+        # approved training project. Shared authentication and HTTP
+        # infrastructure still does not count as Submittals implementation; the
+        # three Submittals tools do.
         # API IDENTITY: asserted because it is verified from official Autodesk/APS
         # documentation (see PHASE_4_CAPABILITY_GAP.md 4 and 6) — Autodesk Forma
         # Build Submittals API, contract/request-route version v2 under
         # /construction/submittals/v2/projects/:projectId, read phase generally
         # available 2024-02-22. api_version is REQUIRED here because
         # api_maturity: ga is a concrete lifecycle assertion (ADR-0009).
-        # ADOPTED FIRST READ-ONLY SLICE — CONTRACT ONLY, NOT IMPLEMENTED:
+        # ADOPTED FIRST READ-ONLY SLICE — IMPLEMENTED AND LIVE-VERIFIED:
         # 1. GET users/me; 2. GET items; 3. GET items/:itemId. All three are GET,
         # so no POST-as-read classification is involved. Caller projections are
         # 3 / 8 / 17 fields (COMPONENT_BOUNDARIES.md 6.3). Packages, spec sections
         # as independent operations, item types, responses, review steps,
         # attachments, comments, templates, settings/mappings and ALL WRITES are
-        # excluded from that initial slice.
+        # excluded from that initial slice, and Submittals writes remain
+        # unsupported and unauthorised.
         # GATES / VERIFICATION: Gate 2 is sufficiently verified (16.8), Gate 5 is
-        # passed (16.9) and Gate 6 is passed (16.10). GATE 8 IS OPEN — no live MCP
-        # evidence exists. The single controlled synthetic fixture in the approved
-        # training project is DIAGNOSTIC INPUT ONLY, not Gate-8 evidence.
+        # passed (16.9), Gate 6 is passed (16.10) and GATE 8 IS CLOSED for this
+        # first slice (16.11). Live verification used one fresh MCP process and
+        # exactly three Autodesk-facing GET requests with zero writes; the
+        # controlled synthetic fixture is unchanged.
+        # SCOPE: the proven first-slice requirement is data:read alone. The normal
+        # server grant holds a broader four-scope configuration for other
+        # capabilities; that does not widen the Submittals requirement.
         # SCOPE: the proven first-slice requirement is data:read alone. The normal
         # server grant holds a broader four-scope configuration for other
         # capabilities; that does not widen the Submittals requirement.
@@ -331,13 +341,17 @@ stages:
         api_version: v2
         api_maturity: ga
         mcp_component: aps-forma-mcp
-        # `planned` is the vocabulary value for NO MCP TOOL YET — not `partial`,
-        # which describes a capability whose own tool surface is partly built.
-        mcp_implementation_status: planned
-        # NOT DERIVED FROM IMPLEMENTATION STATUS. Gate 8 is open and readiness has
-        # not been assessed for this capability. data_readiness_reason is omitted
-        # because it is optional and is never invented where none exists.
-        data_readiness: not-assessed
+        mcp_implementation_status: confirmed
+        # SCOPE OF data_readiness BELOW: readiness was established in the APPROVED
+        # TRAINING PROJECT for the Submittals first read-only slice, against ONE
+        # controlled synthetic fixture, through the published MCP contract — NOT in
+        # the Harrismith example project, which is not asserted to hold a Submittal
+        # fixture. It asserts nothing about other Autodesk projects, other
+        # Submittal workflow states, other caller roles, any write capability, or
+        # production readiness. data_readiness_reason names that scope, per the
+        # header definition.
+        data_readiness: ready
+        data_readiness_reason: submittals-first-slice-ready-in-approved-training-project
 
   - id: asset_handover
     platform: Autodesk Forma

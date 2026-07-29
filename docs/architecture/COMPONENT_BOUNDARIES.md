@@ -294,7 +294,7 @@ of the component boundary.
 | Stage | Capability | Status |
 |---|---|---|
 | construction_information | RFI — adopted second Phase 4A capability; first read-only slice implemented and live-verified 2026-07-28 (§6.2) | confirmed |
-| construction_information | Submittals — adopted third Phase 4A capability; first read-only slice **contract approved, implementation not written** (§6.3) | planned |
+| construction_information | Submittals — adopted third Phase 4A capability; first read-only slice implemented and live-verified 2026-07-29 (§6.3) | confirmed |
 | asset_handover | Assets | planned |
 
 Reviews and issue-relationship reads for `reviews_and_issues` are now implemented
@@ -448,7 +448,7 @@ prefix and normalised by stripping it, as the Transmittals client already does.
 **Pagination:** `limit` 1–200 (default 10), `offset` ≥ 0; no fetch-all, no
 automatic detail call per search result, no bulk crawling.
 
-### 6.3 Submittals first-slice contract (adopted, not implemented)
+### 6.3 Submittals first-slice contract (adopted, implemented, live-verified)
 
 **Approved by
 [reference-repo ADR-0014](../decisions/0014-adopt-submittals-first-slice-mcp-contract-and-component-boundary.md)
@@ -456,17 +456,26 @@ automatic detail call per search result, no bulk crawling.
 **Submittals v1 first slice**.
 
 > **Read this subsection as describing SUBMITTALS ONLY.** Every statement in §6.3
-> is scoped to Submittals and to no other capability. **Zero Submittals MCP tools
-> exist**: `mcp_implementation_status` is `planned` and `data_readiness` is
-> `not-assessed`. Statements elsewhere in §6 about other capabilities'
-> implementation state — including any pre-implementation prose about RFIs — do not
-> describe Submittals, and Submittals statements do not describe them.
+> is scoped to Submittals and to no other capability. Statements elsewhere in §6
+> about other capabilities' implementation state — including any
+> pre-implementation prose about RFIs — do not describe Submittals, and Submittals
+> statements do not describe them.
 
-**The contract is approved; the implementation is not written.** No
-`submittals_client` and no Submittals tool exists at APS/Forma MCP revision
-`5dca2297e610d5125ea123cd4203de63e96e943b`. **This adoption changes no tool count.**
+**Three tools are implemented, published and live-verified (2026-07-29)** in a
+dedicated `submittals_client` at APS/Forma MCP revision
+`f763d190871743e4c638902ddd6fdadf2d740e88`, exercised through a **freshly launched
+server over the MCP protocol surface** against a controlled synthetic fixture in
+the **approved training project**, using **three Autodesk-facing GET requests and
+zero writes**. The verified surface reports **41 registered tools**, of which
+**3 are Submittals reads** and **0 are Submittals writes**.
 [`PHASE_4_CAPABILITY_GAP.md`](PHASE_4_CAPABILITY_GAP.md) §16.10 records the Gate 6
-closure; **Gate 8 is open**, and no live MCP evidence exists.
+closure and §16.11 records the Gate 8 closure. `mcp_implementation_status` is
+`confirmed` and `data_readiness` is `ready`, both scoped to that project and that
+read-only slice — no other project, no other Submittal workflow state, no other
+caller role, and **no write capability**. The **minimum proven scope is
+`data:read`**; the normal server grant holds a broader four-scope configuration for
+other capabilities and that does not widen the Submittals requirement. The
+controlled fixture is **unchanged**.
 
 **APS/Forma MCP owns Submittals**, in a **dedicated `submittals_client`**.
 Submittals semantics belong in no existing client and in no generic request
@@ -604,12 +613,15 @@ failures per sibling precedent. The raw Autodesk error body, headers, resolved U
 tokens, identifiers and diagnostic payloads are **never** exposed. Logging is
 narrower than the output: operation name, status and bounded counts only.
 
-**Prescribed later implementation.** A dedicated `submittals_client.py`, GET-only,
-three internal helpers hardwired to three fixed routes, no generic request helper,
-no caller-supplied URL/path/method/body, no shared-client refactor, no
+**Implementation, as built.** A dedicated `submittals_client.py`, GET-only, three
+internal helpers hardwired to three fixed routes, no generic request helper, no
+caller-supplied URL/path/method/body, no shared-client refactor, no
 transport-abstraction expansion, no write helpers, capability-local validation,
-reuse of the existing APS 3LO lifecycle, and eventual registration of three MCP
-tools. **None of it is authorised to be written by this adoption.**
+reuse of the existing APS 3LO lifecycle, and three MCP tools registered. The
+client's shape enforcement **fails closed**: an absent or upstream-null value maps
+to `null`, but a present value of an unexpected type is a transport-contract
+violation and returns the structured malformed-response outcome rather than being
+coerced.
 
 **Gate 5 versus Gate 6.** ADR-0013 governs **public repository evidence**;
 ADR-0014 governs **authenticated runtime caller output**. The caller may
