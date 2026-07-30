@@ -1,0 +1,57 @@
+schema_version: 1
+
+# V1 FREEZE BASELINE — the immutable component revisions V1 was accepted against.
+#
+# This is a HISTORICAL RELEASE DECLARATION, and nothing else. It is not a Git
+# submodule pin, not runtime configuration, not a dependency or checkout manager,
+# and not a multi-release registry. The components remain separate repositories
+# referenced by identity and local path; no source is vendored, no component
+# checkout is controlled, and no build dependency is pinned
+# (ADR-0002, which this file neither amends nor contradicts). Cross-repository
+# acceptance simply verifies that these commit objects exist in the repositories
+# resolved through config/components.example.yaml, and reads component facts from
+# them.
+#
+# WHAT THIS CHANGES. Before the freeze, acceptance validated whichever revision a
+# component had published most recently. After it, `scripts/acceptance.py` reads
+# `accepted_revision` from this file, so a future component commit cannot
+# silently change what "V1 acceptance" means. There is no fallback to component
+# HEAD: an unresolvable or missing pin is fatal.
+#
+# SCOPE LIVES ELSEWHERE. What V1 governs is defined by the machine-readable
+# sources below, and is deliberately NOT duplicated here — no capability lists,
+# no tool inventories, no counts, no deferred-tool lists, no technical-debt
+# register:
+#
+#   config/workflows/end-to-end-reference.yaml   governed capability records
+#   config/capability-tools.yaml                 capability / support / deferred
+#                                                tool classification
+#
+# Acceptance semantics are recorded in docs/architecture/COMPONENT_BOUNDARIES.md
+# §12.
+
+# The published reference revision at which Cross-Repository Acceptance completed
+# (A1-A7 PASS, A8 documentary, exit 0).
+#
+# THIS IS NOT THE FINAL V1 REFERENCE REVISION. The final reference revision is
+# the freeze commit that introduces this file, and a file cannot contain the hash
+# of the commit that contains it. That revision is identified instead by the
+# annotated `v1.0.0` tag applied to the freeze commit — which is why the baseline
+# is split across two mechanisms: this manifest records the component revisions,
+# the tag records the reference revision.
+acceptance_baseline:
+  repository: CognitiveStack/autodesk-bim-workflow-reference
+  acceptance_revision: 5c2896c2c4598e3df90521016282ae9965578c5d
+
+# Immutable component revisions accepted for V1. `mcp_component` and `repository`
+# must both agree with the matching declaration in config/components.example.yaml,
+# so a pin cannot be silently redirected at a different repository.
+components:
+
+  - mcp_component: aps-forma-mcp
+    repository: CognitiveStack/autodesk-aps-forma-mcp
+    accepted_revision: f763d190871743e4c638902ddd6fdadf2d740e88
+
+  - mcp_component: revit-mcp
+    repository: CognitiveStack/revit-mcp-triviron
+    accepted_revision: ae01d292735549ac406e5e7101620e64a5477970

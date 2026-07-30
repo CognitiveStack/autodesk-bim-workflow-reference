@@ -5,6 +5,12 @@ Validates that this reference repository, the APS/Forma MCP and the Revit MCP
 describe one coherent architecture. Runs entirely OFFLINE against committed Git
 state: no Autodesk call, no running Revit, no MCP server, no component doctor.
 
+Component facts are read at the **frozen V1 revisions** declared in
+config/v1-baseline.yaml, not at whichever revision a component happens to have
+published most recently. A future component commit therefore cannot silently
+change what V1 acceptance validates. There is no fallback to component HEAD: a
+missing, unresolvable or misdirected pin is fatal.
+
 Assertions (see docs/architecture/COMPONENT_BOUNDARIES.md §12):
 
     A1  reference capability contract is valid
@@ -17,8 +23,9 @@ Assertions (see docs/architecture/COMPONENT_BOUNDARIES.md §12):
     A8  read/write governance basis exists  (DOCUMENTARY, not executable)
 
 Component repositories are resolved from the `local_path_env` declared in
-config/components.example.yaml (FORMA_MCP_REPO, REVIT_MCP_REPO). No absolute
-path is encoded here or in committed configuration.
+config/components.example.yaml (FORMA_MCP_REPO, REVIT_MCP_REPO); the revision
+inspected within each is the `accepted_revision` from config/v1-baseline.yaml.
+No absolute path is encoded here or in committed configuration.
 
 Requires: Python 3.9+, PyYAML, jsonschema, git on PATH. Nothing else, and no
 packaging is added for it.
@@ -53,6 +60,7 @@ REPO = Path(__file__).resolve().parent.parent
 CONTRACT = REPO / "config" / "workflows" / "end-to-end-reference.yaml"
 COMPONENTS = REPO / "config" / "components.example.yaml"
 MAPPING = REPO / "config" / "capability-tools.yaml"
+BASELINE = REPO / "config" / "v1-baseline.yaml"
 EVIDENCE = REPO / "examples" / "harrismith-fire-station" / "expected-results"
 SCHEMAS = REPO / "schemas"
 
@@ -158,6 +166,55 @@ def load() -> tuple[dict, dict, dict]:
     components = yaml.safe_load(COMPONENTS.read_text())
     mapping = yaml.safe_load(MAPPING.read_text())
     return contract, components, mapping
+
+
+class BaselineError(Exception):
+    """The V1 freeze baseline is unusable. Never recoverable by falling back."""
+
+
+def load_baseline(declared: dict) -> tuple[dict, dict]:
+    """Frozen V1 component pins, validated directly (no separate schema file).
+
+    Returns (pins_by_mcp_component, acceptance_baseline). Raises BaselineError
+    for anything that would leave acceptance validating an unintended revision:
+    a wrong schema version, a missing or duplicated component, a pin lacking a
+    field, a pin naming a repository the component declaration does not, or a
+    declared component with no pin at all. There is deliberately no default and
+    no fallback to HEAD.
+    """
+    if not BASELINE.is_file():
+        raise BaselineError(f"{BASELINE.name} is missing")
+    doc = yaml.safe_load(BASELINE.read_text()) or {}
+
+    if doc.get("schema_version") != 1:
+        raise BaselineError(f"schema_version is {doc.get('schema_version')!r}, expected 1")
+
+    base = doc.get("acceptance_baseline") or {}
+    for field in ("repository", "acceptance_revision"):
+        if not base.get(field):
+            raise BaselineError(f"acceptance_baseline is missing {field!r}")
+
+    pins: dict[str, dict] = {}
+    for entry in doc.get("components") or []:
+        for field in ("mcp_component", "repository", "accepted_revision"):
+            if not entry.get(field):
+                raise BaselineError(f"a component pin is missing {field!r}")
+        token = entry["mcp_component"]
+        if token in pins:
+            raise BaselineError(f"duplicate component pin for {token!r}")
+        if token not in declared:
+            raise BaselineError(f"pin names undeclared component {token!r}")
+        # A pin must not be able to redirect a component at another repository.
+        if entry["repository"] != declared[token]["repository"]:
+            raise BaselineError(
+                f"{token}: pinned repository {entry['repository']!r} disagrees with "
+                f"the declaration {declared[token]['repository']!r}")
+        pins[token] = entry
+
+    missing = sorted(set(declared) - set(pins))
+    if missing:
+        raise BaselineError(f"no V1 pin declared for component(s): {missing}")
+    return pins, base
 
 
 def capabilities(contract: dict):
@@ -312,7 +369,9 @@ def check_a5(artifacts, declared: dict, repos: dict, revs: dict) -> Result:
                 r.fail(f"{path.name}/{key}: {rev[:12]} is not a commit in {slug}")
                 continue
             # Historical revisions are valid: an artifact pins the revision it was
-            # produced against, which normally precedes the accepted revision.
+            # produced against, which normally precedes the frozen V1 revision.
+            # The ancestor base is the accepted pin, never the component's HEAD,
+            # and equality with the pin is never required.
             if not git_ok(repo, "merge-base", "--is-ancestor", rev, revs[token]):
                 r.fail(f"{path.name}/{key}: {rev[:12]} is not in the accepted "
                        f"lineage of {revs[token][:12]}")
@@ -392,8 +451,20 @@ def main() -> int:
                 for c in (components.get("components") or {}).values()
                 if c.get("mcp_component")}
 
-    print("V1 CROSS-REPOSITORY ACCEPTANCE")
-    print(f"reference   {REPO.name} @ {git(str(REPO), 'rev-parse', '--short', 'HEAD')}")
+    try:
+        pins, acceptance_baseline = load_baseline(declared)
+    except BaselineError as exc:
+        print("V1 CROSS-REPOSITORY ACCEPTANCE")
+        print(f"FATAL: V1 freeze baseline unusable — {exc}")
+        print("RESULT: FAIL")
+        return 1
+
+    print("V1 CROSS-REPOSITORY ACCEPTANCE — FROZEN V1 COMPONENT PINS")
+    print(f"reference   {REPO.name} @ {git(str(REPO), 'rev-parse', '--short', 'HEAD')} "
+          f"(current); Phase-C acceptance baseline "
+          f"{acceptance_baseline['acceptance_revision'][:12]}")
+    print(f"baseline    {BASELINE.name} — component facts are read at the accepted "
+          f"revisions below, never at component HEAD")
 
     # ---- resolve component repositories (required; unavailability is fatal) --
     repos: dict[str, str] = {}
@@ -419,19 +490,27 @@ def main() -> int:
             unavailable.append(f"{token}: remote {remote!r} != declared "
                                f"{decl['repository']!r}")
             continue
-        rev = git(path, "rev-parse", "HEAD")
-        repos[token], revs[token] = path, rev
-        inventory[token] = extract_tools(path, rev)
+        # The accepted revision, never HEAD. An unresolvable pin is fatal and is
+        # never recovered from by substituting the component's current tip.
+        rev = pins[token]["accepted_revision"]
+        if not git_ok(path, "cat-file", "-e", f"{rev}^{{commit}}"):
+            unavailable.append(f"{token}: accepted revision {rev[:12]} does not "
+                               f"resolve to a commit in {decl['repository']}")
+            continue
+        repos[token], revs[token] = path, git(path, "rev-parse", rev)
+        inventory[token] = extract_tools(path, revs[token])
+        head = git(path, "rev-parse", "HEAD")
         dirty = len([ln for ln in git(path, "status", "--porcelain").splitlines() if ln])
         content = len([ln for ln in git(path, "diff", "--ignore-cr-at-eol",
                                         "--numstat").splitlines()
                        if ln and not ln.startswith("0\t0\t")])
-        print(f"component   {token} @ {rev[:12]}  "
-              f"tools={len(inventory[token])}  "
-              f"worktree={'dirty' if dirty else 'clean'}"
-              + (f" ({dirty} modified, {content} with content change — "
-                 f"informational; acceptance reads committed objects only)"
-                 if dirty else ""))
+        print(f"component   {token} @ {revs[token]}")
+        print(f"              V1 ACCEPTED REVISION — tools={len(inventory[token])}")
+        print(f"              current repository state: HEAD {head[:12]}"
+              f"{' (= accepted)' if head == revs[token] else ' (AHEAD OF / DIFFERENT FROM ACCEPTED — not used)'}"
+              f", worktree {'dirty' if dirty else 'clean'}"
+              + (f" ({dirty} modified, {content} with content change)" if dirty else "")
+              + " — informational only")
     print()
 
     # ---- assertions ---------------------------------------------------------

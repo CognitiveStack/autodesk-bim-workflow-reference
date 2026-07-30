@@ -98,8 +98,22 @@ and not to any other project.
 
 **No fourth Autodesk Forma capability is in the V1 roadmap.** Sheets and Meetings
 are not adopted, and Assets remains a governed **planned** capability in the
-`asset_handover` stage. V1 now proceeds to common-schema consolidation and Revit
-MCP alignment rather than to a further Forma capability.
+`asset_handover` stage.
+
+### V1 freeze baseline
+
+Common-schema consolidation, Revit MCP alignment and cross-repository acceptance
+are complete. The **V1 freeze baseline is prepared**: the accepted component
+revisions are declared in
+[`config/v1-baseline.yaml`](config/v1-baseline.yaml), and
+[`scripts/acceptance.py`](scripts/acceptance.py) validates the architecture
+against those exact revisions rather than against whatever the components publish
+next. Acceptance is **offline** — no Autodesk call, no running Revit, no MCP
+server — and its contract is recorded in
+[COMPONENT_BOUNDARIES.md](docs/architecture/COMPONENT_BOUNDARIES.md) §12.
+
+The final reference revision is identified by the annotated **`v1.0.0`** tag once
+freeze finalisation is complete.
 
 The Phase 4 evidence schema
 ([`schemas/phase-4-result.schema.json`](schemas/phase-4-result.schema.json)) and

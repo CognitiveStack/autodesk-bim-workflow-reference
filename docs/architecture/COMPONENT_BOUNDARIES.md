@@ -1087,3 +1087,42 @@ needs a caller-context, OAuth or run-discipline analogue of the other.
 from the declared `local_path_env` variables. **A component that cannot be
 resolved makes the run INCOMPLETE and exits non-zero** — a skipped component
 check never yields success.
+
+### 12.1 V1 freeze — acceptance runs against pinned component revisions
+
+Phase C validated whichever revision each component had **published most
+recently**. V1 Freeze converts those accepted states into **durable pins**:
+`config/v1-baseline.yaml` declares an `accepted_revision` per component, and
+`scripts/acceptance.py` reads component facts at those revisions.
+
+**Future component HEAD movement does not alter V1 validation.** If either
+component advances, acceptance still extracts tool inventories, verifies
+`confirmed` capabilities, accounts inventories and resolves evidence provenance
+at the pinned revisions. **There is no fallback to HEAD**: a missing,
+unresolvable or misdirected pin is fatal, and a pin whose `repository` disagrees
+with the component declaration is rejected, so a pin cannot be silently
+redirected at a different repository.
+
+Everything else in §12 is unchanged. Component facts are still read **only** from
+committed Git objects at the accepted revision, so a component working tree stays
+**informational** and unreachable by extraction — the run reports current HEAD and
+worktree state separately from the accepted revision, and never treats them as
+acceptance input. Historical evidence remains valid by **ancestor relationship to
+the accepted pin**, never by equality with it.
+
+**This is not submodule pinning.** No source is vendored, no component checkout
+is controlled, and no build dependency is pinned; the components remain separate
+repositories referenced by identity and local path. The manifest records a
+**historical accepted revision** and acceptance verifies that commit object
+exists — which is precisely the failure mode
+[ADR-0002](../decisions/0002-multi-repo-no-submodules.md) raised against
+submodules, a pin that "silently rots", checked rather than assumed. **ADR-0002 is
+not amended.**
+
+The manifest deliberately carries **no capability lists, tool inventories, counts,
+deferred-tool lists or debt registers** — V1 scope stays in
+`config/workflows/end-to-end-reference.yaml` and `config/capability-tools.yaml`,
+and `unaccounted = 0` remains the invariant A7 derives rather than a constant
+anyone records. It also does **not** record the final V1 reference revision: a
+file cannot contain the hash of the commit introducing it, so that revision is
+identified by the annotated **`v1.0.0`** tag applied to the freeze commit.
