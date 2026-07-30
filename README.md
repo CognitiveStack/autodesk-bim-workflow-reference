@@ -34,7 +34,7 @@ software components:
 
 - `CognitiveStack/revit-mcp-triviron`
   - Revit and pyRevit MCP automation
-  - Revit model creation, inspection, views, sheets, and authoring workflows
+  - Revit model creation, inspection, views, and authoring workflows
 
 The component repositories remain separate Git repositories. They are not
 embedded as submodules.
@@ -52,6 +52,12 @@ Site and context
     -> Asset handover
 ```
 ## Current Status
+
+**V1 is complete and frozen as `v1.0.0`.** The annotated tag identifies reference
+commit `ffa6d460d30ab267ccb31947d1081a9088a2f97c`, accepted against component
+revisions `f763d190871743e4c638902ddd6fdadf2d740e88` (`aps-forma-mcp`) and
+`ae01d292735549ac406e5e7101620e64a5477970` (`revit-mcp`), declared in
+[`config/v1-baseline.yaml`](config/v1-baseline.yaml).
 
 **Phases 0, 1, 2 and 3 are complete, and the Phase 4A Forma proving ground is
 complete.** Every slice is strictly read-only, and each has a sanitised public
@@ -103,7 +109,7 @@ are not adopted, and Assets remains a governed **planned** capability in the
 ### V1 freeze baseline
 
 Common-schema consolidation, Revit MCP alignment and cross-repository acceptance
-are complete. The **V1 freeze baseline is prepared**: the accepted component
+are complete. The **V1 freeze is complete**: the accepted component
 revisions are declared in
 [`config/v1-baseline.yaml`](config/v1-baseline.yaml), and
 [`scripts/acceptance.py`](scripts/acceptance.py) validates the architecture
@@ -112,8 +118,8 @@ next. Acceptance is **offline** — no Autodesk call, no running Revit, no MCP
 server — and its contract is recorded in
 [COMPONENT_BOUNDARIES.md](docs/architecture/COMPONENT_BOUNDARIES.md) §12.
 
-The final reference revision is identified by the annotated **`v1.0.0`** tag once
-freeze finalisation is complete.
+The final reference revision is identified by the annotated **`v1.0.0`** tag,
+which targets `ffa6d460d30ab267ccb31947d1081a9088a2f97c`.
 
 The Phase 4 evidence schema
 ([`schemas/phase-4-result.schema.json`](schemas/phase-4-result.schema.json)) and

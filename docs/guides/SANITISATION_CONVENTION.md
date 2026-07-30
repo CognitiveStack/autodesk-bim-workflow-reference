@@ -394,8 +394,10 @@ retained alias · **proof-reproducibility classification** · `endpoint_evidence
 `sanitisation_profile_version`.
 
 **This is policy guidance, not the Phase 4 schema.** No artifact is created by
-this profile, and **no Phase 4 schema exists yet**. The eventual schema may
-refine these field names but **must not weaken the policy**.
+this profile. **No Phase 4 schema existed when this profile was approved.** The
+Phase 4 evidence schema was added on 2026-07-27 and now exists at
+[`schemas/phase-4-result.schema.json`](../../schemas/phase-4-result.schema.json);
+it may refine these field names but **must not weaken the policy**.
 
 ### RFI public-evidence profile
 
@@ -918,10 +920,17 @@ identity rules, company rules, error rules and the full checklist below. The lab
 Synthetic narrative is **optional**; omission is always acceptable and remains the
 default.
 
-A controlled synthetic Submittal fixture **exists** in the training project and was
-used as **diagnostic input** for runtime contract verification. Its existence is a
-diagnostic fact, **not** a readiness finding: it is not Gate-8 evidence, its
-content is not authorised for publication, and Gate 8 remains unresolved.
+**State at approval (2026-07-29).** A controlled synthetic Submittal fixture
+**exists** in the training project and was used as **diagnostic input** for runtime
+contract verification. Its existence is a diagnostic fact, **not** a readiness
+finding: it is not Gate-8 evidence, its content is not authorised for publication,
+and Gate 8 was unresolved when this profile was approved.
+
+**Current state (2026-07-29, later the same day).** Gate 8 is **closed for the
+Submittals first read-only slice**, established by the live read verification of
+that slice — not by the fixture's existence. The rule above is unchanged: fixture
+existence is still not Gate-8 evidence, and no fixture content is authorised for
+publication by this profile.
 
 #### Gate 5 / Gate 6 boundary
 

@@ -454,9 +454,6 @@ stages:
         # SCOPE: the proven first-slice requirement is data:read alone. The normal
         # server grant holds a broader four-scope configuration for other
         # capabilities; that does not widen the Submittals requirement.
-        # SCOPE: the proven first-slice requirement is data:read alone. The normal
-        # server grant holds a broader four-scope configuration for other
-        # capabilities; that does not widen the Submittals requirement.
         # SANITISATION: public evidence is governed by ADR-0013 and the Submittals
         # public-evidence profile in docs/guides/SANITISATION_CONVENTION.md, which
         # approves SUBMITTAL_n and reuses PROJECT_n. That profile governs PUBLIC
